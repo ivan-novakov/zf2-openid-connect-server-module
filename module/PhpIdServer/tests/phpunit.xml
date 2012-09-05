@@ -1,0 +1,7 @@
+<phpunit bootstrap="./bootstrap.php" colors="true" verbose="true">
+    <testsuites>
+        <testsuite name="phpID Server Test Suite">
+            <directory>./</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
