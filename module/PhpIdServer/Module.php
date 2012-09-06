@@ -36,14 +36,38 @@ class Module implements AutoloaderProviderInterface
 
     public function onBootstrap (MvcEvent $e)
     {
-        $serverConfig = new Config(require __DIR__ . '/config/server.config.php');
-        $e->getApplication()->getServiceManager()->setService('serverConfig', $serverConfig);
-        
-        // You may not need to do this if you're doing it elsewhere in your
-        // application
         $eventManager = $e->getApplication()
             ->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
+        
+        $serviceManager = $e->getApplication()
+            ->getServiceManager();
+        
+        $serverConfig = new Config(require __DIR__ . '/config/server.config.php');
+        $serviceManager->setService('serverConfig', $serverConfig);
+        
+        $logger = $this->_initLogger($serverConfig);
+        $serviceManager->setService('Logger', $logger);
+    }
+
+
+    protected function _initLogger (\Zend\Config\Config $serverConfig)
+    {
+        $loggerConfig = $serverConfig->logger;
+        $writerConfigs = $loggerConfig->writers->toArray();
+        
+        $logger = new \Zend\Log\Logger();
+        if (count($writerConfigs)) {
+            $priority = 1;
+            foreach ($writerConfigs as $writerConfig) {
+                $logger->addWriter($writerConfig['name'], $priority ++, $writerConfig['options']);
+            }
+        }
+        
+        \Zend\Log\Logger::registerErrorHandler($logger);
+        //\Zend\Log\Logger::registerExceptionHandler($logger);
+ 
+        return $logger;
     }
 }

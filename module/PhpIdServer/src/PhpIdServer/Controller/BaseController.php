@@ -1,9 +1,8 @@
 <?php
 namespace PhpIdServer\Controller;
-use Zend\Mvc\Controller\AbstractActionController;
 
 
-class BaseController extends AbstractActionController
+abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionController
 {
 
 
@@ -11,5 +10,13 @@ class BaseController extends AbstractActionController
     {
         return $this->getServiceLocator()
             ->get('serverConfig');
+    }
+
+
+    protected function _debug ($value)
+    {
+        $this->getServiceLocator()
+            ->get('Logger')
+            ->debug($value);
     }
 }

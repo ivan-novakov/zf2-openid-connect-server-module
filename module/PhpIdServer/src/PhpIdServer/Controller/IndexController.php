@@ -16,25 +16,18 @@ class IndexController extends AbstractActionController
 
     public function indexAction ()
     {
-        return array();
+        $response = $this->getResponse();
+        $response->setContent('INDEX');
+        
+        return $response;
     }
 
 
     public function fooAction ()
     {
-        // This shows the :controller and :action parameters in default route
-        // are working when you browse to /module-specific-root/skeleton/foo
-        return array();
-    }
-
-
-    public function worldAction ()
-    {
-        $message = $this->params()
-            ->fromQuery('message', 'foo');
+        $response = $this->getResponse();
+        $response->setContent('FOO');
         
-        return new ViewModel(array(
-            'message' => $message
-        ));
+        return $response;
     }
 }
