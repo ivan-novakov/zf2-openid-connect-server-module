@@ -3,6 +3,9 @@
 define('ZF2_PATH', realpath(__DIR__ . '/../../../vendor/zendframework/zendframework/library/') . '/');
 define('MODULE_PATH', dirname(__FILE__) . '/../');
 
+define('TESTS_ROOT', dirname(__FILE__) . '/');
+define('TMP_DIR', TESTS_ROOT . 'tmp/');
+
 include ZF2_PATH . 'Zend/Loader/AutoloaderFactory.php';
 Zend\Loader\AutoloaderFactory::factory(array(
     'Zend\Loader\StandardAutoloader' => array(
@@ -12,7 +15,7 @@ Zend\Loader\AutoloaderFactory::factory(array(
         )
     )
 ));
- 
+
 //--
 function _dump ($value)
 {

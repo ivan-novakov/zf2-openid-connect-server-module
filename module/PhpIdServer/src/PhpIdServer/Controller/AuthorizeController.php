@@ -92,8 +92,18 @@ class AuthorizeController extends BaseController
     /*
      * Context state handlers
      */
+    
+    /**
+     * Validates the request.
+     * 
+     * @param AuthorizeContext $context
+     */
     protected function _handlerValidateRequest (AuthorizeContext $context)
     {
+        // get client object from repository
+        // authenticate
+        // validate
+        
         //_dump($context->getRequest());
         $this->_debug('SET STATE: ' . AuthorizeContext::STATE_REQUEST_VALIDATED);
         $context->setState(AuthorizeContext::STATE_REQUEST_VALIDATED);

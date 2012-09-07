@@ -1,5 +1,5 @@
 <?php
-
+namespace PhpIdServer;
 return array(
     
     'logger' => array(
@@ -22,6 +22,13 @@ return array(
                     'route' => '/shibboleth'
                 )
             )
+        )
+    ), 
+    
+    'client_registry_storage' => array(
+        'storage' => '\PhpIdServer\Client\Registry\Storage\SingleJsonFileStorage', 
+        'options' => array(
+            'json_file' => ''
         )
     )
 );
