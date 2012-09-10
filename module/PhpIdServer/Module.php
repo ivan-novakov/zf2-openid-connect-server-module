@@ -36,16 +36,26 @@ class Module implements AutoloaderProviderInterface
 
     public function onBootstrap (MvcEvent $e)
     {
+        $serviceManager = $e->getApplication()
+            ->getServiceManager();
+        
         $eventManager = $e->getApplication()
             ->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
         
-        $serviceManager = $e->getApplication()
-            ->getServiceManager();
+        $router = $e->getRouter();
+        //_dump($router);
+        
+
+        //$eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
+        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function  (MvcEvent $e)
+        {
+            _dump('ERROR IN DISPATCH: ' . $e->getError());
+        }, 100);
         
         $serverConfig = new Config(require __DIR__ . '/config/server.config.php');
-        $serviceManager->setService('serverConfig', $serverConfig);
+        $serviceManager->setService('ServerConfig', $serverConfig);
         
         $logger = $this->_initLogger($serverConfig);
         $serviceManager->setService('Logger', $logger);
@@ -67,7 +77,8 @@ class Module implements AutoloaderProviderInterface
         
         \Zend\Log\Logger::registerErrorHandler($logger);
         //\Zend\Log\Logger::registerExceptionHandler($logger);
- 
+        
+
         return $logger;
     }
 }

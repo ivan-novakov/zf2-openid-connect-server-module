@@ -16,7 +16,7 @@ class AuthorizeContextFactory implements \Zend\ServiceManager\FactoryInterface
         $context = $contextStorage->load();
         if (! $context) {
             $context = new AuthorizeContext();
-            $context->setRequest(new OpenIdConnect\Request(new \Zend\Http\PhpEnvironment\Request()));
+            $context->setRequest(OpenIdConnect\RequestFactory::factory(new \Zend\Http\PhpEnvironment\Request()));
         }
         
         $serviceLocator->setService('AuthorizeContext', $context);

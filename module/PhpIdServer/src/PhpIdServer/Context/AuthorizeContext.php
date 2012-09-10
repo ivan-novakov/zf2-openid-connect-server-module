@@ -1,5 +1,6 @@
 <?php
 namespace PhpIdServer\Context;
+use PhpIdServer\Client\Client;
 use PhpIdServer\OpenIdConnect;
 
 
@@ -26,17 +27,24 @@ class AuthorizeContext extends AbstractContext
     /**
      * The OIC request object.
      * 
-     * @var OpenIdConnect\Request
+     * @var OpenIdConnect\Request\AbstractRequest
      */
     protected $_request = NULL;
+
+    /**
+     * Client object.
+     * 
+     * @var Client
+     */
+    protected $_client = NULL;
 
 
     /**
      * Sets to OIC request object.
      * 
-     * @param OpenIdConnect\Request $request
+     * @param OpenIdConnect\Request\AbstractRequest $request
      */
-    public function setRequest (OpenIdConnect\Request $request)
+    public function setRequest (OpenIdConnect\Request\AbstractRequest $request)
     {
         $this->_request = $request;
     }
@@ -45,10 +53,38 @@ class AuthorizeContext extends AbstractContext
     /**
      * Returns the OIC request object.
      * 
-     * @return OpenIdConnect\Request
+     * @return OpenIdConnect\Request\AbstractRequest
      */
     public function getRequest ()
     {
         return $this->_request;
+    }
+
+
+    /**
+     * Sets the client object.
+     * 
+     * @param Client $client
+     */
+    public function setClient (Client $client)
+    {
+        $this->_client = $client;
+    }
+
+
+    /**
+     * Returns the client object.
+     * 
+     * @return Client
+     */
+    public function getClient ()
+    {
+        return $this->_client;
+    }
+    
+    
+    public function isUserAuthenticated()
+    {
+        return false;
     }
 }

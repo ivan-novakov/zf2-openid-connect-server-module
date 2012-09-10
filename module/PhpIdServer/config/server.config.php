@@ -13,22 +13,14 @@ return array(
         )
     ), 
     
-    'authentication' => array(
-        'handler' => array(
-            'adapter' => 'PhpIdServer\Authentication\Handler\Shibboleth', 
-            'options' => array(
-                'endpoint' => array(
-                    'name' => 'auth-handler-shibboleth', 
-                    'route' => '/shibboleth'
-                )
-            )
-        )
-    ), 
-    
     'client_registry_storage' => array(
         'storage' => '\PhpIdServer\Client\Registry\Storage\SingleJsonFileStorage', 
         'options' => array(
-            'json_file' => ''
+            'json_file' => 'data/client/metadata.json'
         )
+    ), 
+    
+    'authentication' => array(
+        'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
     )
 );

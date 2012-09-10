@@ -8,7 +8,10 @@ return array(
             'PhpIdServer\Controller\Token' => 'PhpIdServer\Controller\TokenController', 
             'PhpIdServer\Controller\Userinfo' => 'PhpIdServer\Controller\UserinfoController', 
             'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
-            'PhpIdServer\Controller\Authenticate' => 'PhpIdServer\Controller\AuthenticateController'
+            
+            'PhpIdServer\Controller\Authenticate' => 'PhpIdServer\Controller\AuthenticateController', 
+            
+            'PhpIdServer\Authentication\Controller\Dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
         )
     ), 
     
@@ -22,8 +25,8 @@ return array(
                     
                     'route' => '/oic', 
                     'defaults' => array(
-                        '__NAMESPACE__' => 'PhpIdServer\Controller', 
-                        'controller' => 'index', 
+                        // '__NAMESPACE__' => 'PhpIdServer\Controller', 
+                        'controller' => 'PhpIdServer\Controller\Index', 
                         'action' => 'index'
                     )
                 ), 
@@ -76,7 +79,29 @@ return array(
                                 'action' => 'index'
                             )
                         )
+                    ), 
+                    
+                    //'authentication-endpoint-shibboleth' => array(), 
+                    
+
+                    'authentication-endpoint-dummy' => array(
+                        'type' => 'Literal', 
+                        'may_terminate' => true, 
+                        'options' => array(
+                            'route' => '/authenticate/dummy', 
+                            'defaults' => array(
+                                'controller' => 'PhpIdServer\Authentication\Controller\Dummy',
+                                'action' => 'authenticate', 
+                                'options' => array(
+                                    'identity' => array(
+                                        'uid' => 'testuser@company.org'
+                                    )
+                                )
+                            )
+                        )
                     )
+                    
+                    
                 )
             )
         )

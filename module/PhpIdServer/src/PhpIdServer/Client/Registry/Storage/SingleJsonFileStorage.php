@@ -130,7 +130,7 @@ class SingleJsonFileStorage implements StorageInterface
         } catch (\Exception $e) {
             throw new Exception\LoadDataException(sprintf("Exception while decoding JSON: [%s] %s", get_class($e), $e->getMessage()));
         }
-        
+        //_dump($data);
         return $data;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpIdServer\OpenIdConnect;
 
 
@@ -13,7 +14,7 @@ class Request
 
     /**
      * The HTTP request object.
-     * 
+     *
      * @var \Zend\Http\Request
      */
     protected $_httpRequest = NULL;
@@ -21,8 +22,8 @@ class Request
 
     /**
      * Constructor.
-     * 
-     * @param \Zend\Http\Request $httpRequest
+     *
+     * @param \Zend\Http\Request $httpRequest            
      */
     public function __construct (\Zend\Http\Request $httpRequest)
     {
@@ -31,8 +32,9 @@ class Request
 
 
     /**
-     * Returns the request method as specified in the specs - simple, parameter, file.
-     * 
+     * Returns the request method as specified in the specs - simple, parameter,
+     * file.
+     *
      * @return string
      */
     public function getRequestMethod ()

@@ -55,6 +55,11 @@ class Registry
      */
     public function getClientById ($clientId)
     {
-        return $this->_storage->getClientById($clientId);
+        $client = $this->_storage->getClientById($clientId);
+        if (! ($client instanceof Client)) {
+            throw new Exception\ClientNotFoundException($clientId);
+        }
+        
+        return $client;
     }
 }
