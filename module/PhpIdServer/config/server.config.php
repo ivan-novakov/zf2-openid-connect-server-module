@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServer;
+
 return array(
     
     'logger' => array(
@@ -22,5 +24,20 @@ return array(
     
     'authentication' => array(
         'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
+    ), 
+    
+    'session_storage' => array(
+        'type' => 'MysqlLite', 
+        'options' => array(
+            'adapter' => array(
+                'driver' => 'Pdo_Mysql', 
+                'host' => 'localhost', 
+                'username' => 'phpidserver', 
+                'password' => 'heslp pro id server', 
+                'database' => 'phpid'
+            )
+        )
     )
-);
+)
+;
+

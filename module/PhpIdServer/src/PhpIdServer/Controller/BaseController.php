@@ -1,5 +1,8 @@
 <?php
+
 namespace PhpIdServer\Controller;
+
+use PhpIdServer\Context\AuthorizeContext;
 use PhpIdServer\Client\Registry;
 
 
@@ -29,6 +32,14 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
         }
         
         return $registry;
+    }
+
+
+    protected function _saveContext (AuthorizeContext $context)
+    {
+        $this->getServiceLocator()
+            ->get('ContextStorage')
+            ->save($context);
     }
 
 

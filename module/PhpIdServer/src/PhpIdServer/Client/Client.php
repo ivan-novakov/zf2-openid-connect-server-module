@@ -1,8 +1,11 @@
 <?php
+
 namespace PhpIdServer\Client;
 
+use PhpIdServer\Entity\Entity;
 
-class Client
+
+class Client extends Entity
 {
 
     const FIELD_ID = 'id';
@@ -10,12 +13,6 @@ class Client
     const FIELD_TYPE = 'type';
 
     const FIELD_AUTHENTICATION = 'authentication';
-
-    /**
-     * Client data.
-     * @var \ArrayObject
-     */
-    protected $_data = NULL;
 
     /**
      * Authentication info object.
@@ -26,17 +23,6 @@ class Client
 
 
     /**
-     * Constructor.
-     * 
-     * @param array $data
-     */
-    public function __construct (Array $data = array())
-    {
-        $this->populate($data);
-    }
-
-
-    /**
      * Populates the object with data.
      * 
      * @param array $data
@@ -44,7 +30,7 @@ class Client
     public function populate (Array $data)
     {
         $this->_authenticationInfo = NULL;
-        $this->_data = new \ArrayObject($data);
+        parent::populate($data);
     }
 
 
@@ -55,7 +41,7 @@ class Client
      */
     public function getId ()
     {
-        return $this->_getValue(self::FIELD_ID);
+        return $this->getValue(self::FIELD_ID);
     }
 
 
@@ -68,7 +54,7 @@ class Client
      */
     public function getType ()
     {
-        return $this->_getValue(self::FIELD_TYPE);
+        return $this->getValue(self::FIELD_TYPE);
     }
 
 
@@ -81,7 +67,7 @@ class Client
     public function getAuthenticationInfo ()
     {
         if (! ($this->_authenticationInfo instanceof Authentication\ClientInfo)) {
-            $authentication = $this->_getValue(self::FIELD_AUTHENTICATION);
+            $authentication = $this->getValue(self::FIELD_AUTHENTICATION);
             if (! $authentication || ! isset($authentication['type'])) {
                 throw new Exception\IncompleteAuthenticationInfoException();
             }
@@ -95,21 +81,5 @@ class Client
         }
         
         return $this->_authenticationInfo;
-    }
-
-
-    /**
-     * Returns a value with the provided index or NULL if the is no such index.
-     * 
-     * @param string $ey
-     * @return mixed|NULL
-     */
-    protected function _getValue ($key)
-    {
-        if ($this->_data->offsetExists($key)) {
-            return $this->_data->offsetGet($key);
-        }
-        
-        return NULL;
     }
 }

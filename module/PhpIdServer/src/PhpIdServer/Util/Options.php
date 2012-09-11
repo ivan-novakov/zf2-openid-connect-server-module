@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpIdServer\Util;
 
 
@@ -27,12 +28,17 @@ class Options extends \ArrayObject
      * Returns the option for the corresponding key.
      * 
      * @param string $key
+     * @param mixed $defaultValue
      * @return mixed|NULL
      */
-    public function get ($key)
+    public function get ($key, $defaultValue = NULL)
     {
         if ($this->offsetExists($key)) {
             return $this->offsetGet($key);
+        }
+        
+        if (NULL !== $defaultValue) {
+            return $defaultValue;
         }
         
         return NULL;

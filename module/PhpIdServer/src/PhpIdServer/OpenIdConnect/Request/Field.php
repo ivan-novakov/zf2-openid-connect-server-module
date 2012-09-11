@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpIdServer\OpenIdConnect\Request;
 
 
@@ -16,4 +17,6 @@ class Field
     const NONCE = 'nonce';
 
     const STATE = 'state';
+
+    const PROMPT = 'prompt';
 }

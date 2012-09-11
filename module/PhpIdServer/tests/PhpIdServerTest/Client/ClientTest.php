@@ -1,23 +1,12 @@
 <?php
+
 namespace PhpIdServerTest\Client;
+
 use PhpIdServer\Client;
 
 
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
-
-
-    public function testPopulate ()
-    {
-        $client = new Client\Client();
-        $client->populate(array(
-            'id' => 'myClientId', 
-            'type' => 'public'
-        ));
-        
-        $this->assertEquals('myClientId', $client->getId());
-        $this->assertEquals('public', $client->getType());
-    }
 
 
     public function testAuthenticationInfo ()

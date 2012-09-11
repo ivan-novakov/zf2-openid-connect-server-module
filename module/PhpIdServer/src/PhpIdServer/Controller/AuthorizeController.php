@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServer\Controller;
+
 use Zend\Mvc\MvcEvent;
 use PhpIdServer\Context;
 use PhpIdServer\Context\AuthorizeContext;
@@ -44,6 +46,7 @@ class AuthorizeController extends BaseController
         }
         
         $this->_debug('Authorization complete');
+        
         $this->getServiceLocator()
             ->get('ContextStorage')
             ->clear();
@@ -101,7 +104,7 @@ class AuthorizeController extends BaseController
      */
     protected function _handlerValidateRequest (AuthorizeContext $context)
     {
-        // validate request (?)
+        // validate request (?) - first validate and then add to context
         
 
         /*
@@ -112,10 +115,11 @@ class AuthorizeController extends BaseController
         $registry = $this->_getClientRegistry();
         $client = $registry->getClientById($clientId);
         //_dump($client);
-        // authenticate
-        // validate
+
+        // validate - check redirect_uri
         
 
+        $this->_debug(sprintf("Loaded client ID '%s'", $clientId));
         $context->setClient($client);
         
         //_dump($context->getRequest());
@@ -128,17 +132,22 @@ class AuthorizeController extends BaseController
     {
         // if not authenticated - use authentication handler and redirect, but first save the current state
         if (! $context->isUserAuthenticated()) {
+            $this->_debug('user not authenticated');
             
             $manager = $this->_getAuthenticationManager();
             //_dump($manager);
-            $this->_debug('redirect to authentication');
-            $this->getServiceLocator()
-                ->get('ContextStorage')
-                ->save($context);
+            $this->_debug('redirecting user to authentication handler');
+            $this->_saveContext($context);
             
             return $this->plugin('redirect')
                 ->toRoute($manager->getAuthenticationRouteName());
         }
+        
+        $user = $context->getUser();
+        $info = $context->getAuthenticationInfo();
+        
+        $this->_debug(sprintf("User '%s' authenticated, handler: %s, time: %s", $user->getId(), $info->getHandler(), date("c", $info->getTime())));
+        
         // otherwise continue
         $context->setState(AuthorizeContext::STATE_USER_AUTHENTICATED);
     }
@@ -146,6 +155,8 @@ class AuthorizeController extends BaseController
 
     protected function _handlerUserConsent (AuthorizeContext $context)
     {
+        $this->_debug('handling user consent');
+        
         $this->_debug('SET STATE: ' . AuthorizeContext::STATE_USER_CONSENT_APPROVED);
         $context->setState(AuthorizeContext::STATE_USER_CONSENT_APPROVED);
     }
@@ -165,7 +176,8 @@ class AuthorizeController extends BaseController
 
     protected function _getAuthenticationManager ()
     {
-        $config = $this->getServiceLocator()->get('ServerConfig');
+        $config = $this->getServiceLocator()
+            ->get('ServerConfig');
         $manager = new Authentication\Manager($config->authentication);
         
         return $manager;

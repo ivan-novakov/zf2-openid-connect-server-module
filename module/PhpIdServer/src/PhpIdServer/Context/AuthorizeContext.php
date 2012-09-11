@@ -1,7 +1,11 @@
 <?php
+
 namespace PhpIdServer\Context;
+
 use PhpIdServer\Client\Client;
 use PhpIdServer\OpenIdConnect;
+use PhpIdServer\Authentication;
+use PhpIdServer\User\User;
 
 
 class AuthorizeContext extends AbstractContext
@@ -37,6 +41,20 @@ class AuthorizeContext extends AbstractContext
      * @var Client
      */
     protected $_client = NULL;
+
+    /**
+     * Authentication info object.
+     * 
+     * @var Authentication\Info
+     */
+    protected $_authenticationInfo = NULL;
+
+    /**
+     * User object.
+     * 
+     * @var User
+     */
+    protected $_user = NULL;
 
 
     /**
@@ -81,10 +99,58 @@ class AuthorizeContext extends AbstractContext
     {
         return $this->_client;
     }
-    
-    
-    public function isUserAuthenticated()
+
+
+    public function isUserAuthenticated ()
     {
+        if (($this->_authenticationInfo instanceof Authentication\Info) && ($handlerName = $this->_authenticationInfo->getHandler())) {
+            return true;
+        }
+        
         return false;
+    }
+
+
+    /**
+     * Sets the authentication info.
+     * 
+     * @param Authentication\Info $info
+     */
+    public function setAuthenticationInfo (Authentication\Info $info)
+    {
+        $this->_authenticationInfo = $info;
+    }
+
+
+    /**
+     * Returns the authentication info.
+     * 
+     * @return Authentication\Info
+     */
+    public function getAuthenticationInfo ()
+    {
+        return $this->_authenticationInfo;
+    }
+
+
+    /**
+     * Sets the user object holding user's identity.
+     * 
+     * @param User $user
+     */
+    public function setUser (User $user)
+    {
+        $this->_user = $user;
+    }
+
+
+    /**
+     * Returns the user object holding user's identity.
+     * 
+     * @return User
+     */
+    public function getUser ()
+    {
+        return $this->_user;
     }
 }

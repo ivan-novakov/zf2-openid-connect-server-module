@@ -1,5 +1,9 @@
 <?php
+
 namespace PhpIdServer\Authentication\Controller;
+
+use PhpIdServer\Authentication\Info;
+use PhpIdServer\User\User;
 use PhpIdServer\Context\AuthorizeContext;
 
 
@@ -9,9 +13,19 @@ class DummyController extends AbstractController
 
     protected function _authenticate (AuthorizeContext $context)
     {
-        $this->_debug($this->getRequest()->getUri());
+        $this->_debug('Dummy authentication controller: ' . $this->getRequest()
+            ->getUri());
         
-        $this->_debug('SET STATE: ' . AuthorizeContext::STATE_USER_AUTHENTICATED);
-        $context->setState(AuthorizeContext::STATE_USER_AUTHENTICATED);
+        $user = new User($this->_options->get('identity'));
+        $authenticationInfo = new Info(array(
+            Info::FIELD_HANDLER => $this->_options->get('label'), 
+            Info::FIELD_TIME => time()
+        ));
+        
+        $context->setUser($user);
+        $context->setAuthenticationInfo($authenticationInfo);
+        
+        $this->_debug('Saving context...');
+        $this->_saveContext($context);
     }
 }

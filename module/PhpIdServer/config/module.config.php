@@ -90,19 +90,22 @@ return array(
                         'options' => array(
                             'route' => '/authenticate/dummy', 
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\Authentication\Controller\Dummy',
+                                'controller' => 'PhpIdServer\Authentication\Controller\Dummy', 
                                 'action' => 'authenticate', 
                                 'options' => array(
+                                    'label' => 'dummy', 
                                     'identity' => array(
-                                        'uid' => 'testuser@company.org'
+                                        'id' => 'testuser@company.org', 
+                                        'first_name' => 'Test', 
+                                        'surname' => 'User', 
+                                        'email' => 'testuser@company.org'
                                     )
                                 )
                             )
                         )
                     )
-                    
-                    
                 )
+                
             )
         )
     ), 
