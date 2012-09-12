@@ -29,6 +29,7 @@ return array(
     'session_storage' => array(
         'type' => 'MysqlLite', 
         'options' => array(
+            'table' => 'session', 
             'adapter' => array(
                 'driver' => 'Pdo_Mysql', 
                 'host' => 'localhost', 
@@ -37,7 +38,15 @@ return array(
                 'database' => 'phpid'
             )
         )
+    ), 
+    
+    'user_serializer' => array(
+        'options' => array(
+            'adapter' => array(
+                'name' => 'PhpSerialize', 
+                'options' => array()
+            )
+        )
     )
-)
-;
+);
 

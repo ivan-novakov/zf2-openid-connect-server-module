@@ -21,45 +21,21 @@ class Session extends Entity
 
     const FIELD_AUTHN_METHOD = 'authn_method';
 
+    const FIELD_AUTHORIZATION_CODE = 'authorization_code';
+
     const FIELD_USER_DATA = 'user_data';
 
     const FIELD_ACCESS_TOKEN = 'access_token';
 
     const FIELD_REFRESH_TOKEN = 'refresh_token';
 
+    const FIELD_CTIME = 'ctime';
 
-    public function __construct (Array $data = array())
-    {
-        parent::__construct($data);
-        
-        if (! $this->getId()) {
-            throw new Exception\MissingValueException(self::FIELD_ID);
-        }
-        
-        if (! $this->getUserId()) {
-            throw new Exception\MissingValueException(self::FIELD_USER_ID);
-        }
-        
-        if (! $this->getClientId()) {
-            throw new Exception\MissingValueException(self::FIELD_CLIENT_ID);
-        }
-    }
+    const FIELD_MTIME = 'mtime';
 
 
-    static public function __create ($userId, $clientId, $authenticationTime, $authenticationMethod, $userData)
-    {
-        return new self(array(
-            self::FIELD_USER_ID => $userId, 
-            self::FIELD_CLIENT_ID => $clientId, 
-            self::FIELD_AUTHN_TIME => $authenticationTime, 
-            self::FIELD_AUTHN_METHOD => $authenticationMethod, 
-            self::FIELD_USER_DATA => $userData
-        ));
-    }
-
-
-    static public function create ($sessionId, $userId, $clientId, $authenticationTime, $authenticationMethod, $userData, 
-        $accessToken, $refreshToken)
+    static public function create ($sessionId, $userId, $clientId, $authenticationTime, $authenticationMethod, 
+        $authorizationCode, $userData, $accessToken, $refreshToken, $ctime = NULL, $mtime = NULL)
     {
         return new self(array(
             self::FIELD_ID => $sessionId, 
@@ -67,9 +43,12 @@ class Session extends Entity
             self::FIELD_CLIENT_ID => $clientId, 
             self::FIELD_AUTHN_TIME => $authenticationTime, 
             self::FIELD_AUTHN_METHOD => $authenticationMethod, 
+            self::FIELD_AUTHORIZATION_CODE => $authorizationCode, 
             self::FIELD_USER_DATA => $userData, 
             self::FIELD_ACCESS_TOKEN => $accessToken, 
-            self::FIELD_REFRESH_TOKEN => $refreshToken
+            self::FIELD_REFRESH_TOKEN => $refreshToken, 
+            self::FIELD_CTIME => $ctime, 
+            self::FIELD_MTIME => $mtime
         ));
     }
 
@@ -104,6 +83,12 @@ class Session extends Entity
     }
 
 
+    public function getAuthorizationCode ()
+    {
+        return $this->getValue(self::FIELD_AUTHORIZATION_CODE);
+    }
+
+
     public function getUserData ()
     {
         return $this->getValue(self::FIELD_USER_DATA);
@@ -131,5 +116,17 @@ class Session extends Entity
     public function getRefreshToken ()
     {
         return $this->getValue(self::FIELD_REFRESH_TOKEN);
+    }
+
+
+    public function getCtime ()
+    {
+        return $this->getValue(self::FIELD_CTIME);
+    }
+
+
+    public function getMtime ()
+    {
+        return $this->getValue(self::FIELD_MTIME);
     }
 }

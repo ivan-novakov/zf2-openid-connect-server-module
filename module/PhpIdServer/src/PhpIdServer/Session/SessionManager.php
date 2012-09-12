@@ -2,25 +2,39 @@
 
 namespace PhpIdServer\Session;
 
-use PhpIdServer\User\Serializer\SerializerInterface;
+use PhpIdServer\User;
 use PhpIdServer\Client\Client;
-use PhpIdServer\User\User;
 use PhpIdServer\Authentication;
 
 
 class SessionManager
 {
 
+    /**
+     * The session storage.
+     * 
+     * @var Storage\StorageInterface
+     */
     protected $_storage = NULL;
 
+    /**
+     * The user serializer object.
+     * 
+     * @var User\Serializer\SerializerInterface
+     */
     protected $_userSerializer = NULL;
 
+    /**
+     * The session ID generator object.
+     * 
+     * @var IdGenerator\IdGeneratorInterface
+     */
     protected $_sessionIdGenerator = NULL;
 
     protected $_tokenGenerator = NULL;
 
 
-    public function createSession (User $user, Client $client, Authentication\Info $authenticationInfo)
+    public function createSession (User\User $user, Client $client, Authentication\Info $authenticationInfo)
     {}
 
 
@@ -53,9 +67,9 @@ class SessionManager
     /**
      * Sets the user serializer object.
      * 
-     * @param SerializerInterface $serializer
+     * @param User\Serializer\SerializerInterface $serializer
      */
-    public function setUserSerializer (SerializerInterface $serializer)
+    public function setUserSerializer (User\Serializer\SerializerInterface $serializer)
     {
         $this->_userSerializer = $serializer;
     }

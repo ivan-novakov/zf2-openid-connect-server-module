@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Session\Storage;
 
+use Zend\Db;
 use PhpIdServer\Session\Session;
 
 
@@ -23,7 +24,18 @@ class MysqlLite extends AbstractStorage
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadSessionById()
      */
     public function loadSessionById ($sessionId)
-    {}
+    {
+        $adapter = $this->_getAdapter();
+        $sql = $this->_getSql($adapter);
+        
+        $select = $sql->select();
+        $select->where(array(
+            Session::FIELD_ID => $sessionId
+        ));
+        
+        $result = $this->_sqlQuery($adapter, $sql, $select);
+        return $this->_createSessionFromResult($result);
+    }
 
 
     /**
@@ -34,21 +46,51 @@ class MysqlLite extends AbstractStorage
     {}
 
 
+    public function loadSessionByCode ($code)
+    {}
+
+
     /**
      * (non-PHPdoc)
      * @see \PhpIdServer\Session\Storage\StorageInterface::saveSession()
      */
     public function saveSession (Session $session)
     {
-        $sessions = $this->_getSessionsByUserClient($session->getUserId(), $session->getClientId());
-        
         $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
-        $insert = $sql->insert();
-        
-        _dump($session->toArray());
-        
+        try {
+            $this->_beginTransaction($adapter);
+            
+            /*
+             * Check, if there exists a session with the same ID.
+             */
+            $existingSession = $this->loadSessionById($session->getId());
+            if ($existingSession) {
+                throw new Exception\SessionExistsException($session->getId());
+            }
+            
+            /*
+             * Check if there exists a session for the same pair user ID/client ID.
+             */
+            $similarSession = $this->loadSessionByUserClient($session->getUserId(), $session->getClientId());
+            if ($similarSession) {
+                throw new Exception\SimilarSessionExistsException($session->getUserId(), $session->getClientId());
+            }
+            
+            $sql = $this->_getSql($adapter);
+            $insert = $sql->insert();
+            $insert->values($session->toArray());
+            
+            $this->_sqlQuery($adapter, $sql, $insert);
+            $this->_commit($adapter);
+        } catch (\Exception $e) {
+            $this->_rollback($adapter);
+            throw new Exception\SaveSessionException(sprintf("Error saving session ID '%s': [%s] %s", $session->getId(), get_class($e), $e->getMessage()), 0, $e);
+        }
     }
+
+
+    public function updateSession (Session $session)
+    {}
 
 
     /**
@@ -59,33 +101,71 @@ class MysqlLite extends AbstractStorage
     {}
 
 
-    protected function _getSessionsByUserClient ($userId, $clientId)
+    /**
+     * Loads and returns a session for the supplied user ID and client ID.
+     * 
+     * @param string $userId
+     * @param string $clientId
+     * @return Session
+     */
+    public function loadSessionByUserClient ($userId, $clientId)
     {
         $adapter = $this->_getAdapter();
         $sql = $this->_getSql($adapter);
         $select = $sql->select();
         
         $select->where(array(
-            'user_id' => $userId, 
-            'client_id' => $clientId
+            Session::FIELD_USER_ID => $userId, 
+            Session::FIELD_CLIENT_ID => $clientId
         ));
         
-        $selectString = $sql->getSqlStringForSqlObject($select);
-        $result = $adapter->query($selectString, $adapter::QUERY_MODE_EXECUTE);
-        _dump($result);
+        $result = $this->_sqlQuery($adapter, $sql, $select);
+        return $this->_createSessionFromResult($result);
     }
-    
-    
-    protected function _deleteSessionById($sessionId)
+
+
+    protected function _deleteSessionById ($sessionId)
+    {}
+
+
+    protected function _createSessionFromResult (Db\ResultSet\ResultSet $result)
     {
+        if (! $result->count()) {
+            return NULL;
+        }
         
+        return $this->_arrayToSession((array) $result->current());
+    }
+
+
+    /**
+     * Converts a session object into array representation.
+     * 
+     * @param Session $session
+     * @return array
+     */
+    protected function _sessionToArray (Session $session)
+    {
+        return $session->toArray();
+    }
+
+
+    /**
+     * Creates a session object from array.
+     * 
+     * @param array $data
+     * @return Session
+     */
+    protected function _arrayToSession (Array $data)
+    {
+        return new Session($data);
     }
 
 
     /**
      * Returns the SQL abstraction object.
      * 
-     * @return \Zend\Db\Sql\Sql
+     * @return \Zend\Db\Adapter\Adapter
      */
     protected function _getAdapter ()
     {
@@ -97,11 +177,81 @@ class MysqlLite extends AbstractStorage
     }
 
 
-    protected function _getSql (\Zend\Db\Adapter\Adapter $adapter, $tableName = NULL)
+    /**
+     * Returns the SQL abstraction object.
+     * 
+     * @param \Zend\Db\Adapter\Adapter $adapter
+     * @return \Zend\Db\Sql\Sql
+     */
+    protected function _getSql (\Zend\Db\Adapter\Adapter $adapter)
     {
-        if (! $tableName) {
-            $tableName = self::TABLE_NAME;
-        }
+        $tableName = $this->_getTableName();
+        
         return new \Zend\Db\Sql\Sql($adapter, $tableName);
+    }
+
+
+    /**
+     * Returns the table namem, where the sessions are stored.
+     * 
+     * @param string $defaultValue
+     * @return string
+     */
+    protected function _getTableName ($defaultValue = 'undefined')
+    {
+        return $this->_options->get('table', $defaultValue);
+    }
+
+
+    /**
+     * "Shortcut" for starting a transaction.
+     * 
+     * @param \Zend\Db\Adapter\Adapter $adapter
+     */
+    protected function _beginTransaction (\Zend\Db\Adapter\Adapter $adapter)
+    {
+        $adapter->getDriver()
+            ->getConnection()
+            ->beginTransaction();
+    }
+
+
+    /**
+     * "Shortcut" for commiting a transaction.
+     * 
+     * @param \Zend\Db\Adapter\Adapter $adapter
+     */
+    protected function _commit (\Zend\Db\Adapter\Adapter $adapter)
+    {
+        $adapter->getDriver()
+            ->getConnection()
+            ->commit();
+    }
+
+
+    /**
+     * "Shortcut" for rolling back a transaction.
+     * 
+     * @param \Zend\Db\Adapter\Adapter $adapter
+     */
+    protected function _rollback (\Zend\Db\Adapter\Adapter $adapter)
+    {
+        $adapter->getDriver()
+            ->getConnection()
+            ->rollback();
+    }
+
+
+    /**
+     * "Shortcut" for executing queries.
+     * 
+     * @param Db\Adapter\Adapter $adapter
+     * @param Db\Sql\Sql $sql
+     * @param Db\Sql\SqlInterface $sqlObject
+     * @return Db\ResultSet\Zend\Db\ResultSet
+     */
+    protected function _sqlQuery (Db\Adapter\Adapter $adapter, Db\Sql\Sql $sql, Db\Sql\SqlInterface $sqlObject)
+    {
+        return $adapter->query($sql->getSqlStringForSqlObject($sqlObject), $adapter::QUERY_MODE_EXECUTE);
     }
 }

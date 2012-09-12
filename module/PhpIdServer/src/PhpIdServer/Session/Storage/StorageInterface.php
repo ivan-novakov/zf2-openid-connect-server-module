@@ -27,12 +27,18 @@ interface StorageInterface
     public function loadSessionByAccessToken ($accessToken);
 
 
+    public function loadSessionByCode ($code);
+
+
     /**
      * Saves the session to the storage.
      * 
      * @param Session $session
      */
     public function saveSession (Session $session);
+
+
+    public function updateSession (Session $session);
 
 
     /**
