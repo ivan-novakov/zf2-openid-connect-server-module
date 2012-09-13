@@ -14,6 +14,15 @@ class Client extends Entity
 
     const FIELD_AUTHENTICATION = 'authentication';
 
+    const FIELD_REDIRECT_URI = 'redirect_uri';
+
+    protected $_fields = array(
+        self::FIELD_ID, 
+        self::FIELD_TYPE, 
+        self::FIELD_AUTHENTICATION, 
+        self::FIELD_REDIRECT_URI
+    );
+
     /**
      * Authentication info object.
      * 

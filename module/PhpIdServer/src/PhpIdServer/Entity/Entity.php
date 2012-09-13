@@ -2,9 +2,13 @@
 
 namespace PhpIdServer\Entity;
 
+use PhpIdServer\Util\String;
 
-class Entity
+
+abstract class Entity
 {
+
+    protected $_fields = array();
 
     /**
      * Entity data.
@@ -25,6 +29,23 @@ class Entity
     }
 
 
+    public function __call ($method, $arguments)
+    {
+        if (preg_match('/^get(\w+)$/', $method, $matches)) {
+            $fieldName = String::camelCaseToUnderscore($matches[1]);
+            return $this->getValue($fieldName);
+        }
+        
+        throw new Exception\InvalidMethodException($method);
+    }
+
+
+    public function exchangeArray (Array $data)
+    {
+        return $this->populate($data);
+    }
+
+
     /**
      * Populates the entity with data.
      * 
@@ -32,7 +53,22 @@ class Entity
      */
     public function populate (Array $data)
     {
-        $this->_data = new \ArrayObject($data);
+        $this->_data = new \ArrayObject(array());
+        
+        foreach ($data as $fieldName => $fieldValue) {
+            $setter = 'set' . String::underscoreToCamelCase($fieldName);
+            
+            if (method_exists($this, $setter)) {
+                call_user_func_array(array(
+                    $this, 
+                    $setter
+                ), array(
+                    $fieldValue
+                ));
+            } else {
+                $this->setValue($fieldName, $fieldValue);
+            }
+        }
     }
 
 
@@ -42,10 +78,12 @@ class Entity
      * @param string $ey
      * @return mixed|NULL
      */
-    public function getValue ($key)
+    public function getValue ($fieldName)
     {
-        if ($this->_data->offsetExists($key)) {
-            return $this->_data->offsetGet($key);
+        $this->_checkField($fieldName);
+        
+        if ($this->_data->offsetExists($fieldName)) {
+            return $this->_data->offsetGet($fieldName);
         }
         
         return NULL;
@@ -58,9 +96,10 @@ class Entity
      * @param string $key
      * @param mixed $value
      */
-    public function setValue ($key, $value)
+    public function setValue ($fieldName, $fieldValue)
     {
-        $this->_data->offsetSet($key, $value);
+        $this->_checkField($fieldName);
+        $this->_data->offsetSet($fieldName, $fieldValue);
     }
 
 
@@ -71,6 +110,37 @@ class Entity
      */
     public function toArray ()
     {
-        return (array) $this->_data;
+        $arrayData = array();
+        foreach ($this->_data as $fieldName => $fieldValue) {
+            $arrayData[$fieldName] = $fieldValue;
+        }
+        
+        return $arrayData;
+    }
+
+
+    public function getArrayCopy ()
+    {
+        return $this->toArray();
+    }
+
+
+    public function getEntityName ()
+    {
+        return get_class($this);
+    }
+
+
+    protected function _checkField ($fieldName)
+    {
+        if (! $this->_isValidField($fieldName)) {
+            throw new Exception\InvalidFieldException($fieldName, $this->getEntityName());
+        }
+    }
+
+
+    protected function _isValidField ($fieldName)
+    {
+        return (in_array($fieldName, $this->_fields));
     }
 }

@@ -16,6 +16,13 @@ class User extends Entity
 
     const FIELD_EMAIL = 'email';
 
+    protected $_fields = array(
+        self::FIELD_ID, 
+        self::FIELD_FIRST_NAME, 
+        self::FIELD_SURNAME, 
+        self::FIELD_EMAIL
+    );
+
 
     public function getId ()
     {

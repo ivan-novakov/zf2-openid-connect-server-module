@@ -3,6 +3,7 @@
 namespace PhpIdServer\Session;
 
 use PhpIdServer\User;
+use PhpIdServer\User\User;
 use PhpIdServer\Client\Client;
 use PhpIdServer\Authentication;
 
@@ -34,7 +35,35 @@ class SessionManager
     protected $_tokenGenerator = NULL;
 
 
-    public function createSession (User\User $user, Client $client, Authentication\Info $authenticationInfo)
+    public function createSession (User\User $user, Authentication\Info $authenticationInfo)
+    {}
+
+
+    public function updateSession (Session $session)
+    {}
+
+
+    public function createAuthorizationCode (Session $session, Client $client)
+    {}
+
+
+    public function getAuthorizationCode ($code)
+    {}
+
+
+    public function deactivateAuthorizationCode ($code)
+    {}
+
+
+    public function createAccessToken (Session $session, Client $client)
+    {}
+
+
+    public function getAccessToken ($tokenCode)
+    {}
+
+
+    public function createRefreshToken ()
     {}
 
 
