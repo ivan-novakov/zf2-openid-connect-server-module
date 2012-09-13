@@ -14,6 +14,17 @@ class AbstractToken extends Entity
 
 
     /**
+     * Returns true, if the expiration time is already in the past.
+     * 
+     * @return boolean
+     */
+    public function isExpired ()
+    {
+        return ((new \DateTime('now')) > $this->getExpirationTime());
+    }
+
+
+    /**
      * Converts a string into a DateTime object.
      * 
      * @param string $timeString
@@ -22,6 +33,10 @@ class AbstractToken extends Entity
      */
     protected function _timeStringToDateObject ($timeString)
     {
+        if ($timeString instanceof \DateTime) {
+            return $timeString;
+        }
+        
         try {
             return new \DateTime($timeString);
         } catch (\Exception $e) {
@@ -45,6 +60,13 @@ class AbstractToken extends Entity
     }
 
 
+    /**
+     * Converts selected array values from DateTime object to string.
+     * 
+     * @param array $arrayData
+     * @param array $fields
+     * @return array
+     */
     protected function _arrayDateObjectToTimeString (Array $arrayData, Array $fields)
     {
         foreach ($fields as $fieldName) {

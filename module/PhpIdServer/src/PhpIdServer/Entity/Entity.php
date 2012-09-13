@@ -5,6 +5,10 @@ namespace PhpIdServer\Entity;
 use PhpIdServer\Util\String;
 
 
+/**
+ * Base entity class.
+ *
+ */
 abstract class Entity
 {
 
@@ -29,7 +33,15 @@ abstract class Entity
     }
 
 
-    public function __call ($method, $arguments)
+    /**
+     * Magic __call method.
+     * 
+     * @param string $method
+     * @param array $arguments
+     * @throws Exception\InvalidMethodException
+     * @return mixed
+     */
+    public function __call ($method, Array $arguments)
     {
         if (preg_match('/^get(\w+)$/', $method, $matches)) {
             $fieldName = String::camelCaseToUnderscore($matches[1]);
@@ -40,9 +52,14 @@ abstract class Entity
     }
 
 
+    /**
+     * Alias for populate().
+     * 
+     * @param array $data
+     */
     public function exchangeArray (Array $data)
     {
-        return $this->populate($data);
+        $this->populate($data);
     }
 
 
@@ -119,18 +136,34 @@ abstract class Entity
     }
 
 
+    /**
+     * Alias for toArray().
+     * 
+     * @return array
+     */
     public function getArrayCopy ()
     {
         return $this->toArray();
     }
 
 
+    /**
+     * Returns the name of the entity.
+     * 
+     * @return string
+     */
     public function getEntityName ()
     {
         return get_class($this);
     }
 
 
+    /**
+     * Checks, if the field is valid.
+     * 
+     * @param string $fieldName
+     * @throws Exception\InvalidFieldException
+     */
     protected function _checkField ($fieldName)
     {
         if (! $this->_isValidField($fieldName)) {
@@ -139,6 +172,12 @@ abstract class Entity
     }
 
 
+    /**
+     * Returns true, if the field is valid.
+     * 
+     * @param string $fieldName
+     * @return boolean
+     */
     protected function _isValidField ($fieldName)
     {
         return (in_array($fieldName, $this->_fields));

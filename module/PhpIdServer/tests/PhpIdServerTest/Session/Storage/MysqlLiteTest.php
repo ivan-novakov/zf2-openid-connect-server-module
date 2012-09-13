@@ -57,7 +57,6 @@ class MysqlLiteTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function setUp ()
     {
-        $this->markTestSkipped();
         parent::setUp();
         
         $dbConfig = Config::get()->db;
@@ -68,6 +67,20 @@ class MysqlLiteTest extends \PHPUnit_Extensions_Database_TestCase
     }
 
 
+    public function testSaveLoadSession ()
+    {
+        $session = $this->_createSession();
+        
+        $this->_storage->saveSession($session);
+        
+        // FIXME - use data table
+        $loadedSession = $this->_storage->loadSession($session->getId());
+        
+        $this->assertInstanceOf('\PhpIdServer\Session\Session', $loadedSession);
+        $this->assertEquals($loadedSession->toArray(), $session->toArray());
+    }
+    
+    /*
     public function testLoadSessionById ()
     {
         $session = $this->_storage->loadSessionById('session_id_456');
@@ -148,5 +161,21 @@ class MysqlLiteTest extends \PHPUnit_Extensions_Database_TestCase
         $mtime = '2012-09-09 00:00:00';
         
         return Session::create($sessionId, $userId, $clientId, $time, $method, $code, $data, $accessToken, $refreshToken, $ctime, $mtime);
+    }
+    */
+    protected function _createSession ()
+    {
+        $data = array(
+            Session::FIELD_ID => 'session_id_123', 
+            Session::FIELD_USER_ID => 'testuser', 
+            Session::FIELD_AUTHENTICATION_TIME => '2012-08-01 00:00:00', 
+            Session::FIELD_AUTHENTICATION_METHOD => 'dummy', 
+            Session::FIELD_CREATE_TIME => new \DateTime('now'), 
+            Session::FIELD_MODIFY_TIME => '2012-09-09 00:00:00', 
+            Session::FIELD_EXPIRATION_TIME => '2012-09-13 00:00:00', 
+            Session::FIELD_USER_DATA => 'serialized_user_data_123'
+        );
+        
+        return new Session($data);
     }
 }

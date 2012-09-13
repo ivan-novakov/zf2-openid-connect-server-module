@@ -3,6 +3,11 @@
 namespace PhpIdServer\Session\Storage;
 
 use Zend\Db;
+use PhpIdServer\Entity\Entity;
+use PhpIdServer\Session\Token\AccessToken;
+use PhpIdServer\Session\Token\RefreshToken;
+use PhpIdServer\Session\Token\AuthorizationCode;
+use PhpIdServer\Session\SessionHydrator;
 use PhpIdServer\Session\Session;
 
 
@@ -18,6 +23,86 @@ class MysqlLite extends AbstractStorage
      */
     protected $_dbAdapter = NULL;
 
+
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::loadSession()
+     */
+    public function loadSession ($sessionId)
+    {
+        $adapter = $this->_getAdapter();
+        $sql = $this->_getSql($adapter);
+        
+        $select = $sql->select();
+        $select->where(array(
+            Session::FIELD_ID => $sessionId
+        ));
+        
+        $result = $this->_sqlQuery($adapter, $sql, $select);
+        return $this->_createSessionFromResult($result);
+    }
+
+
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::saveSession()
+     */
+    public function saveSession (Session $session)
+    {
+        $adapter = $this->_getAdapter();
+        try {
+            $this->_beginTransaction($adapter);
+            
+            $sql = $this->_getSql($adapter);
+            $insert = $sql->insert();
+            $insert->values($session->toArray());
+            
+            $this->_sqlQuery($adapter, $sql, $insert);
+            $this->_commit($adapter);
+        } catch (\Exception $e) {
+            $this->_rollback($adapter);
+            throw new Exception\SaveSessionException(sprintf("Error saving session ID '%s': [%s] %s", $session->getId(), get_class($e), $e->getMessage()), 0, $e);
+        }
+    }
+
+
+    public function loadAuthorizationCode ($code)
+    {}
+
+
+    public function saveAuthorizationCode (AuthorizationCode $authorizationCode)
+    {
+        $adapter = $this->_getAdapter();
+        try {
+            
+            $this->_commit($adapter);
+        } catch (\Exception $e) {
+            $this->_rollback($adapter);
+        }
+    }
+
+
+    public function deleteAuthorizationCode (AuthorizationCode $authorizationCode)
+    {}
+
+
+    public function loadAccessToken ($code)
+    {}
+
+
+    public function saveAccessToken (AccessToken $accessToken)
+    {}
+
+
+    public function loadRefreshToken ($code)
+    {}
+
+
+    public function saveRefreshToken (RefreshToken $refreshToken)
+    {}
+    
+    //--------------------------------------------------------------------------------
+    
 
     /**
      * (non-PHPdoc)
@@ -54,7 +139,7 @@ class MysqlLite extends AbstractStorage
      * (non-PHPdoc)
      * @see \PhpIdServer\Session\Storage\StorageInterface::saveSession()
      */
-    public function saveSession (Session $session)
+    public function __saveSession (Session $session)
     {
         $adapter = $this->_getAdapter();
         try {
@@ -146,7 +231,8 @@ class MysqlLite extends AbstractStorage
      */
     protected function _sessionToArray (Session $session)
     {
-        return $session->toArray();
+        $hydrator = $this->getSessionHydrator();
+        return $hydrator->extractData($session);
     }
 
 
@@ -158,7 +244,12 @@ class MysqlLite extends AbstractStorage
      */
     protected function _arrayToSession (Array $data)
     {
-        return new Session($data);
+        $hydrator = $this->getSessionHydrator();
+        $session = new Session();
+        
+        $hydrator->hydrateObject($data, $session);
+        
+        return $session;
     }
 
 

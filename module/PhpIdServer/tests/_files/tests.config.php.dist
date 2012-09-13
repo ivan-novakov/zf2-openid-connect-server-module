@@ -9,9 +9,9 @@ return array(
             'raw_driver' => 'mysql', 
             'driver' => 'Pdo_Mysql', 
             'host' => 'localhost', 
-            'username' => 'phpidserver', 
-            'password' => 'heslp pro id server', 
-            'database' => 'phpid'
+            'username' => 'user', 
+            'password' => 'passwd', 
+            'database' => 'phpidserver'
         )
     )
 );

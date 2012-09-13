@@ -35,7 +35,7 @@ class SessionManager
     protected $_tokenGenerator = NULL;
 
 
-    public function createSession (User\User $user, Authentication\Info $authenticationInfo)
+    public function createSession (User $user, Authentication\Info $authenticationInfo)
     {}
 
 

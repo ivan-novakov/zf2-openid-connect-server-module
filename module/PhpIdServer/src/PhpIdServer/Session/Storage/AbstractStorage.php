@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Session\Storage;
 
+use PhpIdServer\Session\SessionHydrator;
 use PhpIdServer\Util\Options;
 
 
@@ -24,5 +25,11 @@ abstract class AbstractStorage implements StorageInterface
     public function __construct ($options = array())
     {
         $this->_options = new Options($options);
+    }
+
+
+    public function getSessionHydrator ()
+    {
+        return new SessionHydrator();
     }
 }

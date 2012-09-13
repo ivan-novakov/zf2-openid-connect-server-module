@@ -52,6 +52,22 @@ class AuthorizationCodeTest extends \PHPUnit_Framework_TestCase
         
         $this->assertInstanceOf('\DateTime', $this->_authorizationCode->getIssueTime());
     }
+    
+    public function testIsExpired()
+    {
+        $this->_authorizationCode->populate($this->_getData());
+        
+        $this->_authorizationCode->setExpirationTime(new \DateTime('yesterday'));
+        $this->assertTrue($this->_authorizationCode->isExpired());
+    }
+    
+    public function testIsNotExpired()
+    {
+        $this->_authorizationCode->populate($this->_getData());
+    
+        $this->_authorizationCode->setExpirationTime(new \DateTime('tomorrow'));
+        $this->assertFalse($this->_authorizationCode->isExpired());
+    }
 
 
     protected function _getData ()

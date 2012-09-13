@@ -9,13 +9,13 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 DROP TABLE IF EXISTS `session` ;
 
 CREATE  TABLE IF NOT EXISTS `session` (
-  `id` VARCHAR(32) NOT NULL ,
-  `user_id` VARCHAR(45) NOT NULL ,
+  `id` CHAR(40) NOT NULL ,
+  `user_id` VARCHAR(255) NOT NULL ,
   `create_time` DATETIME NOT NULL ,
   `modify_time` DATETIME NOT NULL ,
   `expiration_time` DATETIME NOT NULL ,
   `authentication_time` DATETIME NOT NULL ,
-  `authentication_method` VARCHAR(45) NOT NULL ,
+  `authentication_method` VARCHAR(32) NOT NULL ,
   `user_data` TEXT NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = InnoDB
@@ -29,8 +29,8 @@ COLLATE = utf8_general_ci;
 DROP TABLE IF EXISTS `authorization_code` ;
 
 CREATE  TABLE IF NOT EXISTS `authorization_code` (
-  `code` VARCHAR(32) NOT NULL ,
-  `session_id` VARCHAR(32) NOT NULL ,
+  `code` CHAR(40) NOT NULL ,
+  `session_id` CHAR(40) NOT NULL ,
   `issue_time` DATETIME NOT NULL ,
   `expiration_time` DATETIME NOT NULL ,
   `client_id` VARCHAR(255) NOT NULL ,
@@ -53,8 +53,8 @@ COLLATE = utf8_general_ci;
 DROP TABLE IF EXISTS `access_token` ;
 
 CREATE  TABLE IF NOT EXISTS `access_token` (
-  `token` VARCHAR(32) NOT NULL ,
-  `session_id` VARCHAR(32) NOT NULL ,
+  `token` CHAR(40) NOT NULL ,
+  `session_id` CHAR(40) NOT NULL ,
   `issue_time` DATETIME NOT NULL ,
   `expiration_time` DATETIME NOT NULL ,
   `client_id` VARCHAR(255) NOT NULL ,
@@ -78,8 +78,8 @@ COLLATE = utf8_general_ci;
 DROP TABLE IF EXISTS `refresh_token` ;
 
 CREATE  TABLE IF NOT EXISTS `refresh_token` (
-  `token` VARCHAR(32) NOT NULL ,
-  `access_token` VARCHAR(32) NOT NULL ,
+  `token` CHAR(40) NOT NULL ,
+  `access_token` CHAR(40) NOT NULL ,
   `issue_time` DATETIME NOT NULL ,
   `expiration_time` DATETIME NOT NULL ,
   `client_id` VARCHAR(255) NOT NULL ,

@@ -22,4 +22,16 @@ class String
         $filter = new CamelCaseToUnderscore();
         return strtolower($filter->filter($value));
     }
+
+
+    static public function dbDateTimeFormat ($dateTime = NULL)
+    {
+        if (NULL === $dateTime) {
+            $dateTime = new \DateTime('now');
+        } elseif (! ($dateTime instanceof \DateTime)) {
+            $dateTime = new \DateTime($dateTime);
+        }
+        
+        return $dateTime->format('Y-m-d H:i:s');
+    }
 }
