@@ -19,13 +19,16 @@ class Simple extends AbstractIdGenerator
      * (non-PHPdoc)
      * @see \PhpIdServer\Session\IdGenerator\IdGeneratorInterface::generateId()
      */
-    public function generateId (User $user = NULL, Client $client = NULL)
+    public function generateId (Array $inputValues = array())
     {
         $secretSalt = $this->_options->get('secret_salt');
         if (! $secretSalt) {
             throw new Exception\MissingValueException('secret_salt');
         }
         
-        return md5($user->getId() . $client->getId() . $this->_options->get('time', time()) . $this->_options->get('secret_salt'));
+        $inputValues[] = $secretSalt;
+        $inputValues[] = $this->_options->get('time', time());
+        
+        return md5(implode('_', $inputValues));
     }
 }

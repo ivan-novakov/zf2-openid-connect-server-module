@@ -2,25 +2,41 @@
 
 namespace PhpIdServer\Authentication;
 
-use PhpIdServer\Entity\Entity;
+use PhpIdServer\Entity\TimeDependentEntity;
 
 
-class Info extends Entity
+/**
+ * Entity for storing authentication info.
+ * 
+ * @method string getMethod()
+ * @method \DateTime getTime()
+ *
+ */
+class Info extends TimeDependentEntity
 {
 
-    const FIELD_HANDLER = 'handler';
+    const FIELD_METHOD = 'method';
 
     const FIELD_TIME = 'time';
 
+    protected $_fields = array(
+        self::FIELD_METHOD, 
+        self::FIELD_TIME
+    );
 
-    public function getHandler ()
+
+    public function setTime ($value)
     {
-        return $this->getValue(self::FIELD_HANDLER);
+        $this->setValue(self::FIELD_TIME, $this->_timeStringToDateObject($value));
     }
 
 
-    public function getTime ()
+    public function toArray ()
     {
-        return $this->getValue(self::FIELD_TIME);
+        $arrayData = parent::toArray();
+        
+        return $this->_arrayDateObjectToTimeString($arrayData, array(
+            self::FIELD_TIME
+        ));
     }
 }

@@ -38,6 +38,8 @@ class AuthorizationCode extends AbstractToken
         self::FIELD_SCOPE
     );
 
+    protected $_idField = self::FIELD_CODE;
+
 
     public function setIssueTime ($timeString)
     {

@@ -17,5 +17,5 @@ interface IdGeneratorInterface
      * @param Client $client
      * @return string
      */
-    public function generateId (User $user = NULL, Client $client = NULL);
+    public function generateId (Array $inputValues = array());
 }

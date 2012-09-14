@@ -5,7 +5,7 @@ namespace PhpIdServer\Session\Token;
 use PhpIdServer\Session\Token\AuthorizationCode;
 
 
-class AuthrozationCode extends \Zend\Stdlib\Hydrator\ArraySerializable
+class AuthorizationCodeHydrator extends \Zend\Stdlib\Hydrator\ArraySerializable
 {
 
 
@@ -29,6 +29,6 @@ class AuthrozationCode extends \Zend\Stdlib\Hydrator\ArraySerializable
      */
     public function hydrateObject (Array $data, AuthorizationCode $code)
     {
-        $this->hydrate($data, $code);
+        return $this->hydrate($data, $code);
     }
 }

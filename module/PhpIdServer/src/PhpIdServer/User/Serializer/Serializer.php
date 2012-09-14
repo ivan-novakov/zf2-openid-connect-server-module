@@ -2,7 +2,6 @@
 
 namespace PhpIdServer\User\Serializer;
 
-use PhpIdServer\User\Serializer\Exception\AdapterSerializeException;
 use PhpIdServer\Util\Options;
 use PhpIdServer\User\User;
 
@@ -11,7 +10,7 @@ use PhpIdServer\User\User;
  * The user serializer objects serializes the user object into a string suitable for saving into a session.
  * 
  */
-class Serializer
+class Serializer implements SerializerInterface
 {
 
     /**

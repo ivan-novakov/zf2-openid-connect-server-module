@@ -29,7 +29,12 @@ return array(
     'session_storage' => array(
         'type' => 'MysqlLite', 
         'options' => array(
-            'table' => 'session', 
+            
+            'session_table' => 'session',
+            'authorization_code_table' => 'authorization_code',
+            'access_token_table' => 'access_token',
+            'refresh_token_table' => 'refresh_token',
+            
             'adapter' => array(
                 'driver' => 'Pdo_Mysql', 
                 'host' => 'localhost', 

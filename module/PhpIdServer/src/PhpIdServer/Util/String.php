@@ -10,26 +10,54 @@ class String
 {
 
 
-    static public function underscoreToCamelCase ($value)
+    /**
+     * Converts an underscore delimited string to a camel case string.
+     * 
+     * @param string $value
+     * @param boolean $capitalize
+     * @return string
+     */
+    static public function underscoreToCamelCase ($value, $capitalize = true)
     {
         $filter = new UnderscoreToCamelCase();
-        return $filter->filter($value);
+        $value = $filter->filter($value);
+        if (! $capitalize) {
+            $value = lcfirst($value);
+        }
+        
+        return $value;
     }
 
 
-    static public function camelCaseToUnderscore ($value)
+    /**
+     * Converts a camel case string into an underscore delimited string.
+     * 
+     * @param string $value
+     * @param boolean $lowerCase
+     * @return string
+     */
+    static public function camelCaseToUnderscore ($value, $lowerCase = true)
     {
         $filter = new CamelCaseToUnderscore();
-        return strtolower($filter->filter($value));
+        $value = $filter->filter($value);
+        if ($lowerCase) {
+            $value = strtolower($value);
+        }
+        
+        return $value;
     }
 
 
-    static public function dbDateTimeFormat ($dateTime = NULL)
+    /**
+     * Returns a MySQL DATETIME formatted string.
+     * 
+     * @param \DateTime $dateTime
+     * @return string
+     */
+    static public function dbDateTimeFormat (\DateTime $dateTime = NULL)
     {
         if (NULL === $dateTime) {
             $dateTime = new \DateTime('now');
-        } elseif (! ($dateTime instanceof \DateTime)) {
-            $dateTime = new \DateTime($dateTime);
         }
         
         return $dateTime->format('Y-m-d H:i:s');

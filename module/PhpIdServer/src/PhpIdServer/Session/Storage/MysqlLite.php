@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Session\Storage;
 
+use PhpIdServer\Session\Token\AuthrozationCode;
 use Zend\Db;
 use PhpIdServer\Entity\Entity;
 use PhpIdServer\Session\Token\AccessToken;
@@ -14,7 +15,15 @@ use PhpIdServer\Session\Session;
 class MysqlLite extends AbstractStorage
 {
 
-    const TABLE_NAME = 'session';
+    const OPT_ADAPTER = 'adapter';
+
+    const OPT_SESSION_TABLE = 'session_table';
+
+    const OPT_AUTHORIZATION_CODE_TABLE = 'authorization_code_table';
+
+    const OPT_ACCESS_TOKEN_TABLE = 'access_token_table';
+
+    const OPT_REFRESH_TOKEN_TABLE = 'refresh_token_table';
 
     /**
      * The SQL abstraction object.
@@ -33,7 +42,7 @@ class MysqlLite extends AbstractStorage
         $adapter = $this->_getAdapter();
         $sql = $this->_getSql($adapter);
         
-        $select = $sql->select();
+        $select = $sql->select($this->_getSessionTableName());
         $select->where(array(
             Session::FIELD_ID => $sessionId
         ));
@@ -51,33 +60,66 @@ class MysqlLite extends AbstractStorage
     {
         $adapter = $this->_getAdapter();
         try {
-            $this->_beginTransaction($adapter);
+            //$this->_beginTransaction($adapter);
             
+
             $sql = $this->_getSql($adapter);
-            $insert = $sql->insert();
-            $insert->values($session->toArray());
+            $insert = $sql->insert($this->_getSessionTableName());
+            $insert->values($this->_sessionToArray($session));
             
             $this->_sqlQuery($adapter, $sql, $insert);
-            $this->_commit($adapter);
+            //$this->_commit($adapter);
         } catch (\Exception $e) {
-            $this->_rollback($adapter);
-            throw new Exception\SaveSessionException(sprintf("Error saving session ID '%s': [%s] %s", $session->getId(), get_class($e), $e->getMessage()), 0, $e);
+            //$this->_rollback($adapter);
+            throw new Exception\SaveException($session, $e);
         }
     }
 
 
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::loadAuthorizationCode()
+     */
     public function loadAuthorizationCode ($code)
-    {}
+    {
+        $adapter = $this->_getAdapter();
+        $sql = $this->_getSql($adapter);
+        
+        $select = $sql->select($this->_getAuthoriozationCodeTableName());
+        $select->where(array(
+            AuthorizationCode::FIELD_CODE => $code
+        ));
+        
+        $result = $this->_sqlQuery($adapter, $sql, $select);
+        if (! $result->count()) {
+            return NULL;
+        }
+        
+        $data = (array) $result->current();
+        $authorizationCode = new AuthorizationCode();
+        
+        return $this->getAuthorizationCodeHydrator()
+            ->hydrateObject($data, $authorizationCode);
+    }
 
 
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::saveAuthorizationCode()
+     */
     public function saveAuthorizationCode (AuthorizationCode $authorizationCode)
     {
         $adapter = $this->_getAdapter();
         try {
             
-            $this->_commit($adapter);
+            $sql = $this->_getSql($adapter);
+            $insert = $sql->insert($this->_getAuthoriozationCodeTableName());
+            $insert->values($this->getAuthorizationCodeHydrator()
+                ->extract($authorizationCode));
+            
+            $this->_sqlQuery($adapter, $sql, $insert);
         } catch (\Exception $e) {
-            $this->_rollback($adapter);
+            throw new Exception\SaveException($authorizationCode, $e);
         }
     }
 
@@ -99,117 +141,6 @@ class MysqlLite extends AbstractStorage
 
 
     public function saveRefreshToken (RefreshToken $refreshToken)
-    {}
-    
-    //--------------------------------------------------------------------------------
-    
-
-    /**
-     * (non-PHPdoc)
-     * @see \PhpIdServer\Session\Storage\StorageInterface::loadSessionById()
-     */
-    public function loadSessionById ($sessionId)
-    {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
-        
-        $select = $sql->select();
-        $select->where(array(
-            Session::FIELD_ID => $sessionId
-        ));
-        
-        $result = $this->_sqlQuery($adapter, $sql, $select);
-        return $this->_createSessionFromResult($result);
-    }
-
-
-    /**
-     * (non-PHPdoc)
-     * @see \PhpIdServer\Session\Storage\StorageInterface::loadSessionByAccessToken()
-     */
-    public function loadSessionByAccessToken ($accessToken)
-    {}
-
-
-    public function loadSessionByCode ($code)
-    {}
-
-
-    /**
-     * (non-PHPdoc)
-     * @see \PhpIdServer\Session\Storage\StorageInterface::saveSession()
-     */
-    public function __saveSession (Session $session)
-    {
-        $adapter = $this->_getAdapter();
-        try {
-            $this->_beginTransaction($adapter);
-            
-            /*
-             * Check, if there exists a session with the same ID.
-             */
-            $existingSession = $this->loadSessionById($session->getId());
-            if ($existingSession) {
-                throw new Exception\SessionExistsException($session->getId());
-            }
-            
-            /*
-             * Check if there exists a session for the same pair user ID/client ID.
-             */
-            $similarSession = $this->loadSessionByUserClient($session->getUserId(), $session->getClientId());
-            if ($similarSession) {
-                throw new Exception\SimilarSessionExistsException($session->getUserId(), $session->getClientId());
-            }
-            
-            $sql = $this->_getSql($adapter);
-            $insert = $sql->insert();
-            $insert->values($session->toArray());
-            
-            $this->_sqlQuery($adapter, $sql, $insert);
-            $this->_commit($adapter);
-        } catch (\Exception $e) {
-            $this->_rollback($adapter);
-            throw new Exception\SaveSessionException(sprintf("Error saving session ID '%s': [%s] %s", $session->getId(), get_class($e), $e->getMessage()), 0, $e);
-        }
-    }
-
-
-    public function updateSession (Session $session)
-    {}
-
-
-    /**
-     * (non-PHPdoc)
-     * @see \PhpIdServer\Session\Storage\StorageInterface::deleteSession()
-     */
-    public function deleteSession (Session $session)
-    {}
-
-
-    /**
-     * Loads and returns a session for the supplied user ID and client ID.
-     * 
-     * @param string $userId
-     * @param string $clientId
-     * @return Session
-     */
-    public function loadSessionByUserClient ($userId, $clientId)
-    {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
-        $select = $sql->select();
-        
-        $select->where(array(
-            Session::FIELD_USER_ID => $userId, 
-            Session::FIELD_CLIENT_ID => $clientId
-        ));
-        
-        $result = $this->_sqlQuery($adapter, $sql, $select);
-        return $this->_createSessionFromResult($result);
-    }
-
-
-    protected function _deleteSessionById ($sessionId)
     {}
 
 
@@ -261,7 +192,7 @@ class MysqlLite extends AbstractStorage
     protected function _getAdapter ()
     {
         if (! ($this->_dbAdapter instanceof \Zend\Db\Adapter\Adapter)) {
-            $this->_dbAdapter = new \Zend\Db\Adapter\Adapter($this->_options->get('adapter'));
+            $this->_dbAdapter = new \Zend\Db\Adapter\Adapter($this->_options->get(self::OPT_ADAPTER));
         }
         
         return $this->_dbAdapter;
@@ -276,21 +207,19 @@ class MysqlLite extends AbstractStorage
      */
     protected function _getSql (\Zend\Db\Adapter\Adapter $adapter)
     {
-        $tableName = $this->_getTableName();
-        
-        return new \Zend\Db\Sql\Sql($adapter, $tableName);
+        return new \Zend\Db\Sql\Sql($adapter);
     }
 
 
-    /**
-     * Returns the table namem, where the sessions are stored.
-     * 
-     * @param string $defaultValue
-     * @return string
-     */
-    protected function _getTableName ($defaultValue = 'undefined')
+    protected function _getSessionTableName ()
     {
-        return $this->_options->get('table', $defaultValue);
+        return $this->_options->get(self::OPT_SESSION_TABLE);
+    }
+
+
+    protected function _getAuthoriozationCodeTableName ()
+    {
+        return $this->_options->get(self::OPT_AUTHORIZATION_CODE_TABLE);
     }
 
 

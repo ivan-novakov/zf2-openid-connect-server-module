@@ -8,62 +8,8 @@ use PhpIdServer\Session\Session;
 use PhpIdServer\Session\Storage;
 
 
-class MysqlLiteTest extends \PHPUnit_Extensions_Database_TestCase
+abstract class AbstractStorageTestCase extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * Raw DB PDO connection.
-     * 
-     * @var \PHPUnit_Extensions_Database_DB_DefaultDatabaseConnection
-     */
-    protected $_conn = NULL;
-
-    /**
-     * Session storage object.
-     * @var Storage\MysqlLite
-     */
-    protected $_storage = NULL;
-
-
-    /**
-     * (non-PHPdoc)
-     * @see PHPUnit_Extensions_Database_TestCase::getConnection()
-     * @return \PHPUnit_Extensions_Database_DB_IDatabaseConnection
-     */
-    public function getConnection ()
-    {
-        if (NULL === $this->_conn) {
-            $pdoConfig = Config::get()->mysql_lite->adapter->toArray();
-            $pdoConfig['raw_driver'] = 'mysql';
-            
-            $dsn = sprintf("%s:dbname=%s;host=%s", $pdoConfig['raw_driver'], $pdoConfig['database'], $pdoConfig['host']);
-            $pdo = new \PDO($dsn, $pdoConfig['username'], $pdoConfig['password']);
-            
-            $this->_conn = $this->createDefaultDBConnection($pdo);
-        }
-        
-        return $this->_conn;
-    }
-
-
-    /**
-     * (non-PHPdoc)
-     * @see PHPUnit_Extensions_Database_TestCase::getDataSet()
-     * @return \PHPUnit_Extensions_Database_DataSet_IDataSet
-     */
-    public function getDataSet ()
-    {
-        return $this->createFlatXMLDataSet(Config::get()->db->dataset);
-    }
-
-
-    public function setUp ()
-    {
-        parent::setUp();
-        
-        $config = Config::get()->mysql_lite;
-        $this->_storage = new Storage\MysqlLite($config);
-    }
 
 
     public function testSaveLoadSession ()

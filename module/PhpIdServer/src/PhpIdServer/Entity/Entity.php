@@ -12,7 +12,21 @@ use PhpIdServer\Util\String;
 abstract class Entity
 {
 
+    const FIELD_ID = 'id';
+
+    /**
+     * Fields definitions for the entity.
+     * 
+     * @var unknown_type
+     */
     protected $_fields = array();
+
+    /**
+     * The identification field of the entity.
+     * 
+     * @var mixed
+     */
+    protected $_idField = self::FIELD_ID;
 
     /**
      * Entity data.
@@ -30,6 +44,22 @@ abstract class Entity
     public function __construct (Array $data = array())
     {
         $this->populate($data);
+    }
+
+
+    /**
+     * Returns the value of the identification field of the entity.
+     * 
+     * @return mixed
+     */
+    public function getId ()
+    {
+        $id = $this->getValue($this->_idField);
+        if (NULL === $id) {
+            $id = 'undefined';
+        }
+        
+        return $id;
     }
 
 
@@ -154,7 +184,19 @@ abstract class Entity
      */
     public function getEntityName ()
     {
-        return get_class($this);
+        $className = get_class($this);
+        return String::camelCaseToUnderscore(substr($className, strrpos($className, '\\') + 1));
+    }
+
+
+    /**
+     * Returns the string representation of the entity.
+     * 
+     * @return string
+     */
+    public function __toString ()
+    {
+        return sprintf("[%s #%s]", $this->getEntityName(), $this->getId());
     }
 
 
