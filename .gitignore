@@ -2,3 +2,5 @@ tmp
 vendor
 composer.lock
 module/PhpIdServer/tests/_files/tests.config.php
+module/PhpIdServer/config/module.config.php
+module/PhpIdServer/config/server.config.php

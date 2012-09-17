@@ -1,22 +1,24 @@
 <?php
+
 namespace PhpIdServerTest\Context\Storage;
+
 use PhpIdServer\Context;
 
 
-class SessionStorageTest extends \PHPUnit_Framework_TestCase
+class SessionTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
      * The session container.
      * 
-     * @var Context\Storage\SessionStorage
+     * @var Context\Storage\Session
      */
     protected $_storage = NULL;
 
 
     public function setUp ()
     {
-        $this->_storage = new Context\Storage\SessionStorage(new \Zend\Session\Container('testContainer'));
+        $this->_storage = new Context\Storage\Session();
     }
 
 

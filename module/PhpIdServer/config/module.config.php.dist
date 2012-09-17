@@ -9,8 +9,9 @@ return array(
             'PhpIdServer\Controller\Userinfo' => 'PhpIdServer\Controller\UserinfoController', 
             'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
             
-            'PhpIdServer\Controller\Authenticate' => 'PhpIdServer\Controller\AuthenticateController', 
+            //'PhpIdServer\Controller\Authenticate' => 'PhpIdServer\Controller\AuthenticateController', 
             
+
             'PhpIdServer\Authentication\Controller\Dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
         )
     ), 
@@ -105,7 +106,6 @@ return array(
                         )
                     )
                 )
-                
             )
         )
     ), 
@@ -121,6 +121,20 @@ return array(
     'view_manager' => array(
         'template_path_stack' => array(
             'php-id-server' => __DIR__ . '/../view'
+        )
+    ), 
+    
+    'service_manager' => array(
+        'factories' => array(
+            'AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory', 
+            'ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory', 
+            'SessionManager' => 'PhpIdServer\Session\SessionManagerFactory', 
+            'UserSerializer' => 'PhpIdServer\User\Serializer\SerializerFactory', 
+            'SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory', 
+            'SessionIdGenerator' => 'PhpIdServer\Session\IdGenerator\IdGeneratorFactory'
+        ), 
+        'invokables' => array(
+            'TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'
         )
     )
 );

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIdServer\Session\Token\Exception;
+namespace PhpIdServer\Entity\Exception;
 
 
 class InvalidTimeFormatException extends \RuntimeException

@@ -75,7 +75,7 @@ class Module implements AutoloaderProviderInterface
             }
         }
         
-        \Zend\Log\Logger::registerErrorHandler($logger);
+        //\Zend\Log\Logger::registerErrorHandler($logger);
         //\Zend\Log\Logger::registerExceptionHandler($logger);
         
 

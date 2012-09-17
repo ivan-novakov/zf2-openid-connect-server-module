@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIdServer\OpenIdConnect\Request;
+namespace PhpIdServer\OpenIdConnect\Request\Authorize;
 
 
 class Field

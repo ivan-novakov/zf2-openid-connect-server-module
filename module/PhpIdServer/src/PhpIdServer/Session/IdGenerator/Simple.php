@@ -4,6 +4,7 @@ namespace PhpIdServer\Session\IdGenerator;
 
 use PhpIdServer\Client\Client;
 use PhpIdServer\User\User;
+use PhpIdServer\General\Exception;
 
 
 /**
@@ -23,7 +24,7 @@ class Simple extends AbstractIdGenerator
     {
         $secretSalt = $this->_options->get('secret_salt');
         if (! $secretSalt) {
-            throw new Exception\MissingValueException('secret_salt');
+            throw new Exception\MissingParameterException('secret_salt');
         }
         
         $inputValues[] = $secretSalt;

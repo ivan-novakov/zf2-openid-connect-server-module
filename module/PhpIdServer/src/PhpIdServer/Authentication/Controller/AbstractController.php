@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServer\Authentication\Controller;
+
 use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
 use PhpIdServer\Context;
@@ -18,9 +20,6 @@ abstract class AbstractController extends BaseController
 
     public function onDispatch (\Zend\Mvc\MvcEvent $e)
     {
-        $authorizeContextFactory = new Context\AuthorizeContextFactory();
-        $authorizeContextFactory->createService($this->getServiceLocator());
-        
         $this->_options = new Options($e->getRouteMatch()
             ->getParam('options'));
         

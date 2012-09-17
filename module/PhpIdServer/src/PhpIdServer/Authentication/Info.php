@@ -39,4 +39,11 @@ class Info extends TimeDependentEntity
             self::FIELD_TIME
         ));
     }
+
+
+    public function __toString ()
+    {
+        return sprintf("[method=%s, time=%s]", $this->getMethod(), $this->getTime()
+            ->format('c'));
+    }
 }

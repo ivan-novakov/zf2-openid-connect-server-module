@@ -6,6 +6,7 @@ use Zend\Mvc\MvcEvent;
 use PhpIdServer\Context;
 use PhpIdServer\Context\AuthorizeContext;
 use PhpIdServer\Authentication;
+use PhpIdServer\OpenIdConnect;
 
 
 class AuthorizeController extends BaseController
@@ -16,15 +17,6 @@ class AuthorizeController extends BaseController
         AuthorizeContext::STATE_REQUEST_VALIDATED => '_handlerAuthenticateUser', 
         AuthorizeContext::STATE_USER_AUTHENTICATED => '_handlerUserConsent'
     );
-
-
-    public function onDispatch (MvcEvent $e)
-    {
-        $authorizeContextFactory = new Context\AuthorizeContextFactory();
-        $authorizeContextFactory->createService($this->getServiceLocator());
-        
-        parent::onDispatch($e);
-    }
 
 
     public function indexAction ()
@@ -40,6 +32,7 @@ class AuthorizeController extends BaseController
                     return $result;
                 }
             } catch (\Exception $e) {
+                _dump("$e");
                 $this->_debug("$e");
                 return $this->_handleError();
             }
@@ -50,6 +43,14 @@ class AuthorizeController extends BaseController
         $this->getServiceLocator()
             ->get('ContextStorage')
             ->clear();
+        
+        try {
+            return $this->_processResponse($context);
+        } catch (\Exception $e) {
+            _dump("$e");
+            $this->_debug("$e");
+            return $this->_handleError();
+        }
         
         //-----------------------
         $response = $this->getResponse();
@@ -73,6 +74,53 @@ class AuthorizeController extends BaseController
         $response->setStatusCode(500);
         
         return $response;
+    }
+
+
+    protected function _processResponse (AuthorizeContext $context)
+    {
+        $user = $context->getUser();
+        if (! $user) {
+            throw new \Exception('No user in context');
+        }
+        
+        $authenticationInfo = $context->getAuthenticationInfo();
+        if (! $authenticationInfo) {
+            throw new \Exception('No authentication info in context');
+        }
+        
+        $client = $context->getClient();
+        if (! $client) {
+            throw new \Exception('No client in context');
+        }
+        
+        $request = $context->getRequest();
+        if (! $request) {
+            throw new \Exception('No request in context');
+        }
+        
+        $sessionManager = $this->getServiceLocator()
+            ->get('SessionManager');
+        //_dump($sessionManager);
+        
+
+        $session = $sessionManager->createSession($user, $authenticationInfo);
+        $authorizationCode = $sessionManager->createAuthorizationCode($session, $client);
+        
+        /*
+         * Simple authorization response
+         */
+        $oicResponse = new OpenIdConnect\Response\Authorize\Simple($this->getResponse());
+        $oicResponse->setAuthorizationCode($authorizationCode->getCode());
+        $oicResponse->setRedirectLocation($client->getRedirectUri());
+        
+        if ($state = $request->getState()) {
+            $oicResponse->setState($state);
+        }
+        
+        $httpResponse = $oicResponse->getHttpResponse();
+        
+        return $httpResponse;
     }
 
 
@@ -115,6 +163,7 @@ class AuthorizeController extends BaseController
         $registry = $this->_getClientRegistry();
         $client = $registry->getClientById($clientId);
         //_dump($client);
+        
 
         // validate - check redirect_uri
         
@@ -146,7 +195,7 @@ class AuthorizeController extends BaseController
         $user = $context->getUser();
         $info = $context->getAuthenticationInfo();
         
-        $this->_debug(sprintf("User '%s' authenticated, handler: %s, time: %s", $user->getId(), $info->getHandler(), date("c", $info->getTime())));
+        $this->_debug(sprintf("User '%s' authenticated: %s", $user->getId(), $info));
         
         // otherwise continue
         $context->setState(AuthorizeContext::STATE_USER_AUTHENTICATED);
@@ -178,6 +227,7 @@ class AuthorizeController extends BaseController
     {
         $config = $this->getServiceLocator()
             ->get('ServerConfig');
+        
         $manager = new Authentication\Manager($config->authentication);
         
         return $manager;

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIdServer\OpenIdConnect;
+namespace PhpIdServer\OpenIdConnect\Request\Authorize;
 
 
 class RequestFactory
@@ -9,6 +9,6 @@ class RequestFactory
 
     static public function factory (\Zend\Http\Request $httpRequest)
     {
-        return new Request\Simple($httpRequest);
+        return new Simple($httpRequest);
     }
 }

@@ -18,8 +18,8 @@ class DummyController extends AbstractController
         
         $user = new User($this->_options->get('identity'));
         $authenticationInfo = new Info(array(
-            Info::FIELD_HANDLER => $this->_options->get('label'), 
-            Info::FIELD_TIME => time()
+            Info::FIELD_METHOD => $this->_options->get('label'), 
+            Info::FIELD_TIME => new \DateTime('now')
         ));
         
         $context->setUser($user);

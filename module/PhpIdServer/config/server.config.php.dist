@@ -26,31 +26,43 @@ return array(
         'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
     ), 
     
+    'context_storage' => array(
+        'type' => 'Session', 
+        'options' => array(
+            'session_container_name' => 'authorize'
+        )
+    ), 
+    
     'session_storage' => array(
         'type' => 'MysqlLite', 
         'options' => array(
             
-            'session_table' => 'session',
-            'authorization_code_table' => 'authorization_code',
-            'access_token_table' => 'access_token',
-            'refresh_token_table' => 'refresh_token',
+            'session_table' => 'session', 
+            'authorization_code_table' => 'authorization_code', 
+            'access_token_table' => 'access_token', 
+            'refresh_token_table' => 'refresh_token', 
             
             'adapter' => array(
                 'driver' => 'Pdo_Mysql', 
                 'host' => 'localhost', 
-                'username' => 'phpidserver', 
-                'password' => 'heslp pro id server', 
-                'database' => 'phpid'
+                'username' => 'user', 
+                'password' => 'passwd', 
+                'database' => 'phpidserver'
             )
         )
     ), 
     
-    'user_serializer' => array(
+    'session_id_generator' => array(
+        'type' => 'Simple', 
         'options' => array(
-            'adapter' => array(
-                'name' => 'PhpSerialize', 
-                'options' => array()
-            )
+            'secret_salt' => 'tajna sul'
+        )
+    ), 
+    
+    'user_serializer' => array(
+        'adapter' => array(
+            'name' => 'PhpSerialize', 
+            'options' => array()
         )
     )
 );

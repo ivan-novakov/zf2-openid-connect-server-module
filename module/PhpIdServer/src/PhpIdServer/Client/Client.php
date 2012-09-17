@@ -5,6 +5,13 @@ namespace PhpIdServer\Client;
 use PhpIdServer\Entity\Entity;
 
 
+/**
+ * Entity representing the client application.
+ *
+ * @method string getId()
+ * @method string getType()
+ * @method string getRedirectUri()
+ */
 class Client extends Entity
 {
 
@@ -22,6 +29,8 @@ class Client extends Entity
         self::FIELD_AUTHENTICATION, 
         self::FIELD_REDIRECT_URI
     );
+
+    protected $_idField = self::FIELD_ID;
 
     /**
      * Authentication info object.
@@ -43,28 +52,7 @@ class Client extends Entity
     }
 
 
-    /**
-     * Returns the client ID.
-     * 
-     * @return string
-     */
-    public function getId ()
-    {
-        return $this->getValue(self::FIELD_ID);
-    }
 
-
-    /**
-     * Returns the client type as defined in OAuth2 spec:
-     * - confidential
-     * - public
-     * 
-     * @return string
-     */
-    public function getType ()
-    {
-        return $this->getValue(self::FIELD_TYPE);
-    }
 
 
     /**

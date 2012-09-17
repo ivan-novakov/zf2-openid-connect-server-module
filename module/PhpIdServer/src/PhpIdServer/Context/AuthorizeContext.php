@@ -3,7 +3,7 @@
 namespace PhpIdServer\Context;
 
 use PhpIdServer\Client\Client;
-use PhpIdServer\OpenIdConnect;
+use PhpIdServer\OpenIdConnect\Request\Authorize;
 use PhpIdServer\Authentication;
 use PhpIdServer\User\User;
 
@@ -60,9 +60,9 @@ class AuthorizeContext extends AbstractContext
     /**
      * Sets to OIC request object.
      * 
-     * @param OpenIdConnect\Request\AbstractRequest $request
+     * @param mixed $request
      */
-    public function setRequest (OpenIdConnect\Request\AbstractRequest $request)
+    public function setRequest ($request)
     {
         $this->_request = $request;
     }
@@ -71,7 +71,7 @@ class AuthorizeContext extends AbstractContext
     /**
      * Returns the OIC request object.
      * 
-     * @return OpenIdConnect\Request\AbstractRequest
+     * @return mixed
      */
     public function getRequest ()
     {
@@ -103,11 +103,7 @@ class AuthorizeContext extends AbstractContext
 
     public function isUserAuthenticated ()
     {
-        if (($this->_authenticationInfo instanceof Authentication\Info) && ($handlerName = $this->_authenticationInfo->getHandler())) {
-            return true;
-        }
-        
-        return false;
+        return ($this->_authenticationInfo instanceof Authentication\Info);
     }
 
 
