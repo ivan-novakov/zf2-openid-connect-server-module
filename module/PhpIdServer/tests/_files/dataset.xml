@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <dataset>
     <session id="session_id_456" user_id="testuser2" create_time="2012-09-01 00:00:00" modify_time="2012-09-01 00:00:00" expiration_time="2013-09-01 00:00:00" authentication_time="2012-09-01 00:00:00" authentication_method="dummy" user_data="serialized_user_data_456" />
-    <authorization_code />
+    <authorization_code code="authorization_code_456" session_id="session_id_456" issue_time="2012-09-01 00:00:00" expiration_time="2013-09-01 00:00:00" client_id="testclient2" scope="openid" />
     <access_token />
     <refresh_token />
 </dataset>

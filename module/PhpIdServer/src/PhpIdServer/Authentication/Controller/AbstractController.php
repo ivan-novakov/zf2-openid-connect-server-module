@@ -45,8 +45,11 @@ abstract class AbstractController extends BaseController
         }
         
         $this->_debug('redirecting back to authorize endpoint');
+        return $this->_redirectToRoute('php-id-server/authorize-endpoint');
+        /*
         return $this->plugin('redirect')
             ->toRoute('php-id-server/authorize-endpoint');
+            */
     }
 
 

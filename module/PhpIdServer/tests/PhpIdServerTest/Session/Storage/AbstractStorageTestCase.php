@@ -3,6 +3,7 @@
 namespace PhpIdServerTest\Session\Storage;
 
 use PhpIdServer\Session\Token\AuthorizationCode;
+use PhpIdServer\Session\Token\AccessToken;
 use PhpIdServerTest\Framework\Config;
 use PhpIdServer\Session\Session;
 use PhpIdServer\Session\Storage;
@@ -37,6 +38,18 @@ abstract class AbstractStorageTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testSaveLoadAccessToken ()
+    {
+        $accessToken = $this->_createAccessToken();
+        
+        $this->_storage->saveAccessToken($accessToken);
+        $loadedAccessToken = $this->_storage->loadAccessToken('access_token_123');
+        
+        $this->assertInstanceOf('\PhpIdServer\Session\Token\AccessToken', $loadedAccessToken);
+        $this->assertEquals($loadedAccessToken->toArray(), $accessToken->toArray());
+    }
+
+
     protected function _createSession ()
     {
         $data = array(
@@ -66,5 +79,21 @@ abstract class AbstractStorageTestCase extends \PHPUnit_Framework_TestCase
         );
         
         return new AuthorizationCode($data);
+    }
+
+
+    protected function _createAccessToken ()
+    {
+        $data = array(
+            AccessToken::FIELD_TOKEN => 'access_token_123', 
+            AccessToken::FIELD_SESSION_ID => 'session_id_456', 
+            AccessToken::FIELD_CLIENT_ID => 'testclient', 
+            AccessToken::FIELD_ISSUE_TIME => new \DateTime('now'), 
+            AccessToken::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
+            AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER, 
+            AccessToken::FIELD_SCOPE => 'openid'
+        );
+        
+        return new AccessToken($data);
     }
 }

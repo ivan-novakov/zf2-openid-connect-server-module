@@ -22,4 +22,16 @@ class AbstractToken extends TimeDependentEntity
     {
         return ((new \DateTime('now')) > $this->getExpirationTime());
     }
+
+
+    public function setIssueTime ($timeString)
+    {
+        $this->setValue(static::FIELD_ISSUE_TIME, $this->_timeStringToDateObject($timeString));
+    }
+
+
+    public function setExpirationTime ($timeString)
+    {
+        $this->setValue(static::FIELD_EXPIRATION_TIME, $this->_timeStringToDateObject($timeString));
+    }
 }

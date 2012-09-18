@@ -2,6 +2,8 @@
 
 namespace PhpIdServer\Session;
 
+use PhpIdServer\Session\Token\AccessToken;
+use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\Session\Token\AuthorizationCode;
 use PhpIdServer\User\User;
 use PhpIdServer\User\Serializer;
@@ -53,18 +55,15 @@ class SessionManager
     {
         $sessionIdGenerator = $this->getSessionIdGenerator();
         if (! $sessionIdGenerator) {
-            throw new Exception\MissingComponentException('session ID generator');
+            throw new GeneralException\MissingDependencyException('session ID generator');
         }
         
         $serializer = $this->getUserSerializer();
         if (! $serializer) {
-            throw new Exception\MissingComponentException('user serializer');
+            throw new GeneralException\MissingDependencyException('user serializer');
         }
         
-        $storage = $this->getStorage();
-        if (! $storage) {
-            throw new Exception\MissingComponentException('session storage');
-        }
+        $storage = $this->_getStorageWithCheck();
         
         $sessionId = $sessionIdGenerator->generateId(array(
             $user->getId()
@@ -95,6 +94,19 @@ class SessionManager
 
 
     /**
+     * Returns the session associated with the authorization code.
+     * 
+     * @param AuthorizationCode $authorizationCode
+     * @return Session
+     */
+    public function getSessionForAuthorizationCode (AuthorizationCode $authorizationCode)
+    {
+        return $this->_getStorageWithCheck()
+            ->loadSession($authorizationCode->getSessionId());
+    }
+
+
+    /**
      * Creates new authorization code for the provided session, bound to the provided client.
      * 
      * @param Session $session
@@ -106,13 +118,10 @@ class SessionManager
     {
         $tokenGenerator = $this->getTokenGenerator();
         if (! $tokenGenerator) {
-            throw new Exception\MissingComponentException('token generator');
+            throw new GeneralException\MissingDependencyException('token generator');
         }
         
-        $storage = $this->getStorage();
-        if (! $storage) {
-            throw new Exception\MissingComponentException('session storage');
-        }
+        $storage = $this->_getStorageWithCheck();
         
         $code = $tokenGenerator->generateAuthorizationCode($session, $client);
         
@@ -120,6 +129,7 @@ class SessionManager
             AuthorizationCode::FIELD_CODE => $code, 
             AuthorizationCode::FIELD_SESSION_ID => $session->getId(), 
             AuthorizationCode::FIELD_ISSUE_TIME => new \DateTime('now'), 
+            // FIXME - set 5 min from config
             AuthorizationCode::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
             AuthorizationCode::FIELD_CLIENT_ID => $client->getId(), 
             AuthorizationCode::FIELD_SCOPE => 'openid'
@@ -131,20 +141,67 @@ class SessionManager
     }
 
 
+    /**
+     * Returns the authorization code object for the provided code or NULL if not found.
+     * 
+     * @param string $code
+     * @throws GeneralException\MissingDependencyException
+     * @return AuthorizationCode|NULL
+     */
     public function getAuthorizationCode ($code)
-    {}
+    {
+        return $this->_getStorageWithCheck()
+            ->loadAuthorizationCode($code);
+    }
 
 
-    public function deactivateAuthorizationCode ($code)
-    {}
+    /**
+     * Deactivates the authentication code - it will not be possible to acquire the corresponding session anymore.
+     * 
+     * @param unknown_type $code
+     */
+    public function deactivateAuthorizationCode (AuthorizationCode $authorizationCode)
+    {
+        $this->_getStorageWithCheck()
+            ->deleteAuthorizationCode($authorizationCode);
+    }
 
 
     public function createAccessToken (Session $session, Client $client)
-    {}
+    {
+        $storage = $this->_getStorageWithCheck();
+        $generator = $this->_getTokenGeneratorWithCheck();
+        
+        $token = $generator->generateAccessToken($session, $client);
+        
+        $accessToken = new AccessToken(array(
+            AccessToken::FIELD_TOKEN => $token, 
+            AccessToken::FIELD_SESSION_ID => $session->getId(), 
+            AccessToken::FIELD_CLIENT_ID => $client->getId(), 
+            AccessToken::FIELD_ISSUE_TIME => new \DateTime('now'), 
+            // FIXME set from config
+            AccessToken::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
+            AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER, 
+            AccessToken::FIELD_SCOPE => 'openid'
+        ));
+        
+        $storage->saveAccessToken($accessToken);
+        
+        return $accessToken;
+    }
 
 
-    public function getAccessToken ($tokenCode)
-    {}
+    /**
+     * Returns the access token object with the provided code.
+     * 
+     * @param string $token
+     * @return AccessToken
+     */
+    public function getAccessToken ($token)
+    {
+        return $this->_getStorageWithCheck()
+            ->loadAccessToken($token);
+    }
 
 
     public function createRefreshToken ()
@@ -236,5 +293,39 @@ class SessionManager
     public function getUserSerializer ()
     {
         return $this->_userSerializer;
+    }
+
+
+    /**
+     * Returns the storage object and throws exception if not set.
+     * 
+     * @throws Exception\MissingComponentException
+     * @return Storage\StorageInterface
+     */
+    protected function _getStorageWithCheck ()
+    {
+        $storage = $this->getStorage();
+        if (! $storage) {
+            throw new GeneralException\MissingDependencyException('session storage');
+        }
+        
+        return $storage;
+    }
+
+
+    /**
+     * Returns the token generator object or throws exception if not set.
+     * 
+     * @throws GeneralException\MissingDependencyException
+     * @return Hash\Generator\GeneratorInterface
+     */
+    protected function _getTokenGeneratorWithCheck ()
+    {
+        $generator = $this->getTokenGenerator();
+        if (! $generator) {
+            throw new GeneralException\MissingDependencyException('token generator');
+        }
+        
+        return $generator;
     }
 }

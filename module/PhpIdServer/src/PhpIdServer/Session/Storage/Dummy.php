@@ -15,6 +15,8 @@ class Dummy extends AbstractStorage
 
     protected $_authorizationCodes = array();
 
+    protected $_accessTokens = array();
+
 
     public function loadSession ($sessionId)
     {
@@ -52,12 +54,20 @@ class Dummy extends AbstractStorage
     {}
 
 
-    public function loadAccessToken ($code)
-    {}
+    public function loadAccessToken ($token)
+    {
+        if (isset($this->_accessTokens[$token])) {
+            return $this->_accessTokens[$token];
+        }
+        
+        return NULL;
+    }
 
 
     public function saveAccessToken (AccessToken $accessToken)
-    {}
+    {
+        $this->_accessTokens[$accessToken->getToken()] = $accessToken;
+    }
 
 
     public function loadRefreshToken ($code)

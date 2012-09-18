@@ -41,25 +41,13 @@ class AuthorizationCode extends AbstractToken
     protected $_idField = self::FIELD_CODE;
 
 
-    public function setIssueTime ($timeString)
-    {
-        $this->setValue(self::FIELD_ISSUE_TIME, $this->_timeStringToDateObject($timeString));
-    }
-
-
-    public function setExpirationTime ($timeString)
-    {
-        $this->setValue(self::FIELD_EXPIRATION_TIME, $this->_timeStringToDateObject($timeString));
-    }
-
-
     public function toArray ()
     {
         $arrayData = parent::toArray();
         
         return $this->_arrayDateObjectToTimeString($arrayData, array(
-            self::FIELD_ISSUE_TIME, 
-            self::FIELD_EXPIRATION_TIME
+            static::FIELD_ISSUE_TIME, 
+            static::FIELD_EXPIRATION_TIME
         ));
     }
 }

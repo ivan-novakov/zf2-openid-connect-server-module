@@ -131,7 +131,9 @@ return array(
             'SessionManager' => 'PhpIdServer\Session\SessionManagerFactory', 
             'UserSerializer' => 'PhpIdServer\User\Serializer\SerializerFactory', 
             'SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory', 
-            'SessionIdGenerator' => 'PhpIdServer\Session\IdGenerator\IdGeneratorFactory'
+            'SessionIdGenerator' => 'PhpIdServer\Session\IdGenerator\IdGeneratorFactory', 
+            'ClientRegistryStorage' => 'PhpIdServer\Client\Registry\StorageFactory', 
+            'ClientRegistry' => 'PhpIdServer\Client\RegistryFactory'
         ), 
         'invokables' => array(
             'TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'

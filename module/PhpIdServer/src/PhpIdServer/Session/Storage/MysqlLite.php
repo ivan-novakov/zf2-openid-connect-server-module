@@ -36,6 +36,7 @@ class MysqlLite extends AbstractStorage
     /**
      * (non-PHPdoc)
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadSession()
+     * @return Session
      */
     public function loadSession ($sessionId)
     {
@@ -79,6 +80,7 @@ class MysqlLite extends AbstractStorage
     /**
      * (non-PHPdoc)
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadAuthorizationCode()
+     * @return AuthorizationCode
      */
     public function loadAuthorizationCode ($code)
     {
@@ -124,16 +126,74 @@ class MysqlLite extends AbstractStorage
     }
 
 
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::deleteAuthorizationCode()
+     * @return AuthorizationCode
+     */
     public function deleteAuthorizationCode (AuthorizationCode $authorizationCode)
-    {}
+    {
+        $adapter = $this->_getAdapter();
+        $sql = $this->_getSql($adapter);
+        
+        $delete = $sql->delete($this->_getAuthoriozationCodeTableName());
+        
+        $delete->where(array(
+            AuthorizationCode::FIELD_CODE => $authorizationCode->getCode()
+        ));
+        
+        $this->_sqlQuery($adapter, $sql, $delete);
+    }
 
 
-    public function loadAccessToken ($code)
-    {}
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::loadAccessToken()
+     * @return AccessToken
+     */
+    public function loadAccessToken ($token)
+    {
+        $adapter = $this->_getAdapter();
+        $sql = $this->_getSql($adapter);
+        
+        $select = $sql->select($this->_getAccessTokenTableName());
+        $select->where(array(
+            AccessToken::FIELD_TOKEN => $token
+        ));
+        
+        $result = $this->_sqlQuery($adapter, $sql, $select);
+        if (! $result->count()) {
+            return NULL;
+        }
+        
+        $data = (array) $result->current();
+        $accessToken = new AccessToken();
+        
+        return $this->getAccessTokenHydrator()
+            ->hydrate($data, $accessToken);
+    }
 
 
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Session\Storage\StorageInterface::saveAccessToken()
+     */
     public function saveAccessToken (AccessToken $accessToken)
-    {}
+    {
+        $adapter = $this->_getAdapter();
+        
+        try {
+            $sql = $this->_getSql($adapter);
+            
+            $insert = $sql->insert($this->_getAccessTokenTableName());
+            $insert->values($this->getAccessTokenHydrator()
+                ->extract($accessToken));
+            
+            $this->_sqlQuery($adapter, $sql, $insert);
+        } catch (\Exception $e) {
+            throw new Exception\SaveException($accessToken, $e);
+        }
+    }
 
 
     public function loadRefreshToken ($code)
@@ -220,6 +280,18 @@ class MysqlLite extends AbstractStorage
     protected function _getAuthoriozationCodeTableName ()
     {
         return $this->_options->get(self::OPT_AUTHORIZATION_CODE_TABLE);
+    }
+
+
+    protected function _getAccessTokenTableName ()
+    {
+        return $this->_options->get(self::OPT_ACCESS_TOKEN_TABLE);
+    }
+
+
+    protected function _getRefreshTokenTableName ()
+    {
+        return $this->_options->get(self::OPT_REFRESH_TOKEN_TABLE);
     }
 
 

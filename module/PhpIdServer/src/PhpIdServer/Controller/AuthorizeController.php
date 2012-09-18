@@ -51,29 +51,6 @@ class AuthorizeController extends BaseController
             $this->_debug("$e");
             return $this->_handleError();
         }
-        
-        //-----------------------
-        $response = $this->getResponse();
-        
-        $response->getHeaders()
-            ->addHeaders(array(
-            'Content-Type' => 'application/json'
-        ));
-        
-        $response->setContent(\Zend\Json\Encoder::encode(array(
-            'endpoint' => 'authorize'
-        )));
-        
-        return $response;
-    }
-
-
-    protected function _handleError ($message = 'Error')
-    {
-        $response = $this->getResponse();
-        $response->setStatusCode(500);
-        
-        return $response;
     }
 
 
@@ -160,7 +137,8 @@ class AuthorizeController extends BaseController
          */
         $clientId = $context->getRequest()
             ->getClientId();
-        $registry = $this->_getClientRegistry();
+        $registry = $this->getServiceLocator()
+            ->get('ClientRegistry');
         $client = $registry->getClientById($clientId);
         //_dump($client);
         
@@ -188,8 +166,7 @@ class AuthorizeController extends BaseController
             $this->_debug('redirecting user to authentication handler');
             $this->_saveContext($context);
             
-            return $this->plugin('redirect')
-                ->toRoute($manager->getAuthenticationRouteName());
+            return $this->_redirectToRoute($manager->getAuthenticationRouteName());
         }
         
         $user = $context->getUser();

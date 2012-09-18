@@ -2,6 +2,7 @@
 
 namespace PhpIdServerTest\Session;
 
+use PhpIdServer\Session\Token\AuthorizationCode;
 use PhpIdServer\Authentication\Info;
 use PhpIdServer\User\User;
 use PhpIdServer\Session\IdGenerator;
@@ -26,7 +27,6 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->_manager = new SessionManager();
         $this->_manager->setStorage(new Storage\Dummy());
-        //$this->_manager->setTokenGenerator(new Hash\Generator\Simple());
     }
 
 
@@ -57,6 +57,51 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
         
         $this->assertInstanceOf('\PhpIdServer\Session\Token\AuthorizationCode', $authorizationCode);
         $this->assertEquals('generated_token', $authorizationCode->getCode());
+    }
+
+
+    public function testGetAuthorizationCode ()
+    {
+        $session = $this->_getSessionStub();
+        $client = $this->_getClientStub();
+        
+        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        
+        $authorizationCode = $this->_manager->createAuthorizationCode($session, $client);
+        
+        $loadedCode = $this->_manager->getAuthorizationCode($authorizationCode->getCode());
+        
+        $this->assertEquals($loadedCode->toArray(), $authorizationCode->toArray());
+    }
+
+
+    public function testCreateAccessToken ()
+    {
+        $session = $this->_getSessionStub();
+        $client = $this->_getClientStub();
+        
+        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        
+        $accessToken = $this->_manager->createAccessToken($session, $client);
+        
+        $this->assertInstanceOf('\PhpIdServer\Session\Token\AccessToken', $accessToken);
+        $this->assertEquals('generated_access_token', $accessToken->getToken());
+        $this->assertEquals(md5('test'), $accessToken->getSessionId());
+    }
+
+
+    public function testGetAccessToken ()
+    {
+        $session = $this->_getSessionStub();
+        $client = $this->_getClientStub();
+        
+        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        
+        $accessToken = $this->_manager->createAccessToken($session, $client);
+        
+        $loadedAccessToken = $this->_manager->getAccessToken($accessToken->getToken());
+        
+        $this->assertEquals($loadedAccessToken->toArray(), $accessToken->toArray());
     }
     
     /*
@@ -116,6 +161,10 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
         $generator->expects($this->any())
             ->method('generateAuthorizationCode')
             ->will($this->returnValue('generated_token'));
+        
+        $generator->expects($this->any())
+            ->method('generateAccessToken')
+            ->will($this->returnValue('generated_access_token'));
         
         return $generator;
     }

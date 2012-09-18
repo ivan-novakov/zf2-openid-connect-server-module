@@ -49,4 +49,15 @@ abstract class AbstractStorage implements StorageInterface
     {
         return new Token\AuthorizationCodeHydrator();
     }
+
+
+    /**
+     * Returns the access token object hydrator.
+     * 
+     * @return Token\AccessTokenHydrator
+     */
+    public function getAccessTokenHydrator ()
+    {
+        return new Token\AccessTokenHydrator();
+    }
 }
