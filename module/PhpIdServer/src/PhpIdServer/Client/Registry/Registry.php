@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServer\Client\Registry;
+
 use PhpIdServer\Client\Client;
 
 
@@ -53,11 +55,15 @@ class Registry
      * @param string $clientId
      * @return Client
      */
-    public function getClientById ($clientId)
+    public function getClientById ($clientId, $throwException = false)
     {
         $client = $this->_storage->getClientById($clientId);
         if (! ($client instanceof Client)) {
-            throw new Exception\ClientNotFoundException($clientId);
+            if ($throwException) {
+                throw new Exception\ClientNotFoundException($clientId);
+            }
+            
+            return NULL;
         }
         
         return $client;

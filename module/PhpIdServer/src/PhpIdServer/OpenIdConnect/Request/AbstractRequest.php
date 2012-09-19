@@ -13,6 +13,11 @@ abstract class AbstractRequest
      */
     protected $_httpRequest = NULL;
 
+    /**
+     * List of reasons, why the request is invalid.
+     * 
+     * @var array
+     */
     protected $_invalidReasons = NULL;
 
 
@@ -45,10 +50,15 @@ abstract class AbstractRequest
      */
     public function isValid ()
     {
-        return (count($this->getInvalidReasons()) > 0);
+        return (count($this->getInvalidReasons()) == 0);
     }
 
 
+    /**
+     * Returns an array of messages describing why the request is invalid.
+     * 
+     * @return array
+     */
     public function getInvalidReasons ()
     {
         if (! is_array($this->_invalidReasons)) {
@@ -59,6 +69,11 @@ abstract class AbstractRequest
     }
 
 
+    /**
+     * Validates the request and returns an array of reason messages.
+     * 
+     * @return array
+     */
     protected function _validate ()
     {
         return array();

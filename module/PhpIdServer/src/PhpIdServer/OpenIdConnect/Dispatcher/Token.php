@@ -5,6 +5,7 @@ namespace PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
+use PhpIdServer\OpenIdConnect\Entity;
 
 
 class Token extends AbstractDispatcher
@@ -58,12 +59,23 @@ class Token extends AbstractDispatcher
     }
 
 
+    /**
+     * Returns the token response object.
+     * 
+     * @return Response\Token
+     */
     public function getTokenResponse ()
     {
         return $this->_tokenResponse;
     }
 
 
+    /**
+     * Dispatchers the request and returns the response.
+     * 
+     * @throws GeneralException\MissingDependencyException
+     * @return Response\Token
+     */
     public function dispatch ()
     {
         $request = $this->getTokenRequest();
@@ -75,7 +87,8 @@ class Token extends AbstractDispatcher
          * Validate request
          */
         if (! $request->isValid()) {
-            throw new Exception\InvalidRequestException($request->getInvalidReasons());
+            _dump($request->getInvalidReasons());
+            return $this->_errorResponse('invalid request');
         }
         
         /*
@@ -88,7 +101,7 @@ class Token extends AbstractDispatcher
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
-            throw new Exception\InvalidClientException($request->getClientId());
+            return $this->_errorResponse('unknown client');
         }
         
         /*
@@ -107,12 +120,11 @@ class Token extends AbstractDispatcher
         
         $authorizationCode = $sessionManager->getAuthorizationCode($request->getCode());
         if (! $authorizationCode) {
-            //throw new Exception\InvalidAuthorizationCodeException($request->getCode());
-            // return error - authorization code not found
+            return $this->_errorResponse('invalid authorization code');
         }
         
         if ($authorizationCode->isExpired()) {
-            // return expire error
+            return $this->_errorResponse('expired authorization code');
         }
         
         /*
@@ -120,8 +132,7 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            //throw new Exception\InvalidAuthorizationCodeException($request->getCode());
-            // return error - session for authorization code not found
+            return $this->_errorResponse('session not found');
         }
         
         /*
@@ -129,6 +140,54 @@ class Token extends AbstractDispatcher
          */
         $accessToken = $sessionManager->createAccessToken($session, $client);
         
-        // return response
+        $accessTokenEntity = new Entity\Token(array(
+            Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(), 
+            Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(), 
+            Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(), 
+            Entity\Token::FIELD_REFRESH_TOKEN => 'not set', 
+            Entity\Token::FIELD_ID_TOKEN => 'not set'
+        ));
+        
+        return $this->_validResponse($accessTokenEntity);
+    }
+
+
+    /**
+     * Returns a valid response based on the provided token data.
+     * 
+     * @param Entity\Token $entityToken
+     * @throws GeneralException\MissingDependencyException
+     * @return Response\Token
+     */
+    protected function _validResponse (Entity\Token $entityToken)
+    {
+        $response = $this->getTokenResponse();
+        if (! $response) {
+            throw new GeneralException\MissingDependencyException('token response');
+        }
+        
+        $response->setTokenEntity($entityToken);
+        
+        return $response;
+    }
+
+
+    /**
+     * Returns an error response with the provided message.
+     * 
+     * @param string $message
+     * @throws GeneralException\MissingDependencyException
+     * @return Response\Token
+     */
+    protected function _errorResponse ($message)
+    {
+        $response = $this->getTokenResponse();
+        if (! $response) {
+            throw new GeneralException\MissingDependencyException('token response');
+        }
+        
+        $response->setError($message);
+        
+        return $response;
     }
 }

@@ -26,21 +26,26 @@ class TokenController extends BaseController
         $dispatcher->setTokenResponse($oicResponse);
         
         try {
-            $response = $dispatcher->dispatch();
+            $tokenResponse = $dispatcher->dispatch();
+            $response = $tokenResponse->getHttpResponse();
         } catch (\Exception $e) {
             $response = $this->_handleException($e);
         }
-        _dump($response);
+        //_dump($response->getContent());
+        
+        return $response;
+    }
+
+
+    protected function _handleException (\Exception $e)
+    {
+        _dump("$e");
+        $this->_debug("$e");
         
         $response = $this->getResponse();
-        
-        $response->getHeaders()
-            ->addHeaders(array(
-            'Content-Type' => 'application/json'
-        ));
-        
-        $response->setContent(\Zend\Json\Encoder::encode(array(
-            'endpoint' => 'token'
+        $response->setStatusCode(400);
+        $response->setContent(\Zend\Json\Json::encode(array(
+            'error' => 'general error'
         )));
         
         return $response;

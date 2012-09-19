@@ -86,6 +86,18 @@ class AuthorizationCodeTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testExpiresIn ()
+    {
+        $this->_authorizationCode->populate(array(
+            AuthorizationCode::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow')
+        ));
+        
+        $seconds = $this->_authorizationCode->expiresIn();
+        $this->assertInternalType('integer', $seconds);
+        $this->assertGreaterThan(0, $seconds);
+    }
+
+
     protected function _getData ()
     {
         return array(

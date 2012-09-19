@@ -5,7 +5,7 @@ namespace PhpIdServer\Entity;
 use PhpIdServer\Util\String;
 
 
-class TimeDependentEntity extends Entity
+abstract class TimeDependentEntity extends Entity
 {
 
 
