@@ -88,7 +88,7 @@ class Token extends AbstractDispatcher
          */
         if (! $request->isValid()) {
             _dump($request->getInvalidReasons());
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
         /*
@@ -101,7 +101,7 @@ class Token extends AbstractDispatcher
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, sprintf("Client with ID '%s' not found in registry", $request->getClientId()));
         }
         
         /*
@@ -120,11 +120,11 @@ class Token extends AbstractDispatcher
         
         $authorizationCode = $sessionManager->getAuthorizationCode($request->getCode());
         if (! $authorizationCode) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'No such authorization code');
         }
         
         if ($authorizationCode->isExpired()) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'Expired authorization code');
         }
         
         /*
@@ -132,7 +132,7 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'No session associated with the authorization code');
         }
         
         /*

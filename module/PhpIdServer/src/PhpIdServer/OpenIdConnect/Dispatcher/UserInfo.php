@@ -92,7 +92,7 @@ class UserInfo extends AbstractDispatcher
          */
         if (! $userInfoRequest->isValid()) {
             _dump($request->getInvalidReasons());
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
         /*
@@ -105,12 +105,16 @@ class UserInfo extends AbstractDispatcher
         
         $accessToken = $sessionManager->getAccessToken($userInfoRequest->getAuthorizationValue());
         if (! $accessToken) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'No such access token');
+        }
+        
+        if ($accessToken->isExpired()) {
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'Expired access token');
         }
         
         $session = $sessionManager->getSessionByAccessToken($accessToken);
         if (! $session) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'No session associated with the access token');
         }
         
         /*
@@ -118,7 +122,7 @@ class UserInfo extends AbstractDispatcher
         */
         $user = $sessionManager->getUserFromSession($session);
         if (! $user) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'Could not extract user data');
         }
         
         // FIXME - validate user data

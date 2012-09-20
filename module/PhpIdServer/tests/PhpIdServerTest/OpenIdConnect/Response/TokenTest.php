@@ -20,7 +20,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorResponse ()
     {
-        $this->_response->setError('error_message');
+        $this->_response->setError('error_message', 'error description');
         $httpResponse = $this->_response->getHttpResponse();
         
         $this->assertInstanceOf('\Zend\Http\Response', $httpResponse);
@@ -31,6 +31,7 @@ class TokenTest extends \PHPUnit_Framework_TestCase
         
         $data = \Zend\Json\Json::decode($httpResponse->getContent());
         $this->assertEquals('error_message', $data->error);
+        $this->assertEquals('error description', $data->error_description);
     }
 
 

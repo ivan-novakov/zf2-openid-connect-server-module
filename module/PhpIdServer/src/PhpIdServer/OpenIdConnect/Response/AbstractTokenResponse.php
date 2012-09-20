@@ -15,15 +15,23 @@ abstract class AbstractTokenResponse extends AbstractResponse
      */
     protected $_errorMessage = NULL;
 
+    /**
+     * The error description.
+     * 
+     * @var string
+     */
+    protected $_errorDescription = NULL;
+
 
     /**
      * Turns the response into error response.
      *
      * @param unknown_type $message
      */
-    public function setError ($message)
+    public function setError ($message, $description = NULL)
     {
         $this->_errorMessage = $message;
+        $this->_errorDescription = $description;
     }
 
 
@@ -41,11 +49,22 @@ abstract class AbstractTokenResponse extends AbstractResponse
     /**
      * Returns the error message.
      *
-     * @return string
+     * @return string|NULL
      */
     public function getErrorMessage ()
     {
         return $this->_errorMessage;
+    }
+
+
+    /**
+     * Returns the error description.
+     * 
+     * @return string|NULL
+     */
+    public function getErrorDescription ()
+    {
+        return $this->_errorDescription;
     }
 
 
@@ -80,9 +99,15 @@ abstract class AbstractTokenResponse extends AbstractResponse
      */
     protected function _createErrorResponseContent ()
     {
-        return $this->_jsonEncode(array(
+        $errorData = array(
             'error' => $this->getErrorMessage()
-        ));
+        );
+        
+        if (($description = $this->getErrorDescription()) !== NULL) {
+            $errorData['error_description'] = $description;
+        }
+        
+        return $this->_jsonEncode($errorData);
     }
 
 

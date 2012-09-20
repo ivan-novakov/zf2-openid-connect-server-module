@@ -19,29 +19,24 @@ class AuthorizationCodeTest extends \PHPUnit_Framework_TestCase
     public function setUp ()
     {
         $this->_authorizationCode = new AuthorizationCode();
+        $this->_authorizationCode->populate($this->_getData());
     }
 
 
-    public function testHydrate ()
+    public function testToArray ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
-        $this->assertEquals($this->_getData(), $this->_authorizationCode->getArrayCopy());
+        $this->assertEquals($this->_getData(), $this->_authorizationCode->toArray());
     }
 
 
     public function testGetCode ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->assertEquals('authorization_code_123', $this->_authorizationCode->getCode());
     }
 
 
     public function testGetId ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->assertEquals('authorization_code_123', $this->_authorizationCode->getId());
     }
 
@@ -54,24 +49,18 @@ class AuthorizationCodeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExpirationTime ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->assertInstanceOf('\DateTime', $this->_authorizationCode->getExpirationTime());
     }
 
 
     public function testGetIssueTime ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->assertInstanceOf('\DateTime', $this->_authorizationCode->getIssueTime());
     }
 
 
     public function testIsExpired ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->_authorizationCode->setExpirationTime(new \DateTime('yesterday'));
         $this->assertTrue($this->_authorizationCode->isExpired());
     }
@@ -79,8 +68,6 @@ class AuthorizationCodeTest extends \PHPUnit_Framework_TestCase
 
     public function testIsNotExpired ()
     {
-        $this->_authorizationCode->populate($this->_getData());
-        
         $this->_authorizationCode->setExpirationTime(new \DateTime('tomorrow'));
         $this->assertFalse($this->_authorizationCode->isExpired());
     }

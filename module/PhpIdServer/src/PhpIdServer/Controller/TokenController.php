@@ -29,10 +29,12 @@ class TokenController extends BaseController
             $tokenResponse = $dispatcher->dispatch();
             $response = $tokenResponse->getHttpResponse();
         } catch (\Exception $e) {
+            // FIXME - use the $oicResponse instead of the raw http response
             $response = $this->_handleException($e);
         }
         //_dump($response->getContent());
         
+
         return $response;
     }
 
@@ -45,7 +47,8 @@ class TokenController extends BaseController
         $response = $this->getResponse();
         $response->setStatusCode(400);
         $response->setContent(\Zend\Json\Json::encode(array(
-            'error' => 'general error'
+            'error' => 'general error', 
+            'error_description' => sprintf("[%s] %s", get_class($e), $e->getMessage())
         )));
         
         return $response;
