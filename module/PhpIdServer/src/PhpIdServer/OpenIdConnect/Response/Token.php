@@ -9,6 +9,18 @@ use PhpIdServer\OpenIdConnect\Entity;
 class Token extends AbstractTokenResponse
 {
 
+    const ERROR_INVALID_REQUEST = 'invalid_request';
+
+    const ERROR_INVALID_CLIENT = 'invalid_client';
+
+    const ERROR_INVALID_GRANT = 'invalid_grant';
+
+    const ERROR_UNAUTHORIZED_CLIENT = 'unauthorized_client';
+
+    const ERROR_UNSUPPORTED_GRANT_TYPE = 'unsupported_grant_type';
+
+    const ERROR_INVALID_SCOPE = 'invalid_scope';
+
     /**
      * The token entity containing actual data.
      *
@@ -40,70 +52,21 @@ class Token extends AbstractTokenResponse
 
 
     /**
-     * (non-PHPdoc)
-     * @see AbstractResponse::getHttpResponse()
-     */
-    public function getHttpResponse ()
-    {
-        $httpResponse = parent::getHttpResponse();
-        $httpResponse->getHeaders()
-            ->addHeaders(array(
-            'Content-Type' => 'application/json'
-        ));
-        
-        if ($this->isError()) {
-            $httpResponse->setStatusCode(400);
-            $httpResponse->setContent($this->_createErrorResponseContent());
-        } else {
-            $tokenEntity = $this->getTokenEntity();
-            if (! $tokenEntity) {
-                throw new GeneralException\MissingDependencyException('token entity');
-            }
-            
-            $httpResponse->setContent($this->_createResponseContent($tokenEntity));
-        }
-        
-        return $httpResponse;
-    }
-
-
-    /**
      * Creates and returns the response data.
      * 
-     * @param Entity\Token $tokenEntity
      * @return string
      */
-    protected function _createResponseContent (Entity\Token $tokenEntity)
+    protected function _createResponseContent ()
     {
+        $tokenEntity = $this->getTokenEntity();
+        if (! $tokenEntity) {
+            throw new GeneralException\MissingDependencyException('token entity');
+        }
+        
         if (! $tokenEntity->getAccessToken()) {
             throw Exception\MissingFieldException('access token');
         }
         
         return $this->_jsonEncode($tokenEntity->toArray());
-    }
-
-
-    /**
-     * Creates and returns error response data.
-     * 
-     * @return string
-     */
-    protected function _createErrorResponseContent ()
-    {
-        return $this->_jsonEncode(array(
-            'error' => $this->getErrorMessage()
-        ));
-    }
-
-
-    /**
-     * Encodes the provided array into JSON string.
-     * 
-     * @param array $data
-     * @return string
-     */
-    protected function _jsonEncode (Array $data)
-    {
-        return \Zend\Json\Json::encode($data);
     }
 }

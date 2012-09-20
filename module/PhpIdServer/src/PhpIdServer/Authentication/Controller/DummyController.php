@@ -17,6 +17,7 @@ class DummyController extends AbstractController
             ->getUri());
         
         $user = new User($this->_options->get('identity'));
+        
         $authenticationInfo = new Info(array(
             Info::FIELD_METHOD => $this->_options->get('label'), 
             Info::FIELD_TIME => new \DateTime('now')

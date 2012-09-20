@@ -42,20 +42,25 @@ abstract class AbstractController extends BaseController
             $this->_authenticate($context);
         } catch (\Exception $e) {
             $this->_debug(sprintf("Error during authentication: [%s] %s", get_class($e), $e->getMessage()));
+            return $this->_errorResponse('');
         }
         
         $this->_debug('redirecting back to authorize endpoint');
+        
         return $this->_redirectToRoute('php-id-server/authorize-endpoint');
-        /*
-        return $this->plugin('redirect')
-            ->toRoute('php-id-server/authorize-endpoint');
-            */
     }
 
 
     abstract protected function _authenticate (Context\AuthorizeContext $context);
 
 
-    protected function _getUri ()
-    {}
+    protected function _errorResponse ($message)
+    {
+        $response = $this->getResponse();
+        
+        $response->setStatusCode(400);
+        $response->setContent('Authentication error');
+        
+        return $response;
+    }
 }

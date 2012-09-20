@@ -55,7 +55,7 @@ class Serializer implements SerializerInterface
             throw new Exception\AdapterSerializeException($e);
         }
         
-        return $data;
+        return base64_encode($data);
     }
 
 
@@ -69,6 +69,7 @@ class Serializer implements SerializerInterface
      */
     public function unserialize ($data)
     {
+        $data = base64_decode($data);
         try {
             $user = $this->getAdapter()
                 ->unserialize($data);

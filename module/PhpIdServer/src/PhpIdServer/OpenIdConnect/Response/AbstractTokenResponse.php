@@ -47,4 +47,53 @@ abstract class AbstractTokenResponse extends AbstractResponse
     {
         return $this->_errorMessage;
     }
+
+
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\OpenIdConnect\Response\AbstractResponse::getHttpResponse()
+     * @return \Zend\Http\Response
+     */
+    public function getHttpResponse ()
+    {
+        $httpResponse = parent::getHttpResponse();
+        $httpResponse->getHeaders()
+            ->addHeaders(array(
+            'Content-Type' => 'application/json'
+        ));
+        
+        if ($this->isError()) {
+            $httpResponse->setStatusCode(400);
+            $httpResponse->setContent($this->_createErrorResponseContent());
+        } else {
+            $httpResponse->setContent($this->_createResponseContent());
+        }
+        
+        return $httpResponse;
+    }
+
+
+    /**
+     * Creates and returns error response data.
+     *
+     * @return string
+     */
+    protected function _createErrorResponseContent ()
+    {
+        return $this->_jsonEncode(array(
+            'error' => $this->getErrorMessage()
+        ));
+    }
+
+
+    /**
+     * Encodes the provided array into JSON string.
+     *
+     * @param array $data
+     * @return string
+     */
+    protected function _jsonEncode (Array $data)
+    {
+        return \Zend\Json\Json::encode($data);
+    }
 }

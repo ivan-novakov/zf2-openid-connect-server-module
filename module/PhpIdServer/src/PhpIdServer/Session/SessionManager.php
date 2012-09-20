@@ -44,6 +44,24 @@ class SessionManager
 
 
     /**
+     * Extracts user data from the session and returns the user object.
+     * 
+     * @param Session $session
+     * @throws GeneralException\MissingDependencyException
+     * @return User
+     */
+    public function getUserFromSession (Session $session)
+    {
+        $serializer = $this->getUserSerializer();
+        if (! $serializer) {
+            throw new GeneralException\MissingDependencyException('user serializer');
+        }
+        
+        return $serializer->unserialize($session->getUserData());
+    }
+
+
+    /**
      * Creates a new session for the provided user and saves it in the storage.
      * 
      * @param User $user
@@ -103,6 +121,19 @@ class SessionManager
     {
         return $this->_getStorageWithCheck()
             ->loadSession($authorizationCode->getSessionId());
+    }
+
+
+    /**
+     * Returns the corresponding session for the provided access token.
+     * 
+     * @param AccessToken $accessToken
+     * @return Session
+     */
+    public function getSessionByAccessToken (AccessToken $accessToken)
+    {
+        return $this->_getStorageWithCheck()
+            ->loadSession($accessToken->getSessionId());
     }
 
 
@@ -205,6 +236,10 @@ class SessionManager
 
 
     public function createRefreshToken ()
+    {}
+
+
+    public function getRefreshToken ($token)
     {}
 
 

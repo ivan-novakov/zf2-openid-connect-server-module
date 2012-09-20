@@ -88,7 +88,7 @@ class Token extends AbstractDispatcher
          */
         if (! $request->isValid()) {
             _dump($request->getInvalidReasons());
-            return $this->_errorResponse('invalid request');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST);
         }
         
         /*
@@ -101,7 +101,7 @@ class Token extends AbstractDispatcher
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
-            return $this->_errorResponse('unknown client');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT);
         }
         
         /*
@@ -120,11 +120,11 @@ class Token extends AbstractDispatcher
         
         $authorizationCode = $sessionManager->getAuthorizationCode($request->getCode());
         if (! $authorizationCode) {
-            return $this->_errorResponse('invalid authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
         }
         
         if ($authorizationCode->isExpired()) {
-            return $this->_errorResponse('expired authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
         }
         
         /*
@@ -132,7 +132,7 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            return $this->_errorResponse('session not found');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT);
         }
         
         /*

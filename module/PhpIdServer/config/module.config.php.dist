@@ -1,4 +1,7 @@
 <?php
+
+use PhpIdServer\User\User;
+
 return array(
     
     'controllers' => array(
@@ -96,10 +99,12 @@ return array(
                                 'options' => array(
                                     'label' => 'dummy', 
                                     'identity' => array(
-                                        'id' => 'testuser@company.org', 
-                                        'first_name' => 'Test', 
-                                        'surname' => 'User', 
-                                        'email' => 'testuser@company.org'
+                                        User::FIELD_ID => 'vomacka@example.cz', 
+                                        User::FIELD_NAME => 'Franta Vomacka', 
+                                        User::FIELD_GIVEN_NAME => 'Franta', 
+                                        User::FIELD_FAMILY_NAME => 'Vomacka', 
+                                        User::FIELD_NICKNAME => 'killer_vom', 
+                                        User::FIELD_EMAIL => 'franta.vomacka@example.cz'
                                     )
                                 )
                             )
