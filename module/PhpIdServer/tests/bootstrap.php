@@ -14,7 +14,8 @@ Zend\Loader\AutoloaderFactory::factory(array(
         'namespaces' => array(
             'Zend' => ZF2_PATH . 'Zend/', 
             'PhpIdServer' => MODULE_PATH . 'src/PhpIdServer', 
-            'PhpIdServerTest' => TESTS_ROOT . 'PhpIdServerTest/'
+            'PhpIdServerTest' => TESTS_ROOT . 'PhpIdServerTest/', 
+            'MyUnit' => TESTS_ROOT . 'MyUnit'
         )
     )
 ));

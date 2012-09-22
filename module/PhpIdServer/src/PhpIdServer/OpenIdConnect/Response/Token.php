@@ -14,6 +14,10 @@ class Token extends AbstractTokenResponse
     const ERROR_INVALID_CLIENT = 'invalid_client';
 
     const ERROR_INVALID_GRANT = 'invalid_grant';
+    
+    const ERROR_INVALID_GRANT_EXPIRED = 'invalid_grant_expired';
+    
+    const ERROR_INVALID_GRANT_NO_SESSION = 'invalid_grant_no_session';
 
     const ERROR_UNAUTHORIZED_CLIENT = 'unauthorized_client';
 

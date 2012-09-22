@@ -2,28 +2,42 @@
 
 namespace PhpIdServer\OpenIdConnect\Dispatcher;
 
+use PhpIdServer\Entity\EntityFactory;
+use PhpIdServer\Session\Token\AccessToken;
+use PhpIdServer\Entity\EntityFactoryInterface;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
 use PhpIdServer\OpenIdConnect\Entity;
 
 
+/**
+ * Dispatches a token request.
+ *
+ */
 class Token extends AbstractDispatcher
 {
-
+    
     /**
      * The token request object.
      * 
      * @var Request\Token
      */
     protected $_tokenRequest = NULL;
-
+    
     /**
      * The token response object.
      * 
      * @var Response\Token
      */
     protected $_tokenResponse = NULL;
+    
+    /**
+     * The token factory object.
+     * 
+     * @var EntityFactoryInterface
+     */
+    protected $_tokenFactory = NULL;
 
 
     /**
@@ -71,7 +85,33 @@ class Token extends AbstractDispatcher
 
 
     /**
-     * Dispatchers the request and returns the response.
+     * Sets the token factory object.
+     * 
+     * @param EntityFactoryInterface $factory
+     */
+    public function setTokenFactory (EntityFactoryInterface $factory)
+    {
+        $this->_tokenFactory = $factory;
+    }
+
+
+    /**
+     * Returns the token factory object.
+     * 
+     * @return EntityFactoryInterface
+     */
+    public function getTokenFactory ()
+    {
+        if (! $this->_tokenFactory) {
+            $this->_tokenFactory = new EntityFactory('\PhpIdServer\OpenIdConnect\Entity\Token');
+        }
+        
+        return $this->_tokenFactory;
+    }
+
+
+    /**
+     * Dispatches the request and returns the response.
      * 
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
@@ -87,7 +127,6 @@ class Token extends AbstractDispatcher
          * Validate request
          */
         if (! $request->isValid()) {
-            _dump($request->getInvalidReasons());
             return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
@@ -109,7 +148,6 @@ class Token extends AbstractDispatcher
          */
         // [..]
         
-
         /*
          * Retrieve and validate the authorization code.
          */
@@ -124,7 +162,7 @@ class Token extends AbstractDispatcher
         }
         
         if ($authorizationCode->isExpired()) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'Expired authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_EXPIRED, 'Expired authorization code');
         }
         
         /*
@@ -132,7 +170,7 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT, 'No session associated with the authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_NO_SESSION, 'No session associated with the authorization code');
         }
         
         /*
@@ -140,15 +178,26 @@ class Token extends AbstractDispatcher
          */
         $accessToken = $sessionManager->createAccessToken($session, $client);
         
-        $accessTokenEntity = new Entity\Token(array(
+        $accessTokenEntity = $this->_createTokenEntity($accessToken);
+        
+        return $this->_validResponse($accessTokenEntity);
+    }
+
+
+    protected function _createTokenEntity (AccessToken $accessToken)
+    {
+        $tokenFactory = $this->getTokenFactory();
+        if (! ($tokenFactory instanceof EntityFactoryInterface)) {
+            throw new GeneralException\MissingDependencyException('token factory');
+        }
+        
+        return $tokenFactory->createEntity(array(
             Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(), 
             Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(), 
             Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(), 
             Entity\Token::FIELD_REFRESH_TOKEN => 'not set', 
             Entity\Token::FIELD_ID_TOKEN => 'not set'
         ));
-        
-        return $this->_validResponse($accessTokenEntity);
     }
 
 

@@ -10,14 +10,14 @@ use PhpIdServer\OpenIdConnect\Response;
 
 abstract class AbstractDispatcher
 {
-
+    
     /**
      * The client registry object.
      * 
      * @var Registry
      */
     protected $_clientRegistry = NULL;
-
+    
     /**
      * The session manager object.
      * 
