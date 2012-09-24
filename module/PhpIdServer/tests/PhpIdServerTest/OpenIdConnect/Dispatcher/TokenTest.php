@@ -136,7 +136,7 @@ class TokenTest extends DispatcherTestCase
             ->setMethods(array())
             ->getMock();
         
-        if ($expectError) {
+        if ($expectError !== NULL) {
             $response->expects($this->once())
                 ->method('setError')
                 ->with($this->stringContains($expectError));

@@ -3,7 +3,7 @@ namespace PhpIdServer\Client\Authentication\Method;
 use PhpIdServer\Util\Options;
 
 
-class AbstractMethod implements MethodInterface
+abstract class AbstractMethod implements MethodInterface
 {
 
     /**

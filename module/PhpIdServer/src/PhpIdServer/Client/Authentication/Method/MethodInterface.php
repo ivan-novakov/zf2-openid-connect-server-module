@@ -1,9 +1,11 @@
 <?php
+
 namespace PhpIdServer\Client\Authentication\Method;
+
 use PhpIdServer\Client;
 
 
-class MethodInterface
+interface MethodInterface
 {
 
 
