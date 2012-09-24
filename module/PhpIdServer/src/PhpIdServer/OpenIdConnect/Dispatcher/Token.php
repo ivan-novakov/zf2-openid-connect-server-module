@@ -152,6 +152,7 @@ class Token extends AbstractDispatcher
          * Retrieve and validate the authorization code.
          */
         $sessionManager = $this->getSessionManager();
+
         if (! $sessionManager) {
             throw new GeneralException\MissingDependencyException('session manager');
         }

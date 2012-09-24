@@ -22,6 +22,13 @@ abstract class AbstractTokenResponse extends AbstractResponse
      */
     protected $_errorDescription = NULL;
 
+    /**
+     * The default HTTP status code of the error response.
+     *
+     * @var integer
+     */
+    protected $_errorHttpStatusCode = 400;
+
 
     /**
      * Turns the response into error response.
@@ -82,7 +89,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
         ));
         
         if ($this->isError()) {
-            $httpResponse->setStatusCode(400);
+            $httpResponse->setStatusCode($this->_errorHttpStatusCode);
             $httpResponse->setContent($this->_createErrorResponseContent());
         } else {
             $httpResponse->setContent($this->_createResponseContent());

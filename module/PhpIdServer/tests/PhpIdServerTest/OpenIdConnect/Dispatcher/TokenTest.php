@@ -2,16 +2,16 @@
 
 namespace PhpIdServerTest\OpenIdConnect\Dispatcher;
 
+use MyUnit\Framework\DispatcherTestCase;
 use PhpIdServer\Session\Token\AuthorizationCode;
 use PhpIdServer\Client\Client;
-use MyUnit\Framework\DispatcherTestCase;
 use PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\OpenIdConnect\Response;
 
 
 class TokenTest extends DispatcherTestCase
 {
-    
+
     /**
      * The dispatcher object.
      * 
@@ -29,7 +29,23 @@ class TokenTest extends DispatcherTestCase
     public function testDispatchRequestInvalid ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub(true));
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub(Response\Token::ERROR_INVALID_REQUEST));
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseError($response, Response\Token::ERROR_INVALID_REQUEST);
+        $this->_dispatcher->setTokenResponse($response);
+        
+        $response = $this->_dispatcher->dispatch();
+        
+        $this->assertInstanceOf('\PhpIdServer\OpenIdConnect\Response\Token', $response);
+    }
+
+
+    public function testDispatchMissingClientRegistryDependencyException ()
+    {
+        $this->setExpectedException('PhpIdServer\General\Exception\MissingDependencyException');
+        
+        $this->_dispatcher->setTokenRequest($this->_getRequestStub());
+        $this->_dispatcher->setTokenResponse($this->_getResponseStub());
         
         $response = $this->_dispatcher->dispatch();
         
@@ -40,7 +56,11 @@ class TokenTest extends DispatcherTestCase
     public function testDispatchInvalidClient ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub());
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub(Response\Token::ERROR_INVALID_CLIENT));
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseError($response, Response\Token::ERROR_INVALID_CLIENT);
+        $this->_dispatcher->setTokenResponse($response);
+        
         $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub(true));
         
         $response = $this->_dispatcher->dispatch();
@@ -49,10 +69,26 @@ class TokenTest extends DispatcherTestCase
     }
 
 
+    public function testDispatchMissingSessionManagerDependencyException ()
+    {
+        $this->setExpectedException('PhpIdServer\General\Exception\MissingDependencyException');
+        
+        $this->_dispatcher->setTokenRequest($this->_getRequestStub());
+        $this->_dispatcher->setTokenResponse($this->_getResponseStub());
+        $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub());
+        
+        $response = $this->_dispatcher->dispatch();
+    }
+
+
     public function testDispatchNoAuthorizationCode ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub());
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub(Response\Token::ERROR_INVALID_GRANT));
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseError($response, Response\Token::ERROR_INVALID_GRANT);
+        $this->_dispatcher->setTokenResponse($response);
+        
         $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub());
         $this->_dispatcher->setSessionManager($this->_getSessionManagerStub(true));
         
@@ -65,9 +101,16 @@ class TokenTest extends DispatcherTestCase
     public function testDispatchExpiredAuthorizationCode ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub());
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub(Response\Token::ERROR_INVALID_GRANT_EXPIRED));
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseError($response, Response\Token::ERROR_INVALID_GRANT_EXPIRED);
+        $this->_dispatcher->setTokenResponse($response);
+        
         $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub());
-        $this->_dispatcher->setSessionManager($this->_getSessionManagerStub(false, true));
+        
+        $smStub = $this->_getSessionManagerStub();
+        $this->_expectSessionManagerGetAuthorizationCode($smStub, true);
+        $this->_dispatcher->setSessionManager($smStub);
         
         $response = $this->_dispatcher->dispatch();
         
@@ -78,9 +121,16 @@ class TokenTest extends DispatcherTestCase
     public function testDispatchNoSessionForAuthorizationCode ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub());
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub(Response\Token::ERROR_INVALID_GRANT_NO_SESSION));
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseError($response, Response\Token::ERROR_INVALID_GRANT_NO_SESSION);
+        $this->_dispatcher->setTokenResponse($response);
+        
         $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub());
-        $this->_dispatcher->setSessionManager($this->_getSessionManagerStub());
+        
+        $smStub = $this->_getSessionManagerStub();
+        $this->_expectSessionManagerGetAuthorizationCode($smStub);
+        $this->_dispatcher->setSessionManager($smStub);
         
         $response = $this->_dispatcher->dispatch();
         
@@ -91,20 +141,18 @@ class TokenTest extends DispatcherTestCase
     public function testDispatchOk ()
     {
         $this->_dispatcher->setTokenRequest($this->_getRequestStub());
-        $this->_dispatcher->setTokenResponse($this->_getResponseStub());
+        
+        $response = $this->_getResponseStub();
+        $this->_expectResponseOk($response, 'setTokenEntity');
+        $this->_dispatcher->setTokenResponse($response);
+        
         $this->_dispatcher->setClientRegistry($this->_getClientRegistryStub());
         
-        $this->_dispatcher->setSessionManager($this->_getSessionManagerStub(false, false, true));
+        $smStub = $this->_getSessionManagerStub();
+        $this->_expectSessionManagerGetAuthorizationCode($smStub);
+        $this->_expectSessionManagerReturnSession($smStub);
+        $this->_dispatcher->setSessionManager($smStub);
         
-        $response = $this->_dispatcher->dispatch();
-        
-        $this->assertInstanceOf('\PhpIdServer\OpenIdConnect\Response\Token', $response);
-    }
-
-
-    public function _testDispatch ()
-    {
-        $this->_dispatcher->setTokenRequest($this->_getRequestStub());
         $response = $this->_dispatcher->dispatch();
         
         $this->assertInstanceOf('\PhpIdServer\OpenIdConnect\Response\Token', $response);
@@ -116,9 +164,11 @@ class TokenTest extends DispatcherTestCase
         $request = $this->getMockBuilder('\PhpIdServer\OpenIdConnect\Request\Token')
             ->disableOriginalConstructor()
             ->getMock();
+        
         $request->expects($this->any())
             ->method('isValid')
             ->will($this->returnValue(! $invalid));
+        
         $request->expects($this->any())
             ->method('getInvalidReasons')
             ->will($this->returnValue(array(
@@ -135,18 +185,6 @@ class TokenTest extends DispatcherTestCase
             ->disableOriginalConstructor()
             ->setMethods(array())
             ->getMock();
-        
-        if ($expectError !== NULL) {
-            $response->expects($this->once())
-                ->method('setError')
-                ->with($this->stringContains($expectError));
-        } else {
-            $response->expects($this->never())
-                ->method('setError');
-            
-            $response->expects($this->once())
-                ->method('setTokenEntity');
-        }
         
         return $response;
     }
@@ -178,48 +216,7 @@ class TokenTest extends DispatcherTestCase
             ->method('createAccessToken')
             ->will($this->returnValue($this->_getAccessTokenStub()));
         
-        if (! $noAuthorizationCode) {
-            $authorizationCode = $this->_getAuthorizationCodeStub($expired);
-            
-            $sm->expects($this->any())
-                ->method('getAuthorizationCode')
-                ->will($this->returnValue($authorizationCode));
-        }
-        
-        if ($returnSession) {
-            $sm->expects($this->any())
-                ->method('getSessionForAuthorizationCode')
-                ->will($this->returnValue($this->_getSessionStub()));
-        }
-        
         return $sm;
-    }
-
-
-    protected function _getClientStub ()
-    {
-        $client = $this->getMock('\PhpIdServer\Client\Client');
-        
-        return $client;
-    }
-
-
-    protected function _getAuthorizationCodeStub ($expired = false)
-    {
-        $authorizationCode = $this->getMock('\PhpIdServer\Session\Token\AuthorizationCode');
-        $authorizationCode->expects($this->any())
-            ->method('isExpired')
-            ->will($this->returnValue($expired));
-        
-        return $authorizationCode;
-    }
-
-
-    protected function _getSessionStub ()
-    {
-        $session = $this->getMock('\PhpIdServer\Session\Session');
-        
-        return $session;
     }
 
 
@@ -228,5 +225,23 @@ class TokenTest extends DispatcherTestCase
         $accessToken = $this->getMock('\PhpIdServer\Session\Token\AccessToken');
         
         return $accessToken;
+    }
+
+
+    protected function _expectSessionManagerGetAuthorizationCode ($sm, $expired = false)
+    {
+        $authorizationCode = $this->_getAuthorizationCodeStub($expired);
+        
+        $sm->expects($this->any())
+            ->method('getAuthorizationCode')
+            ->will($this->returnValue($authorizationCode));
+    }
+
+
+    protected function _expectSessionManagerReturnSession ($sm)
+    {
+        $sm->expects($this->once())
+            ->method('getSessionForAuthorizationCode')
+            ->will($this->returnValue($this->_getSessionStub()));
     }
 }
