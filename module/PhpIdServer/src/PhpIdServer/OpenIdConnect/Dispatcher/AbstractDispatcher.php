@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\OpenIdConnect\Dispatcher;
 
+use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\Session\SessionManager;
 use PhpIdServer\Client\Registry\Registry;
 use PhpIdServer\OpenIdConnect\Request;
@@ -10,14 +11,14 @@ use PhpIdServer\OpenIdConnect\Response;
 
 abstract class AbstractDispatcher
 {
-    
+
     /**
      * The client registry object.
      * 
      * @var Registry
      */
     protected $_clientRegistry = NULL;
-    
+
     /**
      * The session manager object.
      * 
@@ -40,10 +41,14 @@ abstract class AbstractDispatcher
     /**
      * Returns the client registry.
      * 
+     * @throws GeneralException\MissingDependencyException
      * @return Registry
      */
-    public function getClientRegistry ()
+    public function getClientRegistry ($throwException = false)
     {
+        if ($throwException && ! ($this->_clientRegistry instanceof Registry)) {
+            throw new GeneralException\MissingDependencyException('client registry');
+        }
         return $this->_clientRegistry;
     }
 
@@ -62,10 +67,14 @@ abstract class AbstractDispatcher
     /**
      * Returns the session manager.
      * 
+     * @throws GeneralException\MissingDependencyException
      * @return SessionManager
      */
-    public function getSessionManager ()
+    public function getSessionManager ($throwException = false)
     {
+        if ($throwException && ! ($this->_sessionManager instanceof SessionManager)) {
+            throw new GeneralException\MissingDependencyException('session manager');
+        }
         return $this->_sessionManager;
     }
 }

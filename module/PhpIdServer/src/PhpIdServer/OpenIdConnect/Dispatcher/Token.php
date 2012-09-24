@@ -17,21 +17,21 @@ use PhpIdServer\OpenIdConnect\Entity;
  */
 class Token extends AbstractDispatcher
 {
-    
+
     /**
      * The token request object.
      * 
      * @var Request\Token
      */
     protected $_tokenRequest = NULL;
-    
+
     /**
      * The token response object.
      * 
      * @var Response\Token
      */
     protected $_tokenResponse = NULL;
-    
+
     /**
      * The token factory object.
      * 
@@ -56,8 +56,11 @@ class Token extends AbstractDispatcher
      * 
      * @return Request\Token
      */
-    public function getTokenRequest ()
+    public function getTokenRequest ($throwException = false)
     {
+        if ($throwException && ! ($this->_tokenRequest instanceof Request\Token)) {
+            throw new GeneralException\MissingDependencyException('request token');
+        }
         return $this->_tokenRequest;
     }
 
@@ -78,8 +81,11 @@ class Token extends AbstractDispatcher
      * 
      * @return Response\Token
      */
-    public function getTokenResponse ()
+    public function getTokenResponse ($throwException = false)
     {
+        if ($throwException && ! ($this->_tokenResponse instanceof Response\Token)) {
+            throw new GeneralException\MissingDependencyException('response token');
+        }
         return $this->_tokenResponse;
     }
 
@@ -118,10 +124,7 @@ class Token extends AbstractDispatcher
      */
     public function dispatch ()
     {
-        $request = $this->getTokenRequest();
-        if (! $request) {
-            throw new GeneralException\MissingDependencyException('token request');
-        }
+        $request = $this->getTokenRequest(true);
         
         /*
          * Validate request
@@ -133,10 +136,7 @@ class Token extends AbstractDispatcher
         /*
          * Validate client
          */
-        $clientRegistry = $this->getClientRegistry();
-        if (! $clientRegistry) {
-            throw new GeneralException\MissingDependencyException('client registry');
-        }
+        $clientRegistry = $this->getClientRegistry(true);
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
@@ -148,14 +148,11 @@ class Token extends AbstractDispatcher
          */
         // [..]
         
+
         /*
          * Retrieve and validate the authorization code.
          */
-        $sessionManager = $this->getSessionManager();
-
-        if (! $sessionManager) {
-            throw new GeneralException\MissingDependencyException('session manager');
-        }
+        $sessionManager = $this->getSessionManager(true);
         
         $authorizationCode = $sessionManager->getAuthorizationCode($request->getCode());
         if (! $authorizationCode) {
@@ -211,10 +208,7 @@ class Token extends AbstractDispatcher
      */
     protected function _validResponse (Entity\Token $entityToken)
     {
-        $response = $this->getTokenResponse();
-        if (! $response) {
-            throw new GeneralException\MissingDependencyException('token response');
-        }
+        $response = $this->getTokenResponse(true);
         
         $response->setTokenEntity($entityToken);
         
@@ -231,10 +225,7 @@ class Token extends AbstractDispatcher
      */
     protected function _errorResponse ($message)
     {
-        $response = $this->getTokenResponse();
-        if (! $response) {
-            throw new GeneralException\MissingDependencyException('token response');
-        }
+        $response = $this->getTokenResponse(true);
         
         $response->setError($message);
         

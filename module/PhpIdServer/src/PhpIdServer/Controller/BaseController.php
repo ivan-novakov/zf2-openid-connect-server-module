@@ -69,6 +69,7 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
         _dump($message);
         $response = $this->getResponse();
         $response->setStatusCode(500);
+        $response->setContent('ERROR: ' . $message);
         
         return $response;
     }

@@ -3,7 +3,7 @@
 namespace PhpIdServer\OpenIdConnect\Response;
 
 
-abstract class AbstractResponse
+abstract class AbstractResponse implements ResponseInterface
 {
 
     /**
@@ -32,12 +32,29 @@ abstract class AbstractResponse
      */
     public function getHttpResponse ()
     {
-        $this->_httpResponse->getHeaders()
+        $this->_setNoCacheHeaders($this->_httpResponse);
+        
+        return $this->_httpResponse;
+    }
+
+
+    /**
+     * Returns the HTTP response object with no modifications.
+     *
+     * @return \Zend\Http\Response
+     */
+    public function getRawHttpResponse ()
+    {
+        return $this->_httpResponse;
+    }
+
+
+    protected function _setNoCacheHeaders ($httpResponse)
+    {
+        $httpResponse->getHeaders()
             ->addHeaders(array(
             'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0', 
             'Pragma' => 'no-cache'
         ));
-        
-        return $this->_httpResponse;
     }
 }
