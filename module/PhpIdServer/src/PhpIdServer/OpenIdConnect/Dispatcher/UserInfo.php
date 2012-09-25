@@ -97,10 +97,7 @@ class UserInfo extends AbstractDispatcher
         /*
          * Validate token and retrieve session.
          */
-        $sessionManager = $this->getSessionManager();
-        if (! $sessionManager) {
-            throw new GeneralException\MissingDependencyException('session manager');
-        }
+        $sessionManager = $this->getSessionManager(true);
         
         $accessToken = $sessionManager->getAccessToken($request->getAuthorizationValue());
         if (! $accessToken) {
@@ -158,14 +155,14 @@ class UserInfo extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    protected function _errorResponse ($message)
+    protected function _errorResponse ($message, $description = NULL)
     {
         $userInfoResponse = $this->getUserInfoResponse();
         if (! $userInfoResponse) {
             throw new GeneralException\MissingDependencyException('userinfo response');
         }
         
-        $userInfoResponse->setError($message);
+        $userInfoResponse->setError($message, $description);
         
         return $userInfoResponse;
     }

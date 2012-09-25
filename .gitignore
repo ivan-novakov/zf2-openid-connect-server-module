@@ -5,3 +5,4 @@ module/PhpIdServer/tests/_files/tests.config.php
 module/PhpIdServer/config/module.config.php
 module/PhpIdServer/config/server.config.php
 module/PhpIdServer/tests/_reports/*
+public/.htaccess

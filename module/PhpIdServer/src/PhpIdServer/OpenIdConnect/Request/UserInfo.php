@@ -119,7 +119,7 @@ class UserInfo extends AbstractRequest
         
         $authorizationType = $this->getAuthorizationType();
         if ('bearer' != $authorizationType) {
-            $reasons[] = spritnf("invalid auth type '%s'", $authorizationType);
+            $reasons[] = sprintf("invalid auth type '%s'", $authorizationType);
         }
         
         if (NULL === $this->getAuthorizationValue()) {

@@ -148,7 +148,7 @@ class Token extends AbstractDispatcher
          */
         // [..]
         
-
+        
         /*
          * Retrieve and validate the authorization code.
          */
@@ -223,11 +223,11 @@ class Token extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    protected function _errorResponse ($message)
+    protected function _errorResponse ($message, $description = NULL)
     {
         $response = $this->getTokenResponse(true);
         
-        $response->setError($message);
+        $response->setError($message, $description);
         
         return $response;
     }
