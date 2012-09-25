@@ -58,7 +58,7 @@ class AuthorizeController extends BaseController
             
             $this->_debug('redirecting user to authentication handler');
             $this->_saveContext($context);
-
+            
             return $this->_redirectToRoute($manager->getAuthenticationRouteName());
         }
         
@@ -69,13 +69,21 @@ class AuthorizeController extends BaseController
         
 
         /*
+         * Clear context (!)
+         */
+        $serviceLocator->get('ContextStorage')
+            ->clear();
+        
+        /*
          * Dispatching response
          */
         try {
             $response = $dispatcher->dispatch();
-
+            
             $this->_debug('returning response');
-            return $response->getHttpResponse();
+            $httpResponse = $response->getHttpResponse();
+            
+            return $httpResponse;
         } catch (\Exception $e) {
             _dump("$e");
             $this->_debug("$e");

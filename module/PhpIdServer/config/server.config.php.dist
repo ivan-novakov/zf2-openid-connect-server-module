@@ -16,7 +16,7 @@ return array(
     ), 
     
     'client_registry_storage' => array(
-        'storage' => '\PhpIdServer\Client\Registry\Storage\SingleJsonFileStorage', 
+        'type' => 'SingleJsonFileStorage', 
         'options' => array(
             'json_file' => 'data/client/metadata.json'
         )
