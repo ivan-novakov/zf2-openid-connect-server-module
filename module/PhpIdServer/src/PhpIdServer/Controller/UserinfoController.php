@@ -2,6 +2,8 @@
 
 namespace PhpIdServer\Controller;
 
+use Nette\Diagnostics\Debugger;
+
 use PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
@@ -14,7 +16,7 @@ class UserinfoController extends BaseController
     public function indexAction ()
     {
         $serviceLocator = $this->getServiceLocator();
-        
+
         $dispatcher = new Dispatcher\UserInfo();
         $dispatcher->setSessionManager($serviceLocator->get('SessionManager'));
         $dispatcher->setUserInfoRequest(new Request\UserInfo($this->getRequest()));

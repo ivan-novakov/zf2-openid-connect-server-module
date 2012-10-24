@@ -10,10 +10,14 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
 {
 
 
-    protected function _getServerConfig ()
+    /**
+     * Returns the service manager object.
+     * 
+     * @return \Zend\ServiceManager\ServiceManager
+     */
+    protected function _getServiceManager ()
     {
-        return $this->getServiceLocator()
-            ->get('ServerConfig');
+        return $this->getServiceLocator();
     }
 
 
@@ -58,7 +62,7 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
-    protected function _handleException ($e)
+    protected function _handleException (\Exception $e)
     {
         return $this->_handleError("$e");
     }

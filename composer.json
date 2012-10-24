@@ -4,6 +4,7 @@
 
     "require" : {
         "php" : ">=5.3.3",
-        "zendframework/zendframework" : "dev-release"
+        "zendframework/zendframework" : "2.*",
+        "webino/zf2nette-debug" : "1.0.1"
     }
 }

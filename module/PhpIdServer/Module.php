@@ -1,12 +1,16 @@
 <?php
+
 namespace PhpIdServer;
-use Zend\Config\Config;
+
 use Zend\Mvc\MvcEvent;
-use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\EventManager\EventInterface;
 use Zend\Mvc\ModuleRouteListener;
+use Zend\ModuleManager\Feature\ServiceProviderInterface;
+use Zend\ModuleManager\Feature\BootstrapListenerInterface;
+use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 
 
-class Module implements AutoloaderProviderInterface
+class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface
 {
 
 
@@ -34,51 +38,25 @@ class Module implements AutoloaderProviderInterface
     }
 
 
-    public function onBootstrap (MvcEvent $e)
+    public function onBootstrap (EventInterface $e)
     {
-        $serviceManager = $e->getApplication()
-            ->getServiceManager();
-        
+        /* @var $e MvcEvent */
         $eventManager = $e->getApplication()
             ->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
         
-        $router = $e->getRouter();
-        //_dump($router);
-        
-
         //$eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function  (MvcEvent $e)
         {
             _dump('ERROR IN DISPATCH: ' . $e->getError());
         }, 100);
-        
-        $serverConfig = new Config(require __DIR__ . '/config/server.config.php');
-        $serviceManager->setService('ServerConfig', $serverConfig);
-        
-        $logger = $this->_initLogger($serverConfig);
-        $serviceManager->setService('Logger', $logger);
     }
 
 
-    protected function _initLogger (\Zend\Config\Config $serverConfig)
+    public function getServiceConfig ()
     {
-        $loggerConfig = $serverConfig->logger;
-        $writerConfigs = $loggerConfig->writers->toArray();
-        
-        $logger = new \Zend\Log\Logger();
-        if (count($writerConfigs)) {
-            $priority = 1;
-            foreach ($writerConfigs as $writerConfig) {
-                $logger->addWriter($writerConfig['name'], $priority ++, $writerConfig['options']);
-            }
-        }
-        
-        //\Zend\Log\Logger::registerErrorHandler($logger);
-        //\Zend\Log\Logger::registerExceptionHandler($logger);
-        
-
-        return $logger;
+        //return '\PhpIdServer\ServiceManager\ServiceManagerConfig';
+        return new \PhpIdServer\ServiceManager\ServiceManagerConfig();
     }
 }

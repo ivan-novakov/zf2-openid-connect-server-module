@@ -17,7 +17,7 @@ abstract class Entity
     /**
      * Fields definitions for the entity.
      * 
-     * @var unknown_type
+     * @var array
      */
     protected $_fields = array();
 
