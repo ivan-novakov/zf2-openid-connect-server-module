@@ -1,4 +1,2 @@
-.buildpath
-.project
-.settings/
-.DS_Store
+tests/_files/tests.config.php
+tests/_reports/

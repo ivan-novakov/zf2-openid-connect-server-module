@@ -6,16 +6,12 @@ return array(
     
     'controllers' => array(
         'invokables' => array(
-            'PhpIdServer\Controller\Index' => 'PhpIdServer\Controller\IndexController', 
-            'PhpIdServer\Controller\Authorize' => 'PhpIdServer\Controller\AuthorizeController', 
-            'PhpIdServer\Controller\Token' => 'PhpIdServer\Controller\TokenController', 
-            'PhpIdServer\Controller\Userinfo' => 'PhpIdServer\Controller\UserinfoController', 
-            'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
-            
-            //'PhpIdServer\Controller\Authenticate' => 'PhpIdServer\Controller\AuthenticateController', 
-            
-
-            'PhpIdServer\Authentication\Controller\Dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
+            'controller-index' => 'PhpIdServer\Controller\IndexController', 
+            'controller-authorize' => 'PhpIdServer\Controller\AuthorizeController', 
+            'controller-token' => 'PhpIdServer\Controller\TokenController', 
+            'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController', 
+            //'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
+            'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
         )
     ), 
     
@@ -30,7 +26,7 @@ return array(
                     'route' => '/oic', 
                     'defaults' => array(
                         // '__NAMESPACE__' => 'PhpIdServer\Controller', 
-                        'controller' => 'PhpIdServer\Controller\Index', 
+                        'controller' => 'controller-index', 
                         'action' => 'index'
                     )
                 ), 
@@ -43,7 +39,7 @@ return array(
                         'options' => array(
                             'route' => '/authorize', 
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\Controller\Authorize', 
+                                'controller' => 'controller-authorize', 
                                 'action' => 'index'
                             )
                         )
@@ -55,7 +51,7 @@ return array(
                         'options' => array(
                             'route' => '/token', 
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\Controller\Token', 
+                                'controller' => 'controller-token', 
                                 'action' => 'index'
                             )
                         )
@@ -67,19 +63,7 @@ return array(
                         'options' => array(
                             'route' => '/userinfo', 
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\Controller\Userinfo', 
-                                'action' => 'index'
-                            )
-                        )
-                    ), 
-                    
-                    'authentication-endpoint' => array(
-                        'type' => 'Literal', 
-                        'may_terminate' => true, 
-                        'options' => array(
-                            'route' => '/auth', 
-                            'defaults' => array(
-                                'controller' => 'PhpIdServer\Controller\Authenticate', 
+                                'controller' => 'controller-userinfo', 
                                 'action' => 'index'
                             )
                         )
@@ -94,7 +78,7 @@ return array(
                         'options' => array(
                             'route' => '/authenticate/dummy', 
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\Authentication\Controller\Dummy', 
+                                'controller' => 'controller-auth-dummy', 
                                 'action' => 'authenticate', 
                                 'options' => array(
                                     'label' => 'dummy', 
@@ -115,17 +99,19 @@ return array(
         )
     ), 
     
-    // OBSOLETE ?
-    'controller' => array(
-        'classes' => array(
-            'php-id-server-Index' => 'PhpIdServer\Controller\IndexController', 
-            'PhpIdServer-Authorize' => 'PhpIdServer\Controller\AuthorizeController'
-        )
-    ), 
-    
     'view_manager' => array(
         'template_path_stack' => array(
             'php-id-server' => __DIR__ . '/../view'
+        ), 
+        
+        'display_exceptions' => true, 
+        'exception_template' => 'error/index', 
+        
+        'display_not_found_reason' => true, 
+        'not_found_template' => 'error/404', 
+        
+        'template_map' => array(
+            'error/index' => __DIR__ . '/../view/error/error.phtml'
         )
     ), 
     
@@ -134,14 +120,74 @@ return array(
             'AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory', 
             'ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory', 
             'SessionManager' => 'PhpIdServer\Session\SessionManagerFactory', 
-            'UserSerializer' => 'PhpIdServer\User\Serializer\SerializerFactory', 
             'SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory', 
-            'SessionIdGenerator' => 'PhpIdServer\Session\IdGenerator\IdGeneratorFactory', 
             'ClientRegistryStorage' => 'PhpIdServer\Client\Registry\StorageFactory', 
             'ClientRegistry' => 'PhpIdServer\Client\RegistryFactory'
         ), 
         'invokables' => array(
             'TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'
+        )
+    ), 
+    
+    'logger' => array(
+        'writers' => array(
+            array(
+                'name' => 'stream', 
+                'options' => array(
+                    'stream' => '/data/var/log/devel/phpid-server/phpid-server.log'
+                )
+            )
+        )
+    ), 
+    
+    'client_registry_storage' => array(
+        'type' => 'SingleJsonFileStorage', 
+        'options' => array(
+            'json_file' => 'data/client/metadata.json'
+        )
+    ), 
+    
+    'authentication' => array(
+        'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
+    ), 
+    
+    'context_storage' => array(
+        'type' => 'Session', 
+        'options' => array(
+            'session_container_name' => 'authorize'
+        )
+    ), 
+    
+    'session_storage' => array(
+        'type' => 'MysqlLite', 
+        'options' => array(
+            
+            'session_table' => 'session', 
+            'authorization_code_table' => 'authorization_code', 
+            'access_token_table' => 'access_token', 
+            'refresh_token_table' => 'refresh_token', 
+            
+            'adapter' => array(
+                'driver' => 'Pdo_Mysql', 
+                'host' => 'localhost', 
+                'username' => 'phpid_admin',  
+                'password' => 'phpid admin heslo', 
+                'database' => 'phpidserver'
+            )
+        )
+    ), 
+    
+    'session_id_generator' => array(
+        'class' => '\PhpIdServer\Session\IdGenerator\Simple', 
+        'options' => array(
+            'secret_salt' => 'tajna sul'
+        )
+    ), 
+    
+    'user_serializer' => array(
+        'adapter' => array(
+            'name' => 'PhpSerialize', 
+            'options' => array()
         )
     )
 );
