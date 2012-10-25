@@ -2,11 +2,13 @@
 
 namespace PhpIdServer\ServiceManager;
 
-use PhpIdServer\Util\String;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
+use PhpIdServer\Util\String;
 use PhpIdServer\User;
 use PhpIdServer\Authentication;
+use PhpIdServer\OpenIdConnect\Dispatcher;
+use PhpIdServer\OpenIdConnect\Response;
 
 
 class ServiceManagerConfig extends Config
@@ -99,6 +101,26 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return new Authentication\Manager($config['authentication']);
+            }, 
+            
+            'AuthorizeDispatcher' => function  (ServiceManager $sm)
+            {
+                $dispatcher = new Dispatcher\Authorize();
+                
+                $dispatcher->setContext($sm->get('AuthorizeContext'));
+                $dispatcher->setAuthorizeResponse($sm->get('AuthorizeResponse'));
+                $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
+                $dispatcher->setSessionManager($sm->get('SessionManager'));
+                
+                return $dispatcher;
+            }, 
+            
+            /*
+             * OpenIdConnect/Response/Authorize/
+             */
+            'AuthorizeResponse' => function  (ServiceManager $sm)
+            {
+                return new Response\Authorize\Simple($sm->get('Response'));
             }
         );
     }

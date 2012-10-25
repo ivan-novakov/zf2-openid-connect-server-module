@@ -2,15 +2,7 @@
 
 namespace PhpIdServer\Controller;
 
-use PhpIdServer\Authentication\Manager;
-use Zend\Mvc\MvcEvent;
-use PhpIdServer\Context;
-use PhpIdServer\Context\AuthorizeContext;
-use PhpIdServer\Authentication;
-use PhpIdServer\OpenIdConnect;
-use PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\OpenIdConnect\Response;
-use PhpIdServer\OpenIdConnect\Request;
 
 
 class AuthorizeController extends BaseController
@@ -19,17 +11,10 @@ class AuthorizeController extends BaseController
 
     public function indexAction ()
     {
-        $serviceLocator = $this->getServiceLocator();
-        $context = $serviceLocator->get('AuthorizeContext');
+        $serviceManager = $this->_getServiceManager();
         
-        $dispatcher = new Dispatcher\Authorize();
-        $dispatcher->setContext($context);
-        
-        $oicResponse = new Response\Authorize\Simple($this->getResponse());
-        $dispatcher->setAuthorizeResponse($oicResponse);
-        
-        $dispatcher->setClientRegistry($serviceLocator->get('ClientRegistry'));
-        $dispatcher->setSessionManager($serviceLocator->get('SessionManager'));
+        $context = $serviceManager->get('AuthorizeContext');
+        $dispatcher = $serviceManager->get('AuthorizeDispatcher');
         
         /*
          * User authentication
@@ -49,7 +34,7 @@ class AuthorizeController extends BaseController
                 return $this->_handleError();
             }
             
-            $manager = $this->_getAuthenticationManager();
+            $manager = $serviceManager->get('AuthenticationManager');
             
             $this->_debug('redirecting user to authentication handler');
             $this->_saveContext($context);
@@ -68,7 +53,7 @@ class AuthorizeController extends BaseController
         /*
          * Clear context (!)
          */
-        $serviceLocator->get('ContextStorage')
+        $serviceManager->get('ContextStorage')
             ->clear();
         
         /*
@@ -86,29 +71,5 @@ class AuthorizeController extends BaseController
             $this->_debug("$e");
             return $this->_handleError();
         }
-    }
-
-
-    /**
-     * Returns the context object.
-     * 
-     * @return AuthorizeContext
-     */
-    protected function _getContext ()
-    {
-        return $this->_getServiceManager()
-            ->get('AuthorizeContext');
-    }
-
-
-    /**
-     * Returns the authentication manager.
-     * 
-     * @return Manager
-     */
-    protected function _getAuthenticationManager ()
-    {
-        return $this->_getServiceManager()
-            ->get('AuthenticationManager');
     }
 }
