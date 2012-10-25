@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\ServiceManager;
 
+use PhpIdServer\Util\String;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
 use PhpIdServer\User;
@@ -29,9 +30,19 @@ class ServiceManagerConfig extends Config
                 
                 $logger = new \Zend\Log\Logger();
                 if (count($loggerConfig['writers'])) {
+                    
                     $priority = 1;
                     foreach ($loggerConfig['writers'] as $writerConfig) {
-                        $logger->addWriter($writerConfig['name'], $priority ++, $writerConfig['options']);
+                        $writer = $logger->writerPlugin($writerConfig['name'], $writerConfig['options']);
+                        if (isset($writerConfig['filters']) && is_array($writerConfig['filters'])) {
+                            foreach ($writerConfig['filters'] as $filterName => $filterValue) {
+                                $filterClass = '\Zend\Log\Filter\\' . String::underscoreToCamelCase($filterName);
+                                $filter = new $filterClass($filterValue);
+                                $writer->addFilter($filter);
+                            }
+                        }
+                        
+                        $logger->addWriter($writer, $priority ++);
                     }
                 }
                 

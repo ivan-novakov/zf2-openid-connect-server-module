@@ -1,5 +1,7 @@
 <?php
 
+use Zend\Log\Logger;
+
 use PhpIdServer\User\User;
 
 return array(
@@ -25,7 +27,6 @@ return array(
                     
                     'route' => '/oic', 
                     'defaults' => array(
-                        // '__NAMESPACE__' => 'PhpIdServer\Controller', 
                         'controller' => 'controller-index', 
                         'action' => 'index'
                     )
@@ -93,6 +94,19 @@ return array(
                                 )
                             )
                         )
+                    ), 
+                    
+                    'authentication-endpoint-static' => array(
+                        'type' => 'Literal', 
+                        'may_terminate' => true, 
+                        'options' => array(
+                            'route' => '/authenticate/static', 
+                            'defaults' => array(
+                                'controller' => 'controller-auth-static', 
+                                'action' => 'authenticate', 
+                                'options' => array()
+                            )
+                        )
                     )
                 )
             )
@@ -135,6 +149,9 @@ return array(
                 'name' => 'stream', 
                 'options' => array(
                     'stream' => '/data/var/log/devel/phpid-server/phpid-server.log'
+                ), 
+                'filters' => array(
+                    'priority' => Logger::DEBUG
                 )
             )
         )
@@ -170,7 +187,7 @@ return array(
             'adapter' => array(
                 'driver' => 'Pdo_Mysql', 
                 'host' => 'localhost', 
-                'username' => 'phpid_admin',  
+                'username' => 'phpid_admin', 
                 'password' => 'phpid admin heslo', 
                 'database' => 'phpidserver'
             )
