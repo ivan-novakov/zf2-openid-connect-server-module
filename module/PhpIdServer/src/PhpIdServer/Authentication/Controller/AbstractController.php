@@ -79,9 +79,11 @@ abstract class AbstractController extends BaseController implements Authenticati
             return $this->_handleException($e, 'Authentication exception');
         }
         
-        $this->_debug('redirecting back to authorize endpoint');
+        $authorizeRoute = 'php-id-server/authorize-endpoint';
         
-        return $this->_redirectToRoute('php-id-server/authorize-endpoint');
+        $this->_logInfo(sprintf("redirecting back to authorize endpoint '%s'", $authorizeRoute));
+        
+        return $this->_redirectToRoute($authorizeRoute);
     }
 
 

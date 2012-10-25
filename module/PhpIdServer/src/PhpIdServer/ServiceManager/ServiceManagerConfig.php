@@ -171,6 +171,36 @@ class ServiceManagerConfig extends Config
             'TokenResponse' => function  (ServiceManager $sm)
             {
                 return new Response\Token($sm->get('Response'));
+            }, 
+            
+            /*
+             * OpenIdConnect/Dispatcher/UserInfo
+             */
+            'UserInfoDispatcher' => function  (ServiceManager $sm)
+            {
+                $dispatcher = new Dispatcher\UserInfo();
+                
+                $dispatcher->setSessionManager($sm->get('SessionManager'));
+                $dispatcher->setUserInfoRequest($sm->get('UserInfoRequest'));
+                $dispatcher->setUserInfoResponse($sm->get('UserInfoResponse'));
+                
+                return $dispatcher;
+            }, 
+            
+            /*
+             * OpenIdConnect/Request/UserInfo
+             */
+            'UserInfoRequest' => function  (ServiceManager $sm)
+            {
+                return new Request\UserInfo($sm->get('Request'));
+            }, 
+            
+            /*
+             * OpenIdConnect/Response/UserInfo
+             */
+            'UserInfoResponse' => function  (ServiceManager $sm)
+            {
+                return new Response\UserInfo($sm->get('Response'));
             }
         );
     }

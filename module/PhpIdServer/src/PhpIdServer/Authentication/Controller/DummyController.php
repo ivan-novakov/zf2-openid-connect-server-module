@@ -19,7 +19,6 @@ class DummyController extends AbstractController
         $context->setUser($user);
         $context->setAuthenticationInfo($authenticationInfo);
         
-        $this->_debug('Saving context...');
         $this->_saveContext($context);
     }
 }

@@ -9,7 +9,7 @@ use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
 
 
-abstract class AbstractDispatcher
+abstract class AbstractDispatcher implements DispatcherInterface
 {
 
     /**
