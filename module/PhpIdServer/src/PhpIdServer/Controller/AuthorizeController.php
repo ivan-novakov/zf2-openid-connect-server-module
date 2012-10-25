@@ -42,7 +42,7 @@ class AuthorizeController extends BaseController
             
             $manager = $serviceManager->get('AuthenticationManager');
             
-            $authenticationHandlerName = 'dummy';
+            $authenticationHandlerName = $manager->getAuthenticationHandler();
             $this->_logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
             
             return $this->_redirectToRoute($manager->getAuthenticationRouteName(), array(

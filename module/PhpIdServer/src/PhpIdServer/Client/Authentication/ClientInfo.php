@@ -48,6 +48,7 @@ class ClientInfo
         if (! Type::isSupported($type)) {
             throw new Exception\UnsupportedAuthenticationTypeException($type);
         }
+        
         $this->_type = $type;
     }
 

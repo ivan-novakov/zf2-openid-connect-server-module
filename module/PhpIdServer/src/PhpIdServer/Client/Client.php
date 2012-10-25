@@ -11,6 +11,8 @@ use PhpIdServer\Entity\Entity;
  * @method string getId()
  * @method string getType()
  * @method string getRedirectUri()
+ * @method string getUserAuthenticationHandler()
+ * @method Authentication\ClientInfo getAuthenticationInfo()
  */
 class Client extends Entity
 {
@@ -23,11 +25,14 @@ class Client extends Entity
 
     const FIELD_REDIRECT_URI = 'redirect_uri';
 
+    const FIELD_USER_AUTHENTICATION_HANDLER = 'user_authentication_handler';
+
     protected $_fields = array(
         self::FIELD_ID, 
         self::FIELD_TYPE, 
         self::FIELD_AUTHENTICATION, 
-        self::FIELD_REDIRECT_URI
+        self::FIELD_REDIRECT_URI, 
+        self::FIELD_USER_AUTHENTICATION_HANDLER
     );
 
     protected $_idField = self::FIELD_ID;

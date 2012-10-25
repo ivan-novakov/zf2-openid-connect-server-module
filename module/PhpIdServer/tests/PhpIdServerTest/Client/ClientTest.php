@@ -9,18 +9,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 {
 
 
-    public function testAuthenticationInfo ()
+    public function testGetAuthenticationInfo ()
     {
-        $client = new Client\Client(array(
-            'id' => 'myClientId', 
-            'type' => 'public', 
-            'authentication' => array(
-                'type' => Client\Authentication\Type::SECRET, 
-                'options' => array(
-                    'secret' => 'xxx'
-                )
-            )
-        ));
+        $client = new Client\Client($this->_getClientData());
         
         $authenticationInfo = $client->getAuthenticationInfo();
         
@@ -38,5 +29,28 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         ));
         
         $authenticationInfo = $client->getAuthenticationInfo();
+    }
+
+
+    public function testGetUserAuthenticationHandler ()
+    {
+        $client = new Client\Client($this->_getClientData());
+        $this->assertSame('dummy', $client->getUserAuthenticationHandler());
+    }
+
+
+    protected function _getClientData ()
+    {
+        return array(
+            'id' => 'myClientId', 
+            'type' => 'public', 
+            'authentication' => array(
+                'type' => Client\Authentication\Type::SECRET, 
+                'options' => array(
+                    'secret' => 'xxx'
+                )
+            ), 
+            'user_authentication_handler' => 'dummy'
+        );
     }
 }

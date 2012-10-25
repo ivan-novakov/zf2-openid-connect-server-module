@@ -9,7 +9,8 @@
                 "options" : {
                     "secret" : "testclientsecret"
                 }
-            }
+            },
+            "user_authentication_handler" : "dummy"
         },
 
         {

@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServerTest\Client\Authentication;
+
 use PhpIdServer\Client\Authentication\ClientInfo;
 use PhpIdServer\Client\Authentication;
 
@@ -10,11 +12,14 @@ class ClientInfoTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor ()
     {
-        $info = new ClientInfo(Authentication\Type::SECRET, array(
+        $options = array(
             'foo' => 'bar'
-        ));
+        );
         
-        $this->assertEquals(Authentication\Type::SECRET, $info->getType());
+        $info = new ClientInfo(Authentication\Type::SECRET, $options);
+        
+        $this->assertSame(Authentication\Type::SECRET, $info->getType());
+        $this->assertSame($options, $info->getOptions());
     }
 
 

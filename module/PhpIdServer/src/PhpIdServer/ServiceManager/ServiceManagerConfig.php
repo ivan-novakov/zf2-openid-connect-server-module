@@ -116,7 +116,10 @@ class ServiceManagerConfig extends Config
                     throw new Exception\ConfigNotFoundException('authentication');
                 }
                 
-                return new Authentication\Manager($config['authentication']);
+                $manager = new Authentication\Manager($config['authentication']);
+                $manager->setContext($sm->get('AuthorizeContext'));
+                
+                return $manager;
             }, 
             
             /*
