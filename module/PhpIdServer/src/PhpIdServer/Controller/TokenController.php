@@ -10,31 +10,33 @@ use PhpIdServer\OpenIdConnect\Dispatcher\Token;
 class TokenController extends BaseController
 {
 
+    protected $_logIdent = 'token';
+
 
     public function indexAction ()
     {
-        $serviceLocator = $this->getServiceLocator();
+        $this->_logInfo($_SERVER['REQUEST_URI']);
         
-        $dispatcher = new Token();
-        $dispatcher->setClientRegistry($serviceLocator->get('ClientRegistry'));
-        $dispatcher->setSessionManager($serviceLocator->get('SessionManager'));
+        $serviceManager = $this->_getServiceManager();
         
-        $oicRequest = new Request\Token($this->getRequest());
-        $dispatcher->setTokenRequest($oicRequest);
-        
-        $oicResponse = new Response\Token($this->getResponse());
-        $dispatcher->setTokenResponse($oicResponse);
+        $dispatcher = $serviceManager->get('TokenDispatcher');
         
         try {
+            $this->_logInfo('Dispatching token request...');
             $tokenResponse = $dispatcher->dispatch();
+            
+            if ($tokenResponse->isError()) {
+                $this->_logError(sprintf("Dispatch error: %s (%s)", $tokenResponse->getErrorMessage(), $tokenResponse->getErrorDescription()));
+            } else {
+                $this->_logInfO('Dispatch OK, returning response...');
+            }
+            
             $response = $tokenResponse->getHttpResponse();
         } catch (\Exception $e) {
             // FIXME - use the $oicResponse instead of the raw http response
             $response = $this->_handleException($e);
         }
-        //_dump($response->getContent());
         
-
         return $response;
     }
 

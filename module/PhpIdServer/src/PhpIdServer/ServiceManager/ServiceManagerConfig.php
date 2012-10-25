@@ -9,6 +9,7 @@ use PhpIdServer\User;
 use PhpIdServer\Authentication;
 use PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\OpenIdConnect\Response;
+use PhpIdServer\OpenIdConnect\Request;
 
 
 class ServiceManagerConfig extends Config
@@ -118,6 +119,9 @@ class ServiceManagerConfig extends Config
                 return new Authentication\Manager($config['authentication']);
             }, 
             
+            /*
+             * OpenIdConnect/Dispatcher/Authorize
+             */
             'AuthorizeDispatcher' => function  (ServiceManager $sm)
             {
                 $dispatcher = new Dispatcher\Authorize();
@@ -136,6 +140,37 @@ class ServiceManagerConfig extends Config
             'AuthorizeResponse' => function  (ServiceManager $sm)
             {
                 return new Response\Authorize\Simple($sm->get('Response'));
+            },
+            
+            /*
+             * OpenIdConnect/Dispatcher/Token
+             */
+            'TokenDispatcher' => function  (ServiceManager $sm)
+            {
+                $dispatcher = new Dispatcher\Token();
+                
+                $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
+                $dispatcher->setSessionManager($sm->get('SessionManager'));
+                $dispatcher->setTokenRequest($sm->get('TokenRequest'));
+                $dispatcher->setTokenResponse($sm->get('TokenResponse'));
+                
+                return $dispatcher;
+            }, 
+            
+            /*
+             * OpendIdConnect/Request/Token
+             */
+            'TokenRequest' => function  (ServiceManager $sm)
+            {
+                return new Request\Token($sm->get('Request'));
+            }, 
+            
+            /*
+             * OpenIdConnect/Response/Token
+             */
+            'TokenResponse' => function  (ServiceManager $sm)
+            {
+                return new Response\Token($sm->get('Response'));
             }
         );
     }
