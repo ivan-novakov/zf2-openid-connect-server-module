@@ -51,9 +51,6 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         {
             _dump('ERROR IN DISPATCH: ' . $e->getError());
         }, 100);
-        
-        $sm = $e->getApplication()->getServiceManager();
-        //_dump(get_class($sm->get('ControllerLoader')->get('auth-dummy')));
     }
 
 

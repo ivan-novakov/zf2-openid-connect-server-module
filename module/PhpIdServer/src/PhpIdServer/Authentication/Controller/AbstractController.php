@@ -8,7 +8,7 @@ use PhpIdServer\Controller\BaseController;
 use PhpIdServer\Context;
 
 
-abstract class AbstractController extends BaseController
+abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
 {
 
     /**
