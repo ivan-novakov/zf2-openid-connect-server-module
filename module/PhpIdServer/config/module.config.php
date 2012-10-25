@@ -12,7 +12,6 @@ return array(
             'controller-authorize' => 'PhpIdServer\Controller\AuthorizeController', 
             'controller-token' => 'PhpIdServer\Controller\TokenController', 
             'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController', 
-            //'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
             'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
         ), 
         
@@ -86,52 +85,12 @@ return array(
                                 'action' => 'authenticate'
                             )
                         )
-                    ), 
-                    
-                    //'authentication-endpoint-shibboleth' => array(), 
-                    
-                    
-                    /*
-                    'authentication-endpoint-dummy' => array(
-                        'type' => 'Literal', 
-                        'may_terminate' => true, 
-                        'options' => array(
-                            'route' => '/authenticate/dummy', 
-                            'defaults' => array(
-                                'controller' => 'controller-auth-dummy', 
-                                'action' => 'authenticate', 
-                                'options' => array(
-                                    'label' => 'dummy', 
-                                    'identity' => array(
-                                        User::FIELD_ID => 'vomacka@example.cz', 
-                                        User::FIELD_NAME => 'Franta Vomacka', 
-                                        User::FIELD_GIVEN_NAME => 'Franta', 
-                                        User::FIELD_FAMILY_NAME => 'Vomacka', 
-                                        User::FIELD_NICKNAME => 'killer_vom', 
-                                        User::FIELD_EMAIL => 'franta.vomacka@example.cz'
-                                    )
-                                )
-                            )
-                        )
-                    ), 
-                    
-                    'authentication-endpoint-static' => array(
-                        'type' => 'Literal', 
-                        'may_terminate' => true, 
-                        'options' => array(
-                            'route' => '/authenticate/static', 
-                            'defaults' => array(
-                                'controller' => 'controller-auth-static', 
-                                'action' => 'authenticate', 
-                                'options' => array()
-                            )
-                        )
                     )
-                    */
                 )
             )
         )
-    ), 
+    )
+    , 
     
     'view_manager' => array(
         'template_path_stack' => array(
@@ -172,6 +131,10 @@ return array(
                 ), 
                 'filters' => array(
                     'priority' => Logger::DEBUG
+                ), 
+                'formatter' => array(
+                    'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%', 
+                    'dateTimeFormat' => 'Y-m-d H:i:s'
                 )
             )
         )
@@ -185,9 +148,8 @@ return array(
     ), 
     
     'authentication' => array(
-        'base_route' => 'php-id-server/authentication',
-        'default_authentication_handler' => 'dummy',
-        'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
+        'base_route' => 'php-id-server/authentication', 
+        'default_authentication_handler' => 'dummy'
     ), 
     
     'authentication_handlers' => array(

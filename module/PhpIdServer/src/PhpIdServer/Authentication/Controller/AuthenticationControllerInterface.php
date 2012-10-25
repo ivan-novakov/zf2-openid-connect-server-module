@@ -7,5 +7,8 @@ interface AuthenticationControllerInterface
 {
 
 
+    public function getLabel ();
+
+
     public function authenticateAction ();
 }

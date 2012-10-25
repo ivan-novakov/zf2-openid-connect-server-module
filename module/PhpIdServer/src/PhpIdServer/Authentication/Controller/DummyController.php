@@ -2,7 +2,6 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
-use PhpIdServer\Authentication\Info;
 use PhpIdServer\User\User;
 use PhpIdServer\Context\AuthorizeContext;
 

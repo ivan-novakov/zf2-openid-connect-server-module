@@ -11,6 +11,8 @@ use PhpIdServer\Context;
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
 {
 
+    protected $_logIdent = 'abstract authentication';
+
     /**
      * Options.
      * 
@@ -34,12 +36,24 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
+    /**
+     * Returns the value of the option.
+     * 
+     * @param string $name
+     * @param mixed $defaultValue
+     * @return mixed|null
+     */
     public function getOption ($name, $defaultValue = null)
     {
         return $this->_options->get($name, $defaultValue);
     }
 
 
+    /**
+     * Returns the label of the authentication controller.
+     * 
+     * @return string
+     */
     public function getLabel ()
     {
         return $this->getOption('label', 'unknown');
@@ -54,7 +68,7 @@ abstract class AbstractController extends BaseController implements Authenticati
 
     public function authenticateAction ()
     {
-        $this->_debug(sprintf("Authentication controller [%s]", $this->getLabel()));
+        $this->_logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));
         
         $context = $this->getServiceLocator()
             ->get('AuthorizeContext');
@@ -62,8 +76,7 @@ abstract class AbstractController extends BaseController implements Authenticati
         try {
             $this->_authenticate($context);
         } catch (\Exception $e) {
-            $this->_debug(sprintf("Error during authentication: [%s] %s", get_class($e), $e->getMessage()));
-            return $this->_errorResponse('');
+            return $this->_handleException($e, 'Authentication exception');
         }
         
         $this->_debug('redirecting back to authorize endpoint');
@@ -72,18 +85,12 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
+    /**
+     * The actual authentication procedure implemented in subclasses.
+     * 
+     * @param Context\AuthorizeContext $context
+     */
     abstract protected function _authenticate (Context\AuthorizeContext $context);
-
-
-    protected function _errorResponse ($message)
-    {
-        $response = $this->getResponse();
-        
-        $response->setStatusCode(400);
-        $response->setContent('Authentication error');
-        
-        return $response;
-    }
 
 
     /**
@@ -94,10 +101,16 @@ abstract class AbstractController extends BaseController implements Authenticati
     protected function _initAuthenticationInfo ()
     {
         $authenticationInfo = new Info(array(
-            Info::FIELD_METHOD => $this->_options->get('label'), 
+            Info::FIELD_METHOD => $this->getLabel(), 
             Info::FIELD_TIME => new \DateTime('now')
         ));
         
         return $authenticationInfo;
+    }
+
+
+    protected function _formatLogMessage ($message)
+    {
+        return sprintf("CONTROLLER AUTH [%s] %s", $this->getLabel(), $message);
     }
 }

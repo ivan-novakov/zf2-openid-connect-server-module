@@ -61,10 +61,38 @@ class Error extends AbstractAuthorizeResponse
     }
 
 
+    /**
+     * Sets the error message and desrciption.
+     * 
+     * @param string $message
+     * @param string $description
+     */
     public function setError ($message, $description = NULL)
     {
         $this->_errorMessage = $message;
         $this->_errorDescription = $description;
+    }
+
+
+    /**
+     * Returns the error message.
+     * 
+     * @return string
+     */
+    public function getErrorMessage ()
+    {
+        return $this->_errorMessage;
+    }
+
+
+    /**
+     * Returns the error description.
+     * 
+     * @return string|null
+     */
+    public function getErrorDescription ()
+    {
+        return $this->_errorDescription;
     }
 
 

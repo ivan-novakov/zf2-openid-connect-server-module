@@ -31,16 +31,31 @@ class ServiceManagerConfig extends Config
                 }
                 
                 $logger = new \Zend\Log\Logger();
+                
                 if (count($loggerConfig['writers'])) {
                     
                     $priority = 1;
                     foreach ($loggerConfig['writers'] as $writerConfig) {
+                        
                         $writer = $logger->writerPlugin($writerConfig['name'], $writerConfig['options']);
+                        
                         if (isset($writerConfig['filters']) && is_array($writerConfig['filters'])) {
                             foreach ($writerConfig['filters'] as $filterName => $filterValue) {
                                 $filterClass = '\Zend\Log\Filter\\' . String::underscoreToCamelCase($filterName);
                                 $filter = new $filterClass($filterValue);
                                 $writer->addFilter($filter);
+                            }
+                        }
+                        
+                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) && isset($writerConfig['formatter'])) {
+                            $formatterConfig = $writerConfig['formatter'];
+                            if (isset($formatterConfig['format'])) {
+                                $formatter = new \Zend\Log\Formatter\Simple($formatterConfig['format']);
+                                if (isset($formatterConfig['dateTimeFormat'])) {
+                                    $formatter->setDateTimeFormat($formatterConfig['dateTimeFormat']);
+                                }
+                                
+                                $writer->setFormatter($formatter);
                             }
                         }
                         

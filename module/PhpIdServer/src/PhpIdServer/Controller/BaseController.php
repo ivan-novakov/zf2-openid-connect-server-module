@@ -9,6 +9,8 @@ use PhpIdServer\Client\Registry;
 abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionController
 {
 
+    protected $_logIdent = 'abstract base';
+
 
     /**
      * Returns the service manager object.
@@ -29,11 +31,41 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
-    protected function _debug ($value)
+    protected function _debug ($message)
     {
-        $this->getServiceLocator()
+        $this->_logDebug($message);
+    }
+
+
+    protected function _logDebug ($message)
+    {
+        $this->_log($message, \Zend\Log\Logger::DEBUG);
+    }
+
+
+    protected function _logInfo ($message)
+    {
+        $this->_log($message, \Zend\Log\Logger::INFO);
+    }
+
+
+    protected function _logError ($message)
+    {
+        $this->_log($message, \Zend\Log\Logger::ERR);
+    }
+
+
+    protected function _log ($message, $priority = \Zend\Log\Logger::INFO)
+    {
+        $this->_getServiceManager()
             ->get('Logger')
-            ->debug($value);
+            ->log($priority, $this->_formatLogMessage($message));
+    }
+
+
+    protected function _formatLogMessage ($message)
+    {
+        return sprintf("CONTROLLER [%s] %s", $this->_logIdent, $message);
     }
 
 
@@ -62,18 +94,31 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
-    protected function _handleException (\Exception $e)
+    /**
+     * Handles an exception - returns an error.
+     * 
+     * @param \Exception $e
+     * @param string $label
+     */
+    protected function _handleException (\Exception $e, $label = 'Exception')
     {
-        return $this->_handleError("$e");
+        _dump("$e");
+        return $this->_handleError(sprintf("%s: [%s] %s", $label, get_class($e), $e->getMessage()));
     }
 
 
+    /**
+     * Handles an application error.
+     * 
+     * @param string $message
+     * @return \Zend\Stdlib\ResponseInterface
+     */
     protected function _handleError ($message)
     {
-        _dump($message);
+        $this->_logError($message);
+        $this->_logInfo('returnning error response...');
         $response = $this->getResponse();
         $response->setStatusCode(500);
-        $response->setContent('ERROR: ' . $message);
         
         return $response;
     }
