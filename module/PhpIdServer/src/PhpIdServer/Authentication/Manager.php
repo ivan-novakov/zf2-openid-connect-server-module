@@ -1,5 +1,8 @@
 <?php
+
 namespace PhpIdServer\Authentication;
+
+use Zend\Mvc\Router\RouteStackInterface;
 use PhpIdServer\Util\Options;
 
 
@@ -25,8 +28,14 @@ class Manager
     }
 
 
+    public function getOption ($name, $defaultValue = null)
+    {
+        return $this->_options->get($name, $defaultValue);
+    }
+
+
     public function getAuthenticationRouteName ()
     {
-        return $this->_options->get('handler_endpoint_route');
+        return $this->getOption('base_route');
     }
 }

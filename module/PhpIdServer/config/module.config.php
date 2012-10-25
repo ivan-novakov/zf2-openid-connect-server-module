@@ -14,6 +14,10 @@ return array(
             'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController', 
             //'PhpIdServer\Controller\Error' => 'PhpIdServer\Controller\ErrorController', 
             'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
+        ), 
+        
+        'abstract_factories' => array(
+            'PhpIdServer\Authentication\Controller\ControllerAbstractFactory'
         )
     ), 
     
@@ -70,9 +74,24 @@ return array(
                         )
                     ), 
                     
+                    'authentication' => array(
+                        'type' => 'segment', 
+                        'may_terminate' => true, 
+                        'options' => array(
+                            'route' => '/authn/:controller[/:action]', 
+                            'constraints' => array(
+                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]+'
+                            ), 
+                            'defaults' => array(
+                                'action' => 'authenticate'
+                            )
+                        )
+                    ), 
+                    
                     //'authentication-endpoint-shibboleth' => array(), 
                     
-
+                    
+                    /*
                     'authentication-endpoint-dummy' => array(
                         'type' => 'Literal', 
                         'may_terminate' => true, 
@@ -108,6 +127,7 @@ return array(
                             )
                         )
                     )
+                    */
                 )
             )
         )
@@ -165,7 +185,32 @@ return array(
     ), 
     
     'authentication' => array(
+        'base_route' => 'php-id-server/authentication',
+        'default_authentication_handler' => 'dummy',
         'handler_endpoint_route' => 'php-id-server/authentication-endpoint-dummy'
+    ), 
+    
+    'authentication_handlers' => array(
+        
+        'dummy' => array(
+            'class' => 'PhpIdServer\Authentication\Controller\DummyController', 
+            'options' => array(
+                'label' => 'dummy', 
+                'identity' => array(
+                    User::FIELD_ID => 'vomacka@example.cz', 
+                    User::FIELD_NAME => 'Franta Vomacka', 
+                    User::FIELD_GIVEN_NAME => 'Franta', 
+                    User::FIELD_FAMILY_NAME => 'Vomacka', 
+                    User::FIELD_NICKNAME => 'killer_vom', 
+                    User::FIELD_EMAIL => 'franta.vomacka@example.cz'
+                )
+            )
+        ), 
+        
+        'static' => array(
+            'class' => 'PhpIdServer\Authentication\Controller\StaticController', 
+            'options' => array()
+        )
     ), 
     
     'context_storage' => array(

@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Controller;
 
+use PhpIdServer\Authentication\Manager;
 use Zend\Mvc\MvcEvent;
 use PhpIdServer\Context;
 use PhpIdServer\Context\AuthorizeContext;
@@ -53,7 +54,9 @@ class AuthorizeController extends BaseController
             $this->_debug('redirecting user to authentication handler');
             $this->_saveContext($context);
             
-            return $this->_redirectToRoute($manager->getAuthenticationRouteName());
+            return $this->_redirectToRoute($manager->getAuthenticationRouteName(), array(
+                'controller' => 'dummy'
+            ));
         }
         
         /*
@@ -98,6 +101,11 @@ class AuthorizeController extends BaseController
     }
 
 
+    /**
+     * Returns the authentication manager.
+     * 
+     * @return Manager
+     */
     protected function _getAuthenticationManager ()
     {
         return $this->_getServiceManager()

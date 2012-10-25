@@ -52,9 +52,6 @@ class Client extends Entity
     }
 
 
-
-
-
     /**
      * Returns the authentication info for the client.
      * 

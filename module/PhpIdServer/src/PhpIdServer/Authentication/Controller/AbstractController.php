@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
+use PhpIdServer\Authentication\Info;
 use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
 use PhpIdServer\Context;
@@ -18,12 +19,30 @@ abstract class AbstractController extends BaseController
     protected $_options = NULL;
 
 
-    public function onDispatch (\Zend\Mvc\MvcEvent $e)
+    /**
+     * Sets the options.
+     * 
+     * @param array|\Traversable $options
+     */
+    public function setOptions ($options)
     {
-        $this->_options = new Options($e->getRouteMatch()
-            ->getParam('options'));
+        if (! is_array($options)) {
+            $options = array();
+        }
         
-        parent::onDispatch($e);
+        $this->_options = new Options($options);
+    }
+
+
+    public function getOption ($name, $defaultValue = null)
+    {
+        return $this->_options->get($name, $defaultValue);
+    }
+
+
+    public function getLabel ()
+    {
+        return $this->getOption('label', 'unknown');
     }
 
 
@@ -35,6 +54,8 @@ abstract class AbstractController extends BaseController
 
     public function authenticateAction ()
     {
+        $this->_debug(sprintf("Authentication controller [%s]", $this->getLabel()));
+        
         $context = $this->getServiceLocator()
             ->get('AuthorizeContext');
         
@@ -62,5 +83,21 @@ abstract class AbstractController extends BaseController
         $response->setContent('Authentication error');
         
         return $response;
+    }
+
+
+    /**
+     * Initializes and returns authentication info.
+     * 
+     * @return \PhpIdServer\Authentication\Controller\Info
+     */
+    protected function _initAuthenticationInfo ()
+    {
+        $authenticationInfo = new Info(array(
+            Info::FIELD_METHOD => $this->_options->get('label'), 
+            Info::FIELD_TIME => new \DateTime('now')
+        ));
+        
+        return $authenticationInfo;
     }
 }
