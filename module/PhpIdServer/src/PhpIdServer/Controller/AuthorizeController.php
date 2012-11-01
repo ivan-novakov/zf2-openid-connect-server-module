@@ -15,30 +15,34 @@ class AuthorizeController extends BaseController
     {
         $this->_logInfo($_SERVER['REQUEST_URI']);
         
+        $response = null;
         $serviceManager = $this->_getServiceManager();
         
         $context = $serviceManager->get('AuthorizeContext');
+        /* @var $context \PhpIdServer\Context\Authorize */
+        
         $dispatcher = $serviceManager->get('AuthorizeDispatcher');
+        /* @var $dispatcher \PhpIdServer\OpenIdConnect\Dispatcher\Authorize */
         
         /*
          * User authentication
          */
         if (! $context->isUserAuthenticated()) {
+            
             $this->_logInfo('user not authenticated - running preDispatch()');
             
             try {
                 $response = $dispatcher->preDispatch();
                 if ($response instanceof Response\Authorize\Error) {
-                    $this->_logError(sprintf("preDispatch() error: %s (%s)", $response->getErrorMessage(), $response->getErrorDescription()));
-                    return $response->getHttpResponse();
+                    return $this->_errorResponse($response, 'Error in preDispatch()');
                 }
+                
+                $this->_logInfo('preDispatch OK');
+                $this->_saveContext($context);
             } catch (\Exception $e) {
-                return $this->_handleException($e, 'preDispatch() exception');
+                $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
+                return $this->_errorResponse($response, 'General error in preDispatch');
             }
-            
-            $this->_logInfo('preDispatch() OK');
-            
-            $this->_saveContext($context);
             
             $manager = $serviceManager->get('AuthenticationManager');
             
@@ -67,13 +71,32 @@ class AuthorizeController extends BaseController
          */
         try {
             $this->_logInfo('dispatching response...');
+            
             $response = $dispatcher->dispatch();
-            $this->_logInfo('dispatch OK, returning response...');
-            $httpResponse = $response->getHttpResponse();
+            if ($response instanceof Response\Authorize\Error) {
+                return $this->_errorResponse($response, 'Error in dispatch');
+            }
         } catch (\Exception $e) {
-            return $this->_handleException($e, 'Dispatch exception');
+            $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
+            return $this->_errorResponse($response, 'General error in dispatch');
         }
         
-        return $httpResponse;
+        return $this->_validResponse($response);
+    }
+
+
+    protected function _validResponse (Response\Authorize\Simple $response)
+    {
+        $this->_logInfo('dispatch OK, returning response...');
+        
+        return $response->getHttpResponse();
+    }
+
+
+    protected function _errorResponse (Response\Authorize\Error $response, $label = 'Error')
+    {
+        $this->_logError(sprintf("%s: %s (%s)", $label, $response->getErrorMessage(), $response->getErrorDescription()));
+        
+        return $response->getHttpResponse();
     }
 }

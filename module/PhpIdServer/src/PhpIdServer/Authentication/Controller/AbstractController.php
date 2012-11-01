@@ -74,10 +74,19 @@ abstract class AbstractController extends BaseController implements Authenticati
             ->get('AuthorizeContext');
         
         try {
-            $this->_authenticate($context);
+            $user = $this->_authenticate($context);
+            $context->setUser($user);
+            $authenticationInfo = $this->_initSuccessAuthenticationInfo();
+        } catch (Exception\AuthenticationException $e) {
+            $this->_logError(sprintf("Authentication exception: %s (%s)", $e->getError(), $e->getDescription()));
+            $authenticationInfo = $this->_initFailureAuthenticationInfo($e->getError(), $e->getDescription());
         } catch (\Exception $e) {
-            return $this->_handleException($e, 'Authentication exception');
+            $this->_logError(sprintf("General exception during authentication: [%s] %s", get_class($e), $e->getMessage()));
+            $authenticationInfo = $this->_initFailureAuthenticationInfo('general_error');
         }
+        
+        $context->setAuthenticationInfo($authenticationInfo);
+        $this->_saveContext($context);
         
         $authorizeRoute = 'php-id-server/authorize-endpoint';
         
@@ -100,14 +109,15 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @return \PhpIdServer\Authentication\Controller\Info
      */
-    protected function _initAuthenticationInfo ()
+    protected function _initSuccessAuthenticationInfo ()
     {
-        $authenticationInfo = new Info(array(
-            Info::FIELD_METHOD => $this->getLabel(), 
-            Info::FIELD_TIME => new \DateTime('now')
-        ));
-        
-        return $authenticationInfo;
+        return Info::factorySuccess($this->getLabel());
+    }
+
+
+    protected function _initFailureAuthenticationInfo ($error, $description = '')
+    {
+        return Info::factoryFailure($this->getLabel(), $error, $description);
     }
 
 

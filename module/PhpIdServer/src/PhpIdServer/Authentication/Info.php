@@ -10,19 +10,66 @@ use PhpIdServer\Entity\TimeDependentEntity;
  * 
  * @method string getMethod()
  * @method \DateTime getTime()
+ * @method string getError()
+ * @method string getErrorDescription()
  *
  */
 class Info extends TimeDependentEntity
 {
+
+    const FIELD_AUTHENTICATED = 'authenticated';
+
+    const FIELD_ERROR = 'error';
+
+    const FIELD_ERROR_DESCRIPTION = 'error_description';
 
     const FIELD_METHOD = 'method';
 
     const FIELD_TIME = 'time';
 
     protected $_fields = array(
+        self::FIELD_AUTHENTICATED, 
+        self::FIELD_ERROR, 
+        self::FIELD_ERROR_DESCRIPTION, 
         self::FIELD_METHOD, 
         self::FIELD_TIME
     );
+
+
+    static public function factorySuccess ($method, $time = null)
+    {
+        if (null === $time) {
+            $time = new \DateTime('now');
+        }
+        
+        return new self(array(
+            self::FIELD_AUTHENTICATED => true, 
+            self::FIELD_METHOD => $method, 
+            self::FIELD_TIME => $time
+        ));
+    }
+
+
+    static public function factoryFailure ($method, $error, $description = '', $time = null)
+    {
+        if (null === $time) {
+            $time = new \DateTime('now');
+        }
+        
+        return new self(array(
+            self::FIELD_AUTHENTICATED => false, 
+            self::FIELD_ERROR => $error, 
+            self::FIELD_ERROR_DESCRIPTION => $description, 
+            self::FIELD_METHOD => $method, 
+            self::FIELD_TIME => $time
+        ));
+    }
+
+
+    public function isAuthenticated ()
+    {
+        return (boolean) $this->getValue(self::FIELD_AUTHENTICATED);
+    }
 
 
     public function setTime ($value)

@@ -84,9 +84,14 @@ class AuthorizeContext extends AbstractContext
     }
 
 
+    /**
+     * Returns true, if the user has been authenticated.
+     * 
+     * @return boolean
+     */
     public function isUserAuthenticated ()
     {
-        return ($this->_authenticationInfo instanceof Authentication\Info);
+        return ($this->_authenticationInfo instanceof Authentication\Info && $this->_authenticationInfo->isAuthenticated());
     }
 
 

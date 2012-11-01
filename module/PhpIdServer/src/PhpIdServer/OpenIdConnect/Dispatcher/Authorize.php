@@ -117,6 +117,21 @@ class Authorize extends AbstractDispatcher
         // [...]
         
 
+        $this->_clientRedirectUri = $client->getRedirectUri();
+        if (! $this->_clientRedirectUri) {
+            return $this->_clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no redirect uri found');
+        }
+        
+        /*
+         * Check if there has been an unsuccessful authentication attempt
+         */
+        $authenticationInfo = $context->getAuthenticationInfo();
+        if ($authenticationInfo && ($error = $authenticationInfo->getError())) {
+            $description = $authenticationInfo->getErrorDescription();
+            
+            return $this->errorResponse(Error::ERROR_SERVER_ERROR, $error);
+        }
+        
         $context->setClient($client);
     }
 
@@ -142,17 +157,17 @@ class Authorize extends AbstractDispatcher
         
         $user = $context->getUser();
         if (! ($user instanceof User)) {
-            return $this->_errorResponse(Error::ERROR_INVALID_REQUEST, 'no user in context');
+            return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no user in context');
         }
-        
+
         $authenticationInfo = $context->getAuthenticationInfo();
         if (! ($authenticationInfo instanceof Authentication\Info)) {
-            return $this->_errorResponse(Error::ERROR_INVALID_REQUEST, 'no authentication info in context');
+            return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no authentication info in context');
         }
         
         $request = $context->getRequest();
         if (! ($request instanceof Request\Authorize\Simple)) {
-            return $this->_errorResponse(Error::ERROR_INVALID_REQUEST, 'no request in context');
+            return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no request in context');
         }
         
         $response = $this->getAuthorizeResponse(true);
@@ -179,7 +194,7 @@ class Authorize extends AbstractDispatcher
      * @param string $description
      * @return Authorize\Error
      */
-    protected function _errorResponse ($message, $description = NULL)
+    public function errorResponse ($message, $description = NULL)
     {
         if (! $this->_clientRedirectUri) {
             return $this->_clientErrorResponse($message, $description);
@@ -190,6 +205,18 @@ class Authorize extends AbstractDispatcher
         $errorResponse->setError($message, $description);
         
         return $errorResponse;
+    }
+
+
+    /**
+     * Returns an error response object of type 'server error'.
+     * 
+     * @param string $description
+     * @return Authorize\Error
+     */
+    public function serverErrorResponse ($description = NULL)
+    {
+        return $this->errorResponse(Error::ERROR_SERVER_ERROR, $description);
     }
 
 

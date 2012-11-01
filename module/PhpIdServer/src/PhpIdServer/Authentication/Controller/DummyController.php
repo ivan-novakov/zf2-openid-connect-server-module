@@ -14,11 +14,8 @@ class DummyController extends AbstractController
     {
         $user = new User($this->getOption('identity'));
         
-        $authenticationInfo = $this->_initAuthenticationInfo();
+        //throw new Exception\AuthenticationException('error_name', 'error_desc');
         
-        $context->setUser($user);
-        $context->setAuthenticationInfo($authenticationInfo);
-        
-        $this->_saveContext($context);
+        return $user;
     }
 }

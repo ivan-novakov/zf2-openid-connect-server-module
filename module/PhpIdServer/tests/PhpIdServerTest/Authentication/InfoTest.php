@@ -9,15 +9,34 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 {
 
 
-    public function testPopulate ()
+    public function testFactorySuccess ()
     {
-        $data = array(
-            Info::FIELD_METHOD => 'dummy', 
-            INFO::FIELD_TIME => '2012-09-10 00:00:00'
-        );
+        $method = 'dummy';
+        $time = new \DateTime('2012-09-10 00:00:00');
         
-        $info = new Info($data);
+        $info = Info::factorySuccess($method, $time);
         
-        $this->assertEquals($data, $info->toArray());
+        $this->assertInstanceOf('PhpIdServer\Authentication\Info', $info);
+        $this->assertTrue($info->isAuthenticated());
+        $this->assertSame($method, $info->getMethod());
+        $this->assertSame($time, $info->getTime());
+    }
+
+
+    public function testFactoryFailure ()
+    {
+        $method = 'dummy';
+        $time = new \DateTime('2012-09-10 00:00:00');
+        $error = 'error';
+        $description = 'description';
+        
+        $info = Info::factoryFailure($method, $error, $description, $time);
+        
+        $this->assertInstanceOf('PhpIdServer\Authentication\Info', $info);
+        $this->assertFalse($info->isAuthenticated());
+        $this->assertSame($method, $info->getMethod());
+        $this->assertSame($time, $info->getTime());
+        $this->assertSame($error, $info->getError());
+        $this->assertSame($description, $info->getErrorDescription());
     }
 }

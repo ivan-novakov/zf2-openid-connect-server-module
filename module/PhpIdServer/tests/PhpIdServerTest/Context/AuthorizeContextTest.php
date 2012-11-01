@@ -1,5 +1,7 @@
 <?php
+
 namespace PhpIdServerTest\Context;
+
 use PhpIdServer\Context;
 
 
@@ -20,25 +22,34 @@ class AuthorizeContextTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testUnknownStateException ()
+    public function testIsUserAuthenticatedWithNoInfo ()
     {
-        $this->setExpectedException('\PhpIdServer\Context\Exception\UnknownStateException');
-        $this->_context->setState('unknown');
+        $this->assertFalse($this->_context->isUserAuthenticated());
     }
 
 
-    public function testGetContextData ()
+    public function testIsUserAuthenticatedFalse ()
     {
-        $data = $this->_context->getContextData();
-        $this->assertInstanceOf('\ArrayObject', $data);
+        $info = $this->getMock('PhpIdServer\Authentication\Info');
+        $info->expects($this->once())
+            ->method('isAuthenticated')
+            ->will($this->returnValue(false));
+        
+        $this->_context->setAuthenticationInfo($info);
+        
+        $this->assertFalse($this->_context->isUserAuthenticated());
     }
 
 
-    public function testSetValue ()
+    public function testIsUserAuthenticatedTrue ()
     {
-        $origValue = 'some data';
-        $this->_context->setValue('label', $origValue);
-        $value = $this->_context->getValue('label');
-        $this->assertEquals($origValue, $value);
+        $info = $this->getMock('PhpIdServer\Authentication\Info');
+        $info->expects($this->once())
+            ->method('isAuthenticated')
+            ->will($this->returnValue(true));
+        
+        $this->_context->setAuthenticationInfo($info);
+        
+        $this->assertTrue($this->_context->isUserAuthenticated());
     }
 }
