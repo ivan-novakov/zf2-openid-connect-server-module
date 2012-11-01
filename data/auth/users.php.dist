@@ -1,0 +1,21 @@
+<?php
+
+return array( 
+    
+    /*
+    array(
+        'authentication' => array(
+            'username' => '', 
+            'password' => ''
+        ), 
+        'data' => array(
+            'id' => '', 
+            'name' => '', 
+            'given_name' => '', 
+            'family_name' => '', 
+            'email' => '', 
+            'nickname' => ''
+        )
+    )
+    */
+);

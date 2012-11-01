@@ -89,8 +89,7 @@ return array(
                 )
             )
         )
-    )
-    , 
+    ), 
     
     'view_manager' => array(
         'template_path_stack' => array(
@@ -169,9 +168,11 @@ return array(
             )
         ), 
         
-        'static' => array(
-            'class' => 'PhpIdServer\Authentication\Controller\StaticController', 
-            'options' => array()
+        'basic-auth' => array(
+            'class' => 'PhpIdServer\Authentication\Controller\BasicAuthController', 
+            'options' => array(
+                'file' => 'data/auth/users.php'
+            )
         )
     ), 
     

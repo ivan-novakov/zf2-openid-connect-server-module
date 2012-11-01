@@ -10,7 +10,7 @@
                     "secret" : "testclientsecret"
                 }
             },
-            "user_authentication_handler" : "dummy"
+            "user_authentication_handler" : "basic-auth"
         },
 
         {
