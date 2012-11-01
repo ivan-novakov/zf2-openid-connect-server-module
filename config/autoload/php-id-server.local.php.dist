@@ -1,0 +1,19 @@
+<?php
+
+return array(
+    
+    'session_storage' => array(
+        'options' => array(
+            'adapter' => array(
+                'username' => 'username' 
+                'password' => 'password'
+            )
+        )
+    ), 
+    
+    'session_id_generator' => array(
+        'options' => array(
+            'secret_salt' => 'secret salt'
+        )
+    )
+);

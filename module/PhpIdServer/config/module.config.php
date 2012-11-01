@@ -123,10 +123,10 @@ return array(
     
     'logger' => array(
         'writers' => array(
-            array(
+            'stream' => array(
                 'name' => 'stream', 
                 'options' => array(
-                    'stream' => '/data/var/log/devel/phpid-server/phpid-server.log'
+                    'stream' => '/data/var/log/phpid-server.log'
                 ), 
                 'filters' => array(
                     'priority' => Logger::DEBUG
@@ -195,8 +195,8 @@ return array(
             'adapter' => array(
                 'driver' => 'Pdo_Mysql', 
                 'host' => 'localhost', 
-                'username' => 'phpid_admin', 
-                'password' => 'phpid admin heslo', 
+                'username' => 'phpidadmin', 
+                'password' => 'phpidadminpassword', 
                 'database' => 'phpidserver'
             )
         )
