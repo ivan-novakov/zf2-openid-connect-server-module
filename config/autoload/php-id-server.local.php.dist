@@ -16,4 +16,21 @@ return array(
             'secret_salt' => 'secret salt'
         )
     )
+    
+    'logger' => array(
+        'writers' => array(
+            'stream' => array(
+                'options' => array(
+                    'stream' => '/data/var/log/phpid-server.log'
+                ),
+                'filters' => array(
+                    'priority' => 7
+                ),
+                'formatter' => array(
+                    'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
+                    'dateTimeFormat' => 'Y-m-d H:i:s'
+                )
+            )
+        )
+    )
 );
