@@ -1,14 +1,10 @@
 <?php
 use Zend\Http\Client;
 
-require 'bootstrap.php';
+require __DIR__ . '/bootstrap.php';
+require __DIR__ . '/client_common.php';
 
-$serverUri = 'https://hroch.cesnet.cz/devel';
-$authUri = $serverUri . '/phpid-server/oic/authorize';
-$tokenUri = $serverUri . '/phpid-server/oic/token';
-$userInfoUri = $serverUri . '/phpid-server/oic/userinfo';
-
-$clientId = 'test-console-client';
+$clientId = 'test-console-client-dummy';
 
 $client = _getClient();
 
@@ -99,47 +95,3 @@ _dumpResponse($response);
 
 $userData = \Zend\Json\Json::decode($response->getContent(), \Zend\Json\Json::TYPE_ARRAY);
 _dump($userData);
-
-//-----------------------
-function _getClient ()
-{
-    $adapter = new Client\Adapter\Socket();
-    $client = new Client();
-    $client->setOptions(array(
-        'maxredirects' => 3
-    ));
-    $client->setAdapter($adapter);
-    
-    $adapter->setStreamContext(array(
-        'ssl' => array(
-            'cafile' => '/etc/ssl/certs/tcs-ca-bundle.pem'
-        )
-    ));
-    
-    return $client;
-}
-
-
-function _dumpResponse (\Zend\Http\Response $response)
-{
-    _dump('=====[ RESPONSE ]=====');
-    _dump("$response");
-    _dump('======================');
-}
-
-
-function _dumpRequest (\Zend\Http\Request $request)
-{
-    $getParams = $request->getQuery();
-    $uri = $request->getUri();
-    $uri->setQuery($getParams->toArray());
-    
-    _dump("-----[ REQUEST ]-----");
-    _dump("$request");
-    
-    $postParams = $request->getPost();
-    if (! empty($postParams)) {
-        _dump($postParams->toString());
-    }
-    _dump("---------------------");
-}
