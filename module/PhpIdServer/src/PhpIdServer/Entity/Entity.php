@@ -55,9 +55,11 @@ abstract class Entity
     public function getId ()
     {
         $id = $this->getValue($this->_idField);
+        /* ???
         if (NULL === $id) {
             $id = 'undefined';
         }
+        */
         
         return $id;
     }
