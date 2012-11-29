@@ -78,6 +78,34 @@ class Info extends TimeDependentEntity
     }
 
 
+    /**
+     * Returns true, if the amount of $expireTimout seconds has been passed from the authentication instant.
+     * 
+     * @param integer $expireTimeout
+     * @param integer $expireCheckInstant
+     * @return boolean
+     */
+    public function isExpired ($expireTimeout, $expireCheckInstant = null)
+    {
+        if (! $expireCheckInstant) {
+            $expireCheckInstant = time();
+        }
+        
+        $expireTimeout = intval($expireTimeout);
+        if ($expireTimeout <= 0) {
+            return true;
+        }
+        
+        $authenticationInstant = $this->getTime()
+            ->getTimestamp();
+        if ($expireCheckInstant - $authenticationInstant > $expireTimeout) {
+            return true;
+        }
+        
+        return false;
+    }
+
+
     public function toArray ()
     {
         $arrayData = parent::toArray();

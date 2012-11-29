@@ -39,4 +39,42 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($error, $info->getError());
         $this->assertSame($description, $info->getErrorDescription());
     }
+
+
+    /**
+     * @dataProvider isExpiredDataProvider
+     */
+    public function testIsExpired ($timeString, $expireTimeout, $addSeconds, $isExpired)
+    {
+        $time = new \DateTime($timeString);
+        $info = Info::factorySuccess('dummy', $time);
+        
+        $expireCheckTime = $time->getTimestamp() + $addSeconds;
+        $this->assertSame($isExpired, $info->isExpired($expireTimeout, $expireCheckTime));
+    }
+
+
+    public function isExpiredDataProvider ()
+    {
+        return array(
+            array(
+                '2012-09-10 00:00:00', 
+                10, 
+                9, 
+                false
+            ), 
+            array(
+                '2012-09-10 00:00:00', 
+                10, 
+                10, 
+                false
+            ), 
+            array(
+                '2012-09-10 00:00:00', 
+                10, 
+                11, 
+                true
+            )
+        );
+    }
 }
