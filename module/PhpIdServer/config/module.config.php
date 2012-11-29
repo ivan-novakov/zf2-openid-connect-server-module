@@ -173,6 +173,22 @@ return array(
             'options' => array(
                 'file' => 'data/auth/users.php'
             )
+        ), 
+        
+        'shibboleth' => array(
+            'class' => 'PhpIdServer\Authentication\Controller\ShibbolethController', 
+            'options' => array(
+                'system_attributes_map' => array(
+                    'Shib-Session-ID' => 'session_id'
+                ), 
+                'user_attributes_map' => array(
+                    'uid' => User::FIELD_ID, 
+                    'cn' => User::FIELD_NAME, 
+                    'givenName' => User::FIELD_GIVEN_NAME, 
+                    'sn' => User::FIELD_FAMILY_NAME, 
+                    'mail' => User::FIELD_EMAIL
+                )
+            )
         )
     ), 
     
