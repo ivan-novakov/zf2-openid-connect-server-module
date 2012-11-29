@@ -75,7 +75,7 @@ abstract class AbstractController extends BaseController implements Authenticati
             ->get('AuthorizeContext');
         
         try {
-            $user = $this->_authenticate($context);
+            $user = $this->authenticate();
             if (! ($user instanceof User)) {
                 throw new Exception\AuthenticationException('No user');
             }
@@ -104,9 +104,9 @@ abstract class AbstractController extends BaseController implements Authenticati
     /**
      * The actual authentication procedure implemented in subclasses.
      * 
-     * @param Context\AuthorizeContext $context
+     * @return User
      */
-    abstract protected function _authenticate (Context\AuthorizeContext $context);
+    abstract public function authenticate ();
 
 
     /**

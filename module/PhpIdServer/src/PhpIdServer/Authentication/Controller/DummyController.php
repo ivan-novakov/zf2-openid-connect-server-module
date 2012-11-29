@@ -10,11 +10,13 @@ class DummyController extends AbstractController
 {
 
 
-    protected function _authenticate (AuthorizeContext $context)
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Authentication\Controller\AbstractController::authenticate()
+     */
+    public function authenticate ()
     {
         $user = new User($this->getOption('identity'));
-        
-        //throw new Exception\AuthenticationException('error_name', 'error_desc');
         
         return $user;
     }

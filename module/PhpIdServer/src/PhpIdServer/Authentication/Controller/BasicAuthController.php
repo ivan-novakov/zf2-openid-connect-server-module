@@ -10,7 +10,11 @@ class BasicAuthController extends AbstractController
 {
 
 
-    protected function _authenticate (AuthorizeContext $context)
+    /**
+     * (non-PHPdoc)
+     * @see \PhpIdServer\Authentication\Controller\AbstractController::authenticate()
+     */
+    public function authenticate ()
     {
         $request = $this->getRequest();
         
