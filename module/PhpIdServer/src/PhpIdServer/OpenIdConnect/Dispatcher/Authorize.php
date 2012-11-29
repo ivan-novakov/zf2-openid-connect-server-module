@@ -36,6 +36,13 @@ class Authorize extends AbstractDispatcher
      */
     protected $_clientRedirectUri = NULL;
 
+    /**
+     * The amount of seconds after an invalid authentication, when it is possible to perform another authentication.
+     * 
+     * @var integer
+     */
+    protected $_previousAuthenticationErrorTimeout = 10;
+
 
     /**
      * Sets the context object.
@@ -126,10 +133,10 @@ class Authorize extends AbstractDispatcher
          * Check if there has been an unsuccessful authentication attempt
          */
         $authenticationInfo = $context->getAuthenticationInfo();
-        if ($authenticationInfo && ($error = $authenticationInfo->getError())) {
+        if ($authenticationInfo && ! $authenticationInfo->isExpired($this->_previousAuthenticationErrorTimeout) && ($error = $authenticationInfo->getError())) {
             $description = $authenticationInfo->getErrorDescription();
             
-            return $this->errorResponse(Error::ERROR_SERVER_ERROR, $error);
+            return $this->errorResponse(Error::ERROR_SERVER_ERROR, sprintf("Previous authentication error: '%s'", $error));
         }
         
         $context->setClient($client);
@@ -159,7 +166,7 @@ class Authorize extends AbstractDispatcher
         if (! ($user instanceof User)) {
             return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no user in context');
         }
-
+        
         $authenticationInfo = $context->getAuthenticationInfo();
         if (! ($authenticationInfo instanceof Authentication\Info)) {
             return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no authentication info in context');
