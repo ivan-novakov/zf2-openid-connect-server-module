@@ -78,6 +78,19 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return new User\Serializer\Serializer($config['user_serializer']);
+            }, 
+            
+            /*
+             * User/UserFactory
+             */
+            'UserFactory' => function  (ServiceManager $sm)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config['user_factory'])) {
+                    throw new Exception\ConfigNotFoundException('user_factory');
+                }
+                
+                return new User\UserFactory($config['user_factory']);
             },
             
             /*

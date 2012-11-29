@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
+use PhpIdServer\User\UserFactoryInterface;
 use PhpIdServer\User\User;
 use PhpIdServer\Authentication\Info;
 use PhpIdServer\Util\Options;
@@ -11,15 +12,23 @@ use PhpIdServer\Context;
 
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
 {
-
-    protected $_logIdent = 'abstract authentication';
+    
+    //protected $_logIdent = 'abstract authentication';
+    
 
     /**
      * Options.
      * 
      * @var Options
      */
-    protected $_options = NULL;
+    protected $_options = null;
+
+    /**
+     * User factory.
+     * 
+     * @var UserFactoryInterface
+     */
+    protected $_userFactory = null;
 
 
     /**
@@ -58,6 +67,28 @@ abstract class AbstractController extends BaseController implements Authenticati
     public function getLabel ()
     {
         return $this->getOption('label', 'unknown');
+    }
+
+
+    /**
+     * Sets the user factory.
+     * 
+     * @param UserFactoryInterface $userFactory
+     */
+    public function setUserFactory (UserFactoryInterface $userFactory)
+    {
+        $this->_userFactory = $userFactory;
+    }
+
+
+    /**
+     * Returns the user factory.
+     * 
+     * @return UserFactoryInterface
+     */
+    public function getUserFactory ()
+    {
+        return $this->_userFactory;
     }
 
 

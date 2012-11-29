@@ -16,7 +16,7 @@ use PhpIdServer\Entity\Entity;
  * @method string getEmail()
  *
  */
-class User extends Entity
+class User extends Entity implements UserInterface
 {
 
     const FIELD_ID = 'id';

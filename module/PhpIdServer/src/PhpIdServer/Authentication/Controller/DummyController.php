@@ -16,8 +16,8 @@ class DummyController extends AbstractController
      */
     public function authenticate ()
     {
-        $user = new User($this->getOption('identity'));
-        
+        $user = $this->getUserFactory()
+            ->createUser($this->getOption('identity'));
         return $user;
     }
 }

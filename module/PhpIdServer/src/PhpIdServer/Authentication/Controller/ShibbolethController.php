@@ -161,7 +161,9 @@ class ShibbolethController extends AbstractController
         }
         
         $attributes = $this->getAttributes();
-        $user = new User($attributes);
+        $user = $this->getUserFactory()
+            ->createUser($attributes);
+
         if (! $user->getId()) {
             throw new Exception\AuthenticationException('No user identifier');
         }

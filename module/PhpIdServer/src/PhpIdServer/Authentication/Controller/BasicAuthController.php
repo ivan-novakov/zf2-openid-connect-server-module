@@ -45,7 +45,8 @@ class BasicAuthController extends AbstractController
         foreach ($users as $user) {
             if ($username == $user['authentication']['username']) {
                 if ($password == $user['authentication']['password']) {
-                    return new User($user['data']);
+                    return $this->getUserFactory()
+                        ->createUser($user['data']);
                 }
                 
                 throw new Exception\AuthenticationException(sprintf("Invalid password for user '%s'", $username));

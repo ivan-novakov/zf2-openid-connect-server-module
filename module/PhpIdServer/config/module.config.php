@@ -230,5 +230,9 @@ return array(
             'name' => 'PhpSerialize', 
             'options' => array()
         )
+    ), 
+    
+    'user_factory' => array(
+        'user_class' => '\PhpIdServer\User\User'
     )
 );

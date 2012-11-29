@@ -29,6 +29,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
     /**
      * (non-PHPdoc)
      * @see \Zend\ServiceManager\AbstractFactoryInterface::createServiceWithName()
+     * @return AuthenticationControllerInterface
      */
     public function createServiceWithName (ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
@@ -47,6 +48,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         }
         
         $controller = new $className();
+        /* @var $controller AuthenticationControllerInterface */
         if (! ($controller instanceof AuthenticationControllerInterface)) {
             throw new Exception\InvalidControllerException(sprintf("Controller '%s' is not a valid authentication controller", $requestedName));
         }
@@ -60,6 +62,8 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         }
         
         $controller->setOptions($options);
+        $controller->setUserFactory($this->_getServiceManager($serviceLocator)
+            ->get('UserFactory'));
         
         return $controller;
     }
