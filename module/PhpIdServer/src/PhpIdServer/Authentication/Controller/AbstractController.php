@@ -12,9 +12,6 @@ use PhpIdServer\Context;
 
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
 {
-    
-    //protected $_logIdent = 'abstract authentication';
-    
 
     /**
      * Options.
@@ -110,7 +107,7 @@ abstract class AbstractController extends BaseController implements Authenticati
             if (! ($user instanceof UserInterface)) {
                 throw new Exception\AuthenticationException('No user');
             }
-
+            
             $context->setUser($user);
             $authenticationInfo = $this->_initSuccessAuthenticationInfo();
         } catch (Exception\AuthenticationException $e) {

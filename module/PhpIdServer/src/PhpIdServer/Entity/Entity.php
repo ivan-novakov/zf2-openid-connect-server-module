@@ -80,6 +80,15 @@ abstract class Entity
             return $this->getValue($fieldName);
         }
         
+        if (preg_match('/^set(\w+)$/', $method, $matches)) {
+            $fieldName = String::camelCaseToUnderscore($matches[1]);
+            $fieldValue = null;
+            if (isset($arguments[0])) {
+                $fieldValue = $arguments[0];
+            }
+            return $this->setValue($fieldName, $fieldValue);
+        }
+        
         throw new Exception\InvalidMethodException($method);
     }
 
