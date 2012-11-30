@@ -16,6 +16,14 @@ interface UserInterface
 
 
     /**
+     * Populates the user entity with data.
+     * 
+     * @param array $data
+     */
+    public function populate (array $data);
+
+
+    /**
      * Returns the array representation of the user.
      * 
      * @return array

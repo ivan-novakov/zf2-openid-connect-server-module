@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\OpenIdConnect\Dispatcher;
 
+use PhpIdServer\User\DataConnector\DataConnectorInterface;
 use PhpIdServer\Client\Client;
 use PhpIdServer\Authentication;
 use PhpIdServer\User\UserInterface;
@@ -42,6 +43,13 @@ class Authorize extends AbstractDispatcher
      * @var integer
      */
     protected $_previousAuthenticationErrorTimeout = 10;
+
+    /**
+     * Data connector.
+     * 
+     * @var DataConnectorInterface
+     */
+    protected $_dataConnector = null;
 
 
     /**
@@ -91,6 +99,34 @@ class Authorize extends AbstractDispatcher
             throw new GeneralException\MissingDependencyException('authorize response');
         }
         return $this->_response;
+    }
+
+
+    /**
+     * Sets the data connector.
+     * 
+     * @param DataConnectorInterface $dataConnector
+     */
+    public function setDataConnector (DataConnectorInterface $dataConnector)
+    {
+        $this->_dataConnector = $dataConnector;
+    }
+
+
+    /**
+     * Returns the data connector.
+     * 
+     * @param boolean $throwException
+     * @throws GeneralException\MissingDependencyException
+     * @return DataConnectorInterface
+     */
+    public function getDataConnector ($throwException = false)
+    {
+        if (null === $this->_dataConnector && $throwException) {
+            throw new GeneralException\MissingDependencyException('data connector');
+        }
+        
+        return $this->_dataConnector;
     }
 
 
@@ -175,6 +211,11 @@ class Authorize extends AbstractDispatcher
         $request = $context->getRequest();
         if (! ($request instanceof Request\Authorize\Simple)) {
             return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no request in context');
+        }
+        
+        $dataConnector = $this->getDataConnector();
+        if ($dataConnector instanceof DataConnectorInterface) {
+            $dataConnector->populateUser($user);
         }
         
         $response = $this->getAuthorizeResponse(true);

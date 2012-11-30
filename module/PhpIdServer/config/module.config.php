@@ -234,5 +234,12 @@ return array(
     
     'user_factory' => array(
         'user_class' => '\PhpIdServer\User\User'
+    ), 
+    
+    'data_connectors' => array(
+        'test' => array(
+            'class' => '\PhpIdServer\User\DataConnector\Dummy', 
+            'options' => array()
+        )
     )
 );

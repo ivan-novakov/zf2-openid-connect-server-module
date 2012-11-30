@@ -2,6 +2,7 @@
 
 namespace PhpIdServer\ServiceManager;
 
+use PhpIdServer\User\DataConnector\DataConnectorFactory;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
 use PhpIdServer\Util\String;
@@ -91,6 +92,34 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return new User\UserFactory($config['user_factory']);
+            }, 
+            
+            'UserDataConnectorFactory' => function  (ServiceManager $sm)
+            {
+                return new DataConnectorFactory();
+            }, 
+            
+            /*
+             * The default user data connector.
+             * User/DataConnector/Chain
+             */
+            'UserDataConnector' => function  (ServiceManager $sm)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config['data_connectors'])) {
+                    throw new Exception\ConfigNotFoundException('data_connectors');
+                }
+                
+                $dataConnectorConfigs = $config['data_connectors'];
+                $factory = $sm->get('UserDataConnectorFactory');
+                $chain = $factory->createDataConnector(array(
+                    'class' => '\PhpIdServer\User\DataConnector\Chain'
+                ));
+                foreach ($dataConnectorConfigs as $dataConnectorConfig) {
+                    $chain->addDataConnector($factory->createDataConnector($dataConnectorConfig));
+                }
+                
+                return $chain;
             },
             
             /*
@@ -146,6 +175,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher->setAuthorizeResponse($sm->get('AuthorizeResponse'));
                 $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
                 $dispatcher->setSessionManager($sm->get('SessionManager'));
+                $dispatcher->setDataConnector($sm->get('UserDataConnector'));
                 
                 return $dispatcher;
             }, 
