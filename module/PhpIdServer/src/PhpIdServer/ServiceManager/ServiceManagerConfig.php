@@ -2,9 +2,10 @@
 
 namespace PhpIdServer\ServiceManager;
 
-use PhpIdServer\User\DataConnector\DataConnectorFactory;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
+use PhpIdServer\General\Exception as GeneralException;
+use PhpIdServer\User\DataConnector\DataConnectorFactory;
 use PhpIdServer\Util\String;
 use PhpIdServer\User;
 use PhpIdServer\Authentication;
@@ -94,6 +95,9 @@ class ServiceManagerConfig extends Config
                 return new User\UserFactory($config['user_factory']);
             }, 
             
+            /*
+             * User/DataConnector/DataConnectorFactory
+             */
             'UserDataConnectorFactory' => function  (ServiceManager $sm)
             {
                 return new DataConnectorFactory();
@@ -120,6 +124,26 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return $chain;
+            }, 
+            
+            'UserInfoMapper' => function  (ServiceManager $sm)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config['user_info_mapper'])) {
+                    throw new Exception\ConfigNotFoundException('user_info_mapper');
+                }
+                
+                $mapperConfig = $config['user_info_mapper'];
+                if (! isset($mapperConfig['class'])) {
+                    throw new Exception\ConfigNotFoundException('user_info_mapper / class');
+                }
+                
+                $className = $mapperConfig['class'];
+                if (! class_exists($className)) {
+                    throw new GeneralException\InvalidClassException(sprintf("Non-existent class '%s'", $className));
+                }
+                
+                return new $className();
             },
             
             /*
@@ -229,6 +253,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher->setSessionManager($sm->get('SessionManager'));
                 $dispatcher->setUserInfoRequest($sm->get('UserInfoRequest'));
                 $dispatcher->setUserInfoResponse($sm->get('UserInfoResponse'));
+                $dispatcher->setUserInfoMapper($sm->get('UserInfoMapper'));
                 
                 return $dispatcher;
             }, 

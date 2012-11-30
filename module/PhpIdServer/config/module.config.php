@@ -241,5 +241,9 @@ return array(
             'class' => '\PhpIdServer\User\DataConnector\Dummy', 
             'options' => array()
         )
+    ), 
+    
+    'user_info_mapper' => array(
+        'class' => '\PhpIdServer\User\UserInfo\Mapper\ToArray'
     )
 );
