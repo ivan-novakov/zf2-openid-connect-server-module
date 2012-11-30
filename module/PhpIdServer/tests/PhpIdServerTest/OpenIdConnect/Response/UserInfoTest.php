@@ -42,12 +42,12 @@ class UserInfoTest extends \PHPUnit_Framework_TestCase
 
     public function testGetHttpResponse ()
     {
-        $user = new User(array(
+        $userData = array(
             User::FIELD_ID => 'testuser', 
             User::FIELD_NAME => 'Test User'
-        ));
+        );
         
-        $this->_response->setUserEntity($user);
+        $this->_response->setUserData($userData);
         
         $httpResponse = $this->_response->getHttpResponse();
         

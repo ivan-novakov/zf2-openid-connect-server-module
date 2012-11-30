@@ -14,6 +14,7 @@ use PhpIdServer\Entity\Entity;
  * @method string getFamilyName()
  * @method string getNickname()
  * @method string getEmail()
+ * 
  *
  */
 class User extends Entity implements UserInterface

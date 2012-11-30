@@ -122,17 +122,26 @@ class UserInfoTest extends DispatcherTestCase
 
     public function testDispatchOk ()
     {
+        $user = $this->_getUserMock();
+        
         $smStub = $this->_getSessionManagerStub();
         $this->_expectSessionManagerReturnToken($smStub);
         $this->_expectSessionManagerReturnSession($smStub);
-        $this->_expectSessionManagerReturnUser($smStub);
+        $this->_expectSessionManagerReturnUser($smStub, $user);
         
         $this->_dispatcher->setSessionManager($smStub);
         $this->_dispatcher->setUserInfoRequest($this->_getRequestStub());
         
         $response = $this->_getResponseStub();
-        $this->_expectResponseOk($response, 'setUserEntity');
+        $this->_expectResponseOk($response, 'setUserData');
         $this->_dispatcher->setUserInfoResponse($response);
+        
+        $userInfoMapper = $this->getMock('PhpIdServer\User\UserInfo\Mapper\MapperInterface');
+        $userInfoMapper->expects($this->once())
+            ->method('getUserInfoData')
+            ->with($user)
+            ->will($this->returnValue(array()));
+        $this->_dispatcher->setUserInfoMapper($userInfoMapper);
         
         $response = $this->_dispatcher->dispatch();
         
@@ -178,25 +187,8 @@ class UserInfoTest extends DispatcherTestCase
         
         return $response;
     }
-    
-    /*
-    protected function _expectResponseError ($response, $expectError)
-    {
-        $response->expects($this->once())
-            ->method('setError')
-            ->with($this->stringContains($expectError));
-    }
 
 
-    protected function _expectResponseOk ($response)
-    {
-        $response->expects($this->never())
-            ->method('setError');
-        
-        $response->expects($this->once())
-            ->method('setUserEntity');
-    }
-*/
     protected function _expectSessionManagerReturnToken ($sm, $expired = false)
     {
         $accessToken = $this->_getAccessTokenStub($expired);
@@ -214,10 +206,20 @@ class UserInfoTest extends DispatcherTestCase
     }
 
 
-    protected function _expectSessionManagerReturnUser ($sm)
+    protected function _expectSessionManagerReturnUser ($sm, $user = null)
     {
+        if (null === $user) {
+            $user = $this->_getUserMock();
+        }
+        
         $sm->expects($this->once())
             ->method('getUserFromSession')
-            ->will($this->returnValue($this->getMock('\PhpIdServer\User\User')));
+            ->will($this->returnValue($user));
+    }
+
+
+    protected function _getUserMock ()
+    {
+        return $this->getMock('\PhpIdServer\User\UserInterface');
     }
 }

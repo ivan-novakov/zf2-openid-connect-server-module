@@ -34,32 +34,32 @@ class UserInfo extends AbstractTokenResponse
     const ERROR_INVALID_SCHEMA = 'invalid_schema';
 
     /**
-     * The user entity containing actual data.
+     * The user data.
      *
-     * @var UserInterface
+     * @var array
      */
-    protected $_userEntity = NULL;
+    protected $_userData = array();
 
 
     /**
-     * Sets the user entity object.
+     * Sets the user data.
      *
-     * @param UserInterface $user
+     * @param @array $userData
      */
-    public function setUserEntity (UserInterface $user)
+    public function setUserData (array $userData)
     {
-        $this->_userEntity = $user;
+        $this->_userData = $userData;
     }
 
 
     /**
-     * Returns the user entity object.
+     * Returns the user data.
      *
-     * @return UserInterface
+     * @return array
      */
-    public function getUserEntity ()
+    public function getUserData ()
     {
-        return $this->_userEntity;
+        return $this->_userData;
     }
 
 
@@ -98,11 +98,6 @@ class UserInfo extends AbstractTokenResponse
      */
     protected function _createResponseContent ()
     {
-        $user = $this->getUserEntity();
-        if (! $user) {
-            throw new GeneralException\MissingDependencyException('user entity');
-        }
-        
-        return $this->_jsonEncode($user->toArray());
+        return $this->_jsonEncode($this->getUserData());
     }
 }

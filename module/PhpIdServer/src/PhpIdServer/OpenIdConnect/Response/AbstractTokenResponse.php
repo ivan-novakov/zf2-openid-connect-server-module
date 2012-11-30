@@ -100,6 +100,14 @@ abstract class AbstractTokenResponse extends AbstractResponse
 
 
     /**
+     * Returns the response content data.
+     * 
+     * @return string
+     */
+    abstract protected function _createResponseContent ();
+
+
+    /**
      * Creates and returns error response data.
      *
      * @return string

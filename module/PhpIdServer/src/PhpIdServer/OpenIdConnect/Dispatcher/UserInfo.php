@@ -6,6 +6,7 @@ use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
 use PhpIdServer\User\UserInterface;
+use PhpIdServer\User;
 
 
 /**
@@ -20,14 +21,21 @@ class UserInfo extends AbstractDispatcher
      * 
      * @var Request\UserInfo
      */
-    protected $_request = NULL;
+    protected $_request = null;
 
     /**
      * The user info response.
      * 
      * @var Response\UserInfo
      */
-    protected $_response = NULL;
+    protected $_response = null;
+
+    /**
+     * The userinfo mapper.
+     * 
+     * @var User\UserInfo\Mapper\MapperInterface
+     */
+    protected $_userInfoMapper = null;
 
 
     /**
@@ -71,6 +79,32 @@ class UserInfo extends AbstractDispatcher
     public function getUserInfoResponse ()
     {
         return $this->_response;
+    }
+
+
+    /**
+     * Sets the userinfo mapper.
+     * 
+     * @param User\UserInfo\Mapper\MapperInterface $mapper
+     */
+    public function setUserInfoMapper (User\UserInfo\Mapper\MapperInterface $mapper)
+    {
+        $this->_userInfoMapper = $mapper;
+    }
+
+
+    /**
+     * Returns the userinfo mapper.
+     * 
+     * @return User\UserInfo\Mapper\MapperInterface
+     */
+    public function getUserInfoMapper ()
+    {
+        if (null === $this->_userInfoMapper) {
+            $this->_userInfoMapper = new User\UserInfo\Mapper\ToArray();
+        }
+        
+        return $this->_userInfoMapper;
     }
 
 
@@ -142,7 +176,8 @@ class UserInfo extends AbstractDispatcher
             throw new GeneralException\MissingDependencyException('userinfo response');
         }
         
-        $userInfoResponse->setUserEntity($user);
+        $userInfoResponse->setUserData($this->getUserInfoMapper()
+            ->getUserInfoData($user));
         
         return $userInfoResponse;
     }
