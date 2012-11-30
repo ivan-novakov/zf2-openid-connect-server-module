@@ -4,7 +4,7 @@ namespace PhpIdServer\OpenIdConnect\Dispatcher;
 
 use PhpIdServer\Client\Client;
 use PhpIdServer\Authentication;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\Context\AuthorizeContext;
 use PhpIdServer\OpenIdConnect\Response;
@@ -163,7 +163,7 @@ class Authorize extends AbstractDispatcher
         }
         
         $user = $context->getUser();
-        if (! ($user instanceof User)) {
+        if (! ($user instanceof UserInterface)) {
             return $this->errorResponse(Error::ERROR_INVALID_REQUEST, 'no user in context');
         }
         

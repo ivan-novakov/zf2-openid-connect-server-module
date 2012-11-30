@@ -3,6 +3,7 @@ return array(
     
     'modules' => array(
         'PhpIdServer', 
+        'Shongo',
         'ZF2NetteDebug'
     ), 
     
@@ -12,7 +13,8 @@ return array(
         ), 
         'module_paths' => array(
             './module', 
-            './vendor'
+            './vendor', 
+            './external'
         )
     )
 );

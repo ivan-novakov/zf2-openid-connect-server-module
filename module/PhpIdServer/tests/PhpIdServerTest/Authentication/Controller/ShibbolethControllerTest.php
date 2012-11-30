@@ -161,14 +161,18 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributes')
             ->will($this->returnValue(array()));
         
+        $user = $this->_getUserMock(null);
+        $controller->setUserFactory($this->_getUserFactoryMock($user));
+        
         $controller->authenticate();
     }
 
 
     public function testAuthenticateWithValidData ()
     {
+        $userId = 'testuser';
         $userData = array(
-            User::FIELD_ID => 'testuser'
+            User::FIELD_ID => $userId
         );
         
         $controller = $this->_getControllerMock(array(
@@ -182,9 +186,11 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributes')
             ->will($this->returnValue($userData));
         
-        $user = $controller->authenticate();
-        $this->assertInstanceOf('PhpIdServer\User\User', $user);
-        $this->assertSame('testuser', $user->getId());
+        $user = $this->_getUserMock($userId);
+        $controller->setUserFactory($this->_getUserFactoryMock($user));
+        
+        $authUser = $controller->authenticate();
+        $this->assertSame($user, $authUser);
     }
 
 
@@ -195,5 +201,27 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     protected function _getControllerMock (array $mockedMethods)
     {
         return $this->getMock('PhpIdServer\Authentication\Controller\ShibbolethController', $mockedMethods);
+    }
+
+
+    protected function _getUserMock ($userId)
+    {
+        $user = $this->getMock('PhpIdServer\User\UserInterface');
+        $user->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($userId));
+        
+        return $user;
+    }
+
+
+    protected function _getUserFactoryMock ($user)
+    {
+        $userFactory = $this->getMock('PhpIdServer\User\UserFactoryInterface');
+        $userFactory->expects($this->once())
+            ->method('createUser')
+            ->will($this->returnValue($user));
+        
+        return $userFactory;
     }
 }

@@ -3,7 +3,7 @@
 namespace PhpIdServer\OpenIdConnect\Response;
 
 use PhpIdServer\General\Exception as GeneralException;
-use \PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 
 
 /**
@@ -36,7 +36,7 @@ class UserInfo extends AbstractTokenResponse
     /**
      * The user entity containing actual data.
      *
-     * @var User
+     * @var UserInterface
      */
     protected $_userEntity = NULL;
 
@@ -44,9 +44,9 @@ class UserInfo extends AbstractTokenResponse
     /**
      * Sets the user entity object.
      *
-     * @param User $user
+     * @param UserInterface $user
      */
-    public function setUserEntity (User $user)
+    public function setUserEntity (UserInterface $user)
     {
         $this->_userEntity = $user;
     }
@@ -55,7 +55,7 @@ class UserInfo extends AbstractTokenResponse
     /**
      * Returns the user entity object.
      *
-     * @return User
+     * @return UserInterface
      */
     public function getUserEntity ()
     {

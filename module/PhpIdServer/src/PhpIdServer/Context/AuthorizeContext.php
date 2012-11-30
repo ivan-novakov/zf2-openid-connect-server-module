@@ -5,7 +5,7 @@ namespace PhpIdServer\Context;
 use PhpIdServer\Client\Client;
 use PhpIdServer\OpenIdConnect\Request\Authorize;
 use PhpIdServer\Authentication;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 
 
 class AuthorizeContext extends AbstractContext
@@ -35,7 +35,7 @@ class AuthorizeContext extends AbstractContext
     /**
      * User object.
      * 
-     * @var User
+     * @var UserInterface
      */
     protected $_user = NULL;
 
@@ -120,9 +120,9 @@ class AuthorizeContext extends AbstractContext
     /**
      * Sets the user object holding user's identity.
      * 
-     * @param User $user
+     * @param UserInterface $user
      */
-    public function setUser (User $user)
+    public function setUser (UserInterface $user)
     {
         $this->_user = $user;
     }
@@ -131,7 +131,7 @@ class AuthorizeContext extends AbstractContext
     /**
      * Returns the user object holding user's identity.
      * 
-     * @return User
+     * @return UserInterface
      */
     public function getUser ()
     {

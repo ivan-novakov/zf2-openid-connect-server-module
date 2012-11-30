@@ -3,7 +3,7 @@
 namespace PhpIdServer\Authentication\Controller;
 
 use PhpIdServer\User\UserFactoryInterface;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 use PhpIdServer\Authentication\Info;
 use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
@@ -107,10 +107,10 @@ abstract class AbstractController extends BaseController implements Authenticati
         
         try {
             $user = $this->authenticate();
-            if (! ($user instanceof User)) {
+            if (! ($user instanceof UserInterface)) {
                 throw new Exception\AuthenticationException('No user');
             }
-            
+
             $context->setUser($user);
             $authenticationInfo = $this->_initSuccessAuthenticationInfo();
         } catch (Exception\AuthenticationException $e) {

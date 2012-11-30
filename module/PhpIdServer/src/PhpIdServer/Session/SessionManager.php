@@ -5,7 +5,7 @@ namespace PhpIdServer\Session;
 use PhpIdServer\Session\Token\AccessToken;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\Session\Token\AuthorizationCode;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 use PhpIdServer\User\Serializer;
 use PhpIdServer\Client\Client;
 use PhpIdServer\Authentication;
@@ -48,7 +48,7 @@ class SessionManager
      * 
      * @param Session $session
      * @throws GeneralException\MissingDependencyException
-     * @return User
+     * @return UserInterface
      */
     public function getUserFromSession (Session $session)
     {
@@ -64,12 +64,12 @@ class SessionManager
     /**
      * Creates a new session for the provided user and saves it in the storage.
      * 
-     * @param User $user
+     * @param UserInterface $user
      * @param Authentication\Info $authenticationInfo
      * @throws Exception\MissingComponentException
      * @return Session
      */
-    public function createSession (User $user, Authentication\Info $authenticationInfo)
+    public function createSession (UserInterface $user, Authentication\Info $authenticationInfo)
     {
         $sessionIdGenerator = $this->getSessionIdGenerator();
         if (! $sessionIdGenerator) {

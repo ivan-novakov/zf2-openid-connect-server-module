@@ -3,7 +3,7 @@
 namespace PhpIdServer\User\Serializer;
 
 use PhpIdServer\Util\Options;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 
 
 /**
@@ -42,11 +42,11 @@ class Serializer implements SerializerInterface
     /**
      * Serializes the user object and returns the data.
      * 
-     * @param User $user
+     * @param UserInterface $user
      * @throws Exception\AdapterSerializeException
      * @return string
      */
-    public function serialize (User $user)
+    public function serialize (UserInterface $user)
     {
         try {
             $data = $this->getAdapter()
@@ -77,7 +77,7 @@ class Serializer implements SerializerInterface
             throw new Exception\AdapterUnserializeException($e);
         }
         
-        if (! ($user instanceof User)) {
+        if (! ($user instanceof UserInterface)) {
             throw new Exception\InvalidUnserializationException('The result is not a User object');
         }
         

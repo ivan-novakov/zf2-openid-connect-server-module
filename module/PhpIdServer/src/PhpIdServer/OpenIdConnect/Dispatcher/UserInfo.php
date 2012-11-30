@@ -5,7 +5,7 @@ namespace PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
-use PhpIdServer\User\User;
+use PhpIdServer\User\UserInterface;
 
 
 /**
@@ -131,11 +131,11 @@ class UserInfo extends AbstractDispatcher
     /**
      * Returns the user info response with the user data.
      * 
-     * @param User $user
+     * @param UserInterface $user
      * @throws GeneralException\MissingDependencyException
      * @return Response\UserInfo
      */
-    protected function _validResponse (User $user)
+    protected function _validResponse (UserInterface $user)
     {
         $userInfoResponse = $this->getUserInfoResponse();
         if (! $userInfoResponse) {
