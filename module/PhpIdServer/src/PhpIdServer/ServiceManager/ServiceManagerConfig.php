@@ -126,6 +126,9 @@ class ServiceManagerConfig extends Config
                 return $chain;
             }, 
             
+            /*
+             * User/UserInfo/Mapper/MapperInterface
+             */
             'UserInfoMapper' => function  (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
