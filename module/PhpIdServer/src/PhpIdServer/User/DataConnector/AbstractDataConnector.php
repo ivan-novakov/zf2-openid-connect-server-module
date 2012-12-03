@@ -2,7 +2,9 @@
 
 namespace PhpIdServer\User\DataConnector;
 
+use PhpIdServer\General\Component;
 
-abstract class AbstractDataConnector implements DataConnectorInterface
+
+abstract class AbstractDataConnector extends Component implements DataConnectorInterface
 {
 }
