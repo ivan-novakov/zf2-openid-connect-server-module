@@ -182,7 +182,7 @@ return array(
                     'Shib-Session-ID' => 'session_id'
                 ), 
                 'user_attributes_map' => array(
-                    'uid' => User::FIELD_ID, 
+                    'REMOTE_USER' => User::FIELD_ID, 
                     'cn' => User::FIELD_NAME, 
                     'givenName' => User::FIELD_GIVEN_NAME, 
                     'sn' => User::FIELD_FAMILY_NAME, 
