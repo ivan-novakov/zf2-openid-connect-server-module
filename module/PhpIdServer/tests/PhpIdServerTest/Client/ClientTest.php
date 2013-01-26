@@ -15,7 +15,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         
         $authenticationInfo = $client->getAuthenticationInfo();
         
-        $this->assertInstanceOf('\PhpIdServer\Client\Authentication\ClientInfo', $authenticationInfo);
+        $this->assertInstanceOf('\PhpIdServer\Client\Authentication\Info', $authenticationInfo);
     }
 
 
@@ -45,7 +45,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'id' => 'myClientId', 
             'type' => 'public', 
             'authentication' => array(
-                'type' => Client\Authentication\Type::SECRET, 
+                'type' => 'secret', 
                 'options' => array(
                     'secret' => 'xxx'
                 )

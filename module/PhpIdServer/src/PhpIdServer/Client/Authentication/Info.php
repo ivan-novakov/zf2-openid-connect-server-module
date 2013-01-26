@@ -6,7 +6,7 @@ namespace PhpIdServer\Client\Authentication;
  * Simple class that contains information about the authentication type and parameters of the client.
  *
  */
-class ClientInfo
+class Info
 {
 
     /**
@@ -41,14 +41,9 @@ class ClientInfo
      * Sets the authentication type.
      * 
      * @param string $type
-     * @throws Exception\UnsupportedAuthenticationTypeException
      */
     public function setType ($type)
     {
-        if (! Type::isSupported($type)) {
-            throw new Exception\UnsupportedAuthenticationTypeException($type);
-        }
-        
         $this->_type = $type;
     }
 

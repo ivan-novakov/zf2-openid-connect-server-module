@@ -12,7 +12,7 @@ use PhpIdServer\Entity\Entity;
  * @method string getType()
  * @method string getRedirectUri()
  * @method string getUserAuthenticationHandler()
- * @method Authentication\ClientInfo getAuthenticationInfo()
+ * @method Authentication\Info getAuthenticationInfo()
  */
 class Client extends Entity
 {
@@ -40,7 +40,7 @@ class Client extends Entity
     /**
      * Authentication info object.
      * 
-     * @var Authentication\ClientInfo
+     * @var Authentication\Info
      */
     protected $_authenticationInfo = NULL;
 
@@ -61,7 +61,7 @@ class Client extends Entity
      * Returns the authentication info for the client.
      * 
      * @throws Exception\IncompleteAuthenticationInfoException
-     * @return Authentication\ClientInfo
+     * @return Authentication\Info
      */
     public function getAuthenticationInfo ()
     {
@@ -76,7 +76,7 @@ class Client extends Entity
                 $options = $authentication['options'];
             }
             
-            $this->_authenticationInfo = new Authentication\ClientInfo($authentication['type'], $options);
+            $this->_authenticationInfo = new Authentication\Info($authentication['type'], $options);
         }
         
         return $this->_authenticationInfo;
