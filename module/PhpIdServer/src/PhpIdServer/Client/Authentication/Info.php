@@ -14,7 +14,7 @@ class Info
      * 
      * @var string
      */
-    protected $_type = NULL;
+    protected $_method = NULL;
 
     /**
      * Authentication options.
@@ -27,12 +27,12 @@ class Info
     /**
      * Contructor.
      * 
-     * @param string $type
+     * @param string $method
      * @param array $options
      */
-    public function __construct ($type, Array $options = array())
+    public function __construct ($method, Array $options = array())
     {
-        $this->setType($type);
+        $this->setMethod($method);
         $this->setOptions($options);
     }
 
@@ -40,11 +40,11 @@ class Info
     /**
      * Sets the authentication type.
      * 
-     * @param string $type
+     * @param string $method
      */
-    public function setType ($type)
+    public function setMethod ($method)
     {
-        $this->_type = $type;
+        $this->_method = $method;
     }
 
 
@@ -53,9 +53,9 @@ class Info
      * 
      * @return string
      */
-    public function getType ()
+    public function getMethod ()
     {
-        return $this->_type;
+        return $this->_method;
     }
 
 

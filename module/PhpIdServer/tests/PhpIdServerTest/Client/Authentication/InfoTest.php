@@ -12,14 +12,14 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructor ()
     {
-        $type = 'secret';
+        $method = 'secret';
         $options = array(
             'foo' => 'bar'
         );
         
-        $info = new Info($type, $options);
+        $info = new Info($method, $options);
         
-        $this->assertSame($type, $info->getType());
+        $this->assertSame($method, $info->getMethod());
         $this->assertSame($options, $info->getOptions());
     }
 
