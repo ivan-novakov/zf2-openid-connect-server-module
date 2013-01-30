@@ -53,6 +53,6 @@ abstract class AbstractMethod implements MethodInterface
      */
     public function createFailureResult($reason)
     {
-        return new Authentication\Result(false, $reason);
+        return new Authentication\Result(false, sprintf("[%s] %s", get_class($this), $reason));
     }
 }
