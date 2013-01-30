@@ -82,4 +82,20 @@ class Info
     {
         return $this->_options;
     }
+
+
+    /**
+     * Returns a specific option value.
+     * 
+     * @param string $name
+     * @return mixed|null
+     */
+    public function getOption($name)
+    {
+        if (isset($this->_options[$name])) {
+            return $this->_options[$name];
+        }
+        
+        return null;
+    }
 }
