@@ -7,7 +7,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 {
 
 
-    public function testDispatchMissingRequestDependencyException ()
+    public function testDispatchMissingRequestDependencyException()
     {
         $this->setExpectedException('\PhpIdServer\General\Exception\MissingDependencyException');
         
@@ -15,7 +15,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getSessionManagerStub ($noAuthorizationCode = false, $expired = false, $returnSession = false)
+    protected function _getSessionManagerStub($noAuthorizationCode = false, $expired = false, $returnSession = false)
     {
         $sm = $this->getMockBuilder('\PhpIdServer\Session\SessionManager')
             ->getMock();
@@ -38,7 +38,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getAuthorizationCodeStub ($expired = false)
+    protected function _getAuthorizationCodeStub($expired = false)
     {
         $authorizationCode = $this->getMock('\PhpIdServer\Session\Token\AuthorizationCode');
         $authorizationCode->expects($this->any())
@@ -49,7 +49,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getAccessTokenStub ($expired = false)
+    protected function _getAccessTokenStub($expired = false)
     {
         $accessToken = $this->getMock('\PhpIdServer\Session\Token\AccessToken');
         $accessToken->expects($this->any())
@@ -60,15 +60,31 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getClientStub ()
+    protected function _getClientStub()
     {
         $client = $this->getMock('\PhpIdServer\Client\Client');
+        $client->expects($this->any())
+            ->method('getAuthenticationInfo')
+            ->will($this->returnValue($this->_getAuthenticationInfoStub()));
         
         return $client;
     }
 
 
-    protected function _getSessionStub ()
+    protected function _getAuthenticationInfoStub($method = 'dummy')
+    {
+        $authenticationInfo = $this->getMockBuilder('PhpIdServer\Client\Authentication\Info')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $authenticationInfo->expects($this->any())
+            ->method('getMethod')
+            ->will($this->returnValue($method));
+        
+        return $authenticationInfo;
+    }
+
+
+    protected function _getSessionStub()
     {
         $session = $this->getMock('\PhpIdServer\Session\Session');
         
@@ -76,7 +92,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _expectResponseError ($response, $expectError)
+    protected function _expectResponseError($response, $expectError)
     {
         $response->expects($this->once())
             ->method('setError')
@@ -84,7 +100,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _expectResponseOk ($response, $checkMethod = NULL)
+    protected function _expectResponseOk($response, $checkMethod = NULL)
     {
         $response->expects($this->never())
             ->method('setError');

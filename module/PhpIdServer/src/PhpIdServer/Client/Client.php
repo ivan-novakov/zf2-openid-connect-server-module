@@ -8,6 +8,9 @@ use PhpIdServer\Entity\Entity;
 /**
  * Entity representing the client application.
  *
+ * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
+ * @license http://debug.cz/license/freebsd
+ * 
  * @method string getId()
  * @method string getType()
  * @method string getRedirectUri()
@@ -28,10 +31,10 @@ class Client extends Entity
     const FIELD_USER_AUTHENTICATION_HANDLER = 'user_authentication_handler';
 
     protected $_fields = array(
-        self::FIELD_ID, 
-        self::FIELD_TYPE, 
-        self::FIELD_AUTHENTICATION, 
-        self::FIELD_REDIRECT_URI, 
+        self::FIELD_ID,
+        self::FIELD_TYPE,
+        self::FIELD_AUTHENTICATION,
+        self::FIELD_REDIRECT_URI,
         self::FIELD_USER_AUTHENTICATION_HANDLER
     );
 
@@ -50,7 +53,7 @@ class Client extends Entity
      * 
      * @param array $data
      */
-    public function populate (Array $data)
+    public function populate(Array $data)
     {
         $this->_authenticationInfo = NULL;
         parent::populate($data);
@@ -63,7 +66,7 @@ class Client extends Entity
      * @throws Exception\IncompleteAuthenticationInfoException
      * @return Authentication\Info
      */
-    public function getAuthenticationInfo ()
+    public function getAuthenticationInfo()
     {
         if (! ($this->_authenticationInfo instanceof Authentication\ClientInfo)) {
             $authentication = $this->getValue(self::FIELD_AUTHENTICATION);

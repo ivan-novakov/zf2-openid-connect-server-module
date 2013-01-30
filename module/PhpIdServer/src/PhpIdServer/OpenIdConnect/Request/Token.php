@@ -7,7 +7,7 @@ namespace PhpIdServer\OpenIdConnect\Request;
  * Token request object.
  *
  */
-class Token extends AbstractRequest
+class Token extends AbstractRequest implements ClientRequestInterface
 {
 
     const FIELD_CODE = 'code';

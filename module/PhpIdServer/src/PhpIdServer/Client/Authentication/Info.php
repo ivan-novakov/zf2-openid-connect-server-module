@@ -1,10 +1,13 @@
 <?php
+
 namespace PhpIdServer\Client\Authentication;
 
 
 /**
  * Simple class that contains information about the authentication type and parameters of the client.
  *
+ * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
+ * @license http://debug.cz/license/freebsd
  */
 class Info
 {
@@ -30,7 +33,7 @@ class Info
      * @param string $method
      * @param array $options
      */
-    public function __construct ($method, Array $options = array())
+    public function __construct($method, Array $options = array())
     {
         $this->setMethod($method);
         $this->setOptions($options);
@@ -42,7 +45,7 @@ class Info
      * 
      * @param string $method
      */
-    public function setMethod ($method)
+    public function setMethod($method)
     {
         $this->_method = $method;
     }
@@ -53,7 +56,7 @@ class Info
      * 
      * @return string
      */
-    public function getMethod ()
+    public function getMethod()
     {
         return $this->_method;
     }
@@ -64,7 +67,7 @@ class Info
      * 
      * @param array $options
      */
-    public function setOptions (Array $options)
+    public function setOptions(Array $options)
     {
         $this->_options = $options;
     }
@@ -75,7 +78,7 @@ class Info
      * 
      * @return array
      */
-    public function getOptions ()
+    public function getOptions()
     {
         return $this->_options;
     }

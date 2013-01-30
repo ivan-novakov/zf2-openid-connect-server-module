@@ -12,6 +12,7 @@ use PhpIdServer\Authentication;
 use PhpIdServer\OpenIdConnect\Dispatcher;
 use PhpIdServer\OpenIdConnect\Response;
 use PhpIdServer\OpenIdConnect\Request;
+use PhpIdServer\Client;
 
 
 class ServiceManagerConfig extends Config
@@ -191,6 +192,18 @@ class ServiceManagerConfig extends Config
                 return $manager;
             }, 
             
+            'ClientAuthenticationManager' => function  (ServiceManager $sm)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config['client_authentication_manager']) || ! is_array($config['client_authentication_manager'])) {
+                    throw new Exception\ConfigNotFoundException('client_authentication_manager');
+                }
+                
+                $manager = new Client\Authentication\Manager($config['client_authentication_manager']);
+                
+                return $manager;
+            },
+            
             /*
              * OpenIdConnect/Dispatcher/Authorize
              */
@@ -226,6 +239,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher->setSessionManager($sm->get('SessionManager'));
                 $dispatcher->setTokenRequest($sm->get('TokenRequest'));
                 $dispatcher->setTokenResponse($sm->get('TokenResponse'));
+                $dispatcher->setClientAuthenticationManager($sm->get('ClientAuthenticationManager'));
                 
                 return $dispatcher;
             }, 

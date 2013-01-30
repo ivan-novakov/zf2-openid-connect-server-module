@@ -15,6 +15,8 @@ use PhpIdServer\OpenIdConnect\Request\ClientRequestInterface;
 class Dummy extends AbstractMethod
 {
 
+    const OPT_SUCCESS = 'success';
+
 
     /**
      * {@inheritdoc}
@@ -22,6 +24,10 @@ class Dummy extends AbstractMethod
      */
     public function authenticate(ClientRequestInterface $request, Client $client)
     {
-        return $this->createSuccessResult();
+        if ($this->_options->get(self::OPT_SUCCESS, false)) {
+            return $this->createSuccessResult();
+        }
+        
+        return $this->createFailureResult('dummy failure reason');
     }
 }

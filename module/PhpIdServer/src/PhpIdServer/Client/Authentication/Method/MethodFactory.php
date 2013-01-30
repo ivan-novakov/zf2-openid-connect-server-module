@@ -67,9 +67,9 @@ class MethodFactory
         
         $methodClass = $methodInfo['class'];
         if (! class_exists($methodClass)) {
-            throw new GeneralException\InvalidClassException($methodClass);
+            throw new GeneralException\ClassNotFoundException($methodClass);
         }
-        
+ 
         $options = array();
         if (isset($methodInfo['options']) && is_array($methodInfo['options'])) {
             $options = $methodInfo['options'];

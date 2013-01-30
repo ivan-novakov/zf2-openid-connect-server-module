@@ -6,6 +6,12 @@ use PhpIdServer\Client\Client;
 use PhpIdServer\OpenIdConnect\Request\ClientRequestInterface;
 
 
+/**
+ * Interface for client authentication methods.
+ * 
+ * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
+ * @license http://debug.cz/license/freebsd
+ */
 interface MethodInterface
 {
 

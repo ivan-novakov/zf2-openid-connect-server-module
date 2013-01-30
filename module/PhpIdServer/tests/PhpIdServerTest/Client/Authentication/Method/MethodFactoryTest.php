@@ -56,7 +56,7 @@ class MethodFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateMethodWithNonExistentClass()
     {
-        $this->setExpectedException('PhpIdServer\General\Exception\InvalidClassException');
+        $this->setExpectedException('PhpIdServer\General\Exception\ClassNotFoundException');
         $method = $this->factory->createMethod('dummy_with_nonexistent_class');
     }
 

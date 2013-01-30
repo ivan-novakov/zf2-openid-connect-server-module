@@ -9,6 +9,7 @@ use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\OpenIdConnect\Response;
 use PhpIdServer\OpenIdConnect\Entity;
+use PhpIdServer\Client;
 
 
 /**
@@ -39,13 +40,20 @@ class Token extends AbstractDispatcher
      */
     protected $_tokenFactory = NULL;
 
+    /**
+     * Client authentication manager.
+     * 
+     * @var Client\Authentication\Manager 
+     */
+    protected $_clientAuthenticationManager = NULL;
+
 
     /**
      * Sets the token request object.
      * 
      * @param Request\Token $request
      */
-    public function setTokenRequest (Request\Token $request)
+    public function setTokenRequest(Request\Token $request)
     {
         $this->_tokenRequest = $request;
     }
@@ -56,7 +64,7 @@ class Token extends AbstractDispatcher
      * 
      * @return Request\Token
      */
-    public function getTokenRequest ($throwException = false)
+    public function getTokenRequest($throwException = false)
     {
         if ($throwException && ! ($this->_tokenRequest instanceof Request\Token)) {
             throw new GeneralException\MissingDependencyException('request token');
@@ -70,7 +78,7 @@ class Token extends AbstractDispatcher
      * 
      * @param Response\Token $response
      */
-    public function setTokenResponse (Response\Token $response)
+    public function setTokenResponse(Response\Token $response)
     {
         $this->_tokenResponse = $response;
     }
@@ -81,7 +89,7 @@ class Token extends AbstractDispatcher
      * 
      * @return Response\Token
      */
-    public function getTokenResponse ($throwException = false)
+    public function getTokenResponse($throwException = false)
     {
         if ($throwException && ! ($this->_tokenResponse instanceof Response\Token)) {
             throw new GeneralException\MissingDependencyException('response token');
@@ -95,7 +103,7 @@ class Token extends AbstractDispatcher
      * 
      * @param EntityFactoryInterface $factory
      */
-    public function setTokenFactory (EntityFactoryInterface $factory)
+    public function setTokenFactory(EntityFactoryInterface $factory)
     {
         $this->_tokenFactory = $factory;
     }
@@ -106,7 +114,7 @@ class Token extends AbstractDispatcher
      * 
      * @return EntityFactoryInterface
      */
-    public function getTokenFactory ()
+    public function getTokenFactory()
     {
         if (! $this->_tokenFactory) {
             $this->_tokenFactory = new EntityFactory('\PhpIdServer\OpenIdConnect\Entity\Token');
@@ -117,12 +125,40 @@ class Token extends AbstractDispatcher
 
 
     /**
+     * Sets the client authentication manager.
+     * 
+     * @param Client\Authentication\Manager $clientAuthenticationManager
+     */
+    public function setClientAuthenticationManager(Client\Authentication\Manager $clientAuthenticationManager)
+    {
+        $this->_clientAuthenticationManager = $clientAuthenticationManager;
+    }
+
+
+    /**
+     * Returns the client authentication manager.
+     * 
+     * @param boolean $throwException
+     * @throws GeneralException\MissingDependencyException
+     * @return Client\Authentication\Manager 
+     */
+    public function getClientAuthenticationManager($throwException = false)
+    {
+        if (! ($this->_clientAuthenticationManager instanceof Client\Authentication\Manager) && $throwException) {
+            throw new GeneralException\MissingDependencyException('client authentication manager');
+        }
+        
+        return $this->_clientAuthenticationManager;
+    }
+
+
+    /**
      * Dispatches the request and returns the response.
      * 
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    public function dispatch ()
+    public function dispatch()
     {
         $request = $this->getTokenRequest(true);
         
@@ -130,7 +166,8 @@ class Token extends AbstractDispatcher
          * Validate request
          */
         if (! $request->isValid()) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, 
+                sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
         /*
@@ -140,14 +177,20 @@ class Token extends AbstractDispatcher
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, sprintf("Client with ID '%s' not found in registry", $request->getClientId()));
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, 
+                sprintf("Client with ID '%s' not found in registry", $request->getClientId()));
         }
         
         /*
          * Authenticate client
          */
-        // [..]
-        
+        $clientAuthenticationManager = $this->getClientAuthenticationManager(true);
+        $result = $clientAuthenticationManager->authenticate($request, $client);
+        if (! $result->isAuthenticated()) {
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, 
+                sprintf("Client authentication failure with method '%s'", $client->getAuthenticationInfo()
+                    ->getMethod()));
+        }
         
         /*
          * Retrieve and validate the authorization code.
@@ -168,7 +211,8 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_NO_SESSION, 'No session associated with the authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_NO_SESSION, 
+                'No session associated with the authorization code');
         }
         
         /*
@@ -182,20 +226,21 @@ class Token extends AbstractDispatcher
     }
 
 
-    protected function _createTokenEntity (AccessToken $accessToken)
+    protected function _createTokenEntity(AccessToken $accessToken)
     {
         $tokenFactory = $this->getTokenFactory();
         if (! ($tokenFactory instanceof EntityFactoryInterface)) {
             throw new GeneralException\MissingDependencyException('token factory');
         }
         
-        return $tokenFactory->createEntity(array(
-            Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(), 
-            Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(), 
-            Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(), 
-            Entity\Token::FIELD_REFRESH_TOKEN => 'not set', 
-            Entity\Token::FIELD_ID_TOKEN => 'not set'
-        ));
+        return $tokenFactory->createEntity(
+            array(
+                Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(),
+                Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(),
+                Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(),
+                Entity\Token::FIELD_REFRESH_TOKEN => 'not set',
+                Entity\Token::FIELD_ID_TOKEN => 'not set'
+            ));
     }
 
 
@@ -206,7 +251,7 @@ class Token extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    protected function _validResponse (Entity\Token $entityToken)
+    protected function _validResponse(Entity\Token $entityToken)
     {
         $response = $this->getTokenResponse(true);
         
@@ -223,7 +268,7 @@ class Token extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    protected function _errorResponse ($message, $description = NULL)
+    protected function _errorResponse($message, $description = NULL)
     {
         $response = $this->getTokenResponse(true);
         

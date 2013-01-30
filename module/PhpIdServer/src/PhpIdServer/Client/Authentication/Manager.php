@@ -93,13 +93,11 @@ class Manager
      */
     public function authenticate(ClientRequestInterface $request, Client $client)
     {
-        // get client auth methode + options
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
-        // determine the right method
+        
         $method = $this->getAuthenticationMethodFactory()
             ->createMethod($clientAuthenticationInfo->getMethod());
         
-        // call the method's authenticate() method
         return $method->authenticate($request, $client);
     }
 }

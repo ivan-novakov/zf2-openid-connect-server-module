@@ -15,6 +15,24 @@ use PhpIdServer\Util\Options;
 abstract class AbstractMethod implements MethodInterface
 {
 
+    /**
+     * Options.
+     * @var Options
+     */
+    protected $_options = null;
+
+
+    public function __construct($options = array())
+    {
+        $this->setOptions($options);
+    }
+
+
+    public function setOptions($options)
+    {
+        $this->_options = new Options($options);
+    }
+
 
     /**
      * Creates and returns a successful authentication result.

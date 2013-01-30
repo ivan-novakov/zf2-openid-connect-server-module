@@ -7,7 +7,7 @@ namespace PhpIdServer\OpenIdConnect\Request;
  * User info request.
  *
  */
-class UserInfo extends AbstractRequest
+class UserInfo extends AbstractRequest implements ClientRequestInterface
 {
 
     const FIELD_SCHEMA = 'schema';
@@ -32,7 +32,7 @@ class UserInfo extends AbstractRequest
      * 
      * @return string|NULL
      */
-    public function getSchema ()
+    public function getSchema()
     {
         return $this->_getGetParam(self::FIELD_SCHEMA);
     }
@@ -43,7 +43,7 @@ class UserInfo extends AbstractRequest
      * 
      * @return string|NULL
      */
-    public function getAuthorizationType ()
+    public function getAuthorizationType()
     {
         if (NULL === $this->_authorizationType) {
             $this->_parseAuthorizationHeader();
@@ -58,7 +58,7 @@ class UserInfo extends AbstractRequest
      * 
      * @return string|NULL
      */
-    public function getAuthorizationValue ()
+    public function getAuthorizationValue()
     {
         if (NULL === $this->_authorizationValue) {
             $this->_parseAuthorizationHeader();
@@ -73,7 +73,7 @@ class UserInfo extends AbstractRequest
      * 
      * @return string|NULL
      */
-    public function getAuthorization ()
+    public function getAuthorization()
     {
         $header = $this->_httpRequest->getHeader('Authorization');
         if ($header instanceof \Zend\Http\Header\Authorization) {
@@ -89,13 +89,14 @@ class UserInfo extends AbstractRequest
      * 
      * @throws Exception\InvalidAuthorizationException
      */
-    protected function _parseAuthorizationHeader ()
+    protected function _parseAuthorizationHeader()
     {
         $authorization = trim($this->getAuthorization());
         if ($authorization) {
             $parts = explode(' ', $authorization);
             if (count($parts) != 2) {
-                throw new Exception\InvalidAuthorizationException(sprintf("Unexpected number or authorization parts: %d", count($parts)));
+                throw new Exception\InvalidAuthorizationException(
+                    sprintf("Unexpected number or authorization parts: %d", count($parts)));
             }
             
             $this->_authorizationType = strtolower(trim($parts[0]));
@@ -108,7 +109,7 @@ class UserInfo extends AbstractRequest
      * (non-PHPdoc)
      * @see \PhpIdServer\OpenIdConnect\Request\AbstractRequest::_validate()
      */
-    protected function _validate ()
+    protected function _validate()
     {
         $reasons = array();
         
