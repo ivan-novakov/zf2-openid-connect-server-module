@@ -1,25 +1,40 @@
 <?php
+
 namespace PhpIdServer\Client\Authentication\Method;
+
+use PhpIdServer\Client\Authentication;
 use PhpIdServer\Util\Options;
 
 
+/**
+ * Abstract client authentication method class.
+ * 
+ * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
+ * @license http://debug.cz/license/freebsd
+ */
 abstract class AbstractMethod implements MethodInterface
 {
 
+
     /**
-     * Options.
+     * Creates and returns a successful authentication result.
      * 
-     * @var Options
+     * @return Authentication\Result
      */
-    protected $_options = NULL;
+    public function createSuccessResult()
+    {
+        return new Authentication\Result(true);
+    }
 
 
     /**
-     * (non-PHPdoc)
-     * @see \PhpIdServer\Client\Authentication\Method\MethodInterface::setOptions()
+     * Creates and returns failure authentication result.
+     * 
+     * @param string $reason
+     * @return Authentication\Result
      */
-    public function setOptions ($options)
+    public function createFailureResult($reason)
     {
-        $this->_options = new Options($options);
+        return new Authentication\Result(false, $reason);
     }
 }

@@ -2,7 +2,8 @@
 
 namespace PhpIdServer\Client\Authentication\Method;
 
-use PhpIdServer\Client;
+use PhpIdServer\Client\Client;
+use PhpIdServer\OpenIdConnect\Request\ClientRequestInterface;
 
 
 interface MethodInterface
@@ -10,19 +11,11 @@ interface MethodInterface
 
 
     /**
-     * Sets the method options.
-     * 
-     * @param array|Traversable $options
-     */
-    public function setOptions ($options);
-
-
-    /**
      * Tries to authenticate the client. Returns a message object containing information about the
      * authentication;
      * 
      * @param Client\Client $client
-     * @return Client\Authentication\Message
+     * @return Client\Authentication\Result
      */
-    public function authenticate (Client\Client $client);
+    public function authenticate(ClientRequestInterface $request, Client $client);
 }
