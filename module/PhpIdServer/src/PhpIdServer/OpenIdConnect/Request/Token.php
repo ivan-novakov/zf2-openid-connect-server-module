@@ -56,30 +56,54 @@ class Token extends AbstractRequest implements ClientRequestInterface
     }
 
 
+    /**
+     * Returns the "code" parameter value.
+     * 
+     * @return string
+     */
     public function getCode()
     {
         return $this->_getPostParam(self::FIELD_CODE);
     }
 
 
+    /**
+     * Returns the "grant_type" parameter value.
+     * 
+     * @return string
+     */
     public function getGrantType()
     {
         return $this->_getPostParam(self::FIELD_GRANT_TYPE);
     }
 
 
+    /**
+     * Returns the "redirect_uri" parameter value.
+     * 
+     * @return string
+     */
     public function getRedirectUri()
     {
         return $this->_getPostParam(self::FIELD_REDIRECT_URI);
     }
 
 
+    /**
+     * Returns the "client_id" parameter value.
+     * 
+     * @return string
+     */
     public function getClientId()
     {
         return $this->_getPostParam(self::FIELD_CLIENT_ID);
     }
 
 
+    /**
+     * {@inheritdoc}
+     * @see \PhpIdServer\OpenIdConnect\Request\ClientRequestInterface::getAuthenticationData()
+     */
     public function getAuthenticationData()
     {
         $authorizationHeader = $this->_getHeader('Authorization');

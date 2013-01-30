@@ -34,7 +34,14 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getAuthenticationInfo')
             ->will($this->returnValue($info));
         
+        $data = $this->getMockBuilder('PhpIdServer\Client\Authentication\Data')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
         $request = $this->getMock('PhpIdServer\OpenIdConnect\Request\ClientRequestInterface');
+        $request->expects($this->once())
+            ->method('getAuthenticationData')
+            ->will($this->returnValue($data));
         
         $method = $this->getMock('PhpIdServer\Client\Authentication\Method\MethodInterface');
         

@@ -2,8 +2,7 @@
 
 namespace PhpIdServer\Client\Authentication\Method;
 
-use PhpIdServer\Client\Client;
-use PhpIdServer\OpenIdConnect\Request\ClientRequestInterface;
+use PhpIdServer\Client;
 
 
 /**
@@ -20,8 +19,8 @@ interface MethodInterface
      * Tries to authenticate the client. Returns a message object containing information about the
      * authentication;
      * 
-     * @param Client\Client $client
-     * @return Client\Authentication\Result
+     * @param Client\Authentication\Info $info
+     * @return Client\Authentication\Data $data
      */
-    public function authenticate(ClientRequestInterface $request, Client $client);
+    public function authenticate(Client\Authentication\Info $info, Client\Authentication\Data $data);
 }

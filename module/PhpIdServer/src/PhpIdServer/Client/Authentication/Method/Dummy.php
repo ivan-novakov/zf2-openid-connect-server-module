@@ -2,8 +2,7 @@
 
 namespace PhpIdServer\Client\Authentication\Method;
 
-use PhpIdServer\Client\Client;
-use PhpIdServer\OpenIdConnect\Request\ClientRequestInterface;
+use PhpIdServer\Client;
 
 
 /**
@@ -22,7 +21,7 @@ class Dummy extends AbstractMethod
      * {@inheritdoc}
      * @see \PhpIdServer\Client\Authentication\Method\MethodInterface::authenticate()
      */
-    public function authenticate(ClientRequestInterface $request, Client $client)
+    public function authenticate(Client\Authentication\Info $info, Client\Authentication\Data $data)
     {
         if ($this->_options->get(self::OPT_SUCCESS, false)) {
             return $this->createSuccessResult();
