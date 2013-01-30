@@ -96,6 +96,10 @@ class Manager
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
         $clientAuthenticationData = $request->getAuthenticationData();
         
+        if ($clientAuthenticationInfo->getMethod() != $clientAuthenticationData->getMethod()) {
+            return new Result(false, 'invalid authentication method');
+        }
+        
         $method = $this->getAuthenticationMethodFactory()
             ->createMethod($clientAuthenticationInfo->getMethod());
         
