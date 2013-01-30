@@ -7,7 +7,7 @@ namespace PhpIdServer\OpenIdConnect\Request;
  * User info request.
  *
  */
-class UserInfo extends AbstractRequest implements ClientRequestInterface
+class UserInfo extends AbstractRequest
 {
 
     const FIELD_SCHEMA = 'schema';

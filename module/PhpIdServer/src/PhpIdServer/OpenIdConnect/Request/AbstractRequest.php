@@ -26,9 +26,20 @@ abstract class AbstractRequest
      *
      * @param \Zend\Http\Request $httpRequest            
      */
-    public function __construct (\Zend\Http\Request $httpRequest)
+    public function __construct(\Zend\Http\Request $httpRequest)
     {
         $this->_httpRequest = $httpRequest;
+    }
+
+
+    /**
+     * Returns the underlying HTTP request object.
+     * 
+     * @return \Zend\Http\Request
+     */
+    public function getHttpRequest()
+    {
+        return $this->_httpRequest;
     }
 
 
@@ -37,7 +48,7 @@ abstract class AbstractRequest
      * 
      * @return boolean
      */
-    public function isPostRequest ()
+    public function isPostRequest()
     {
         return (\Zend\Http\Request::METHOD_POST == $this->_httpRequest->getMethod());
     }
@@ -48,7 +59,7 @@ abstract class AbstractRequest
      * 
      * @return boolean
      */
-    public function isValid ()
+    public function isValid()
     {
         return (count($this->getInvalidReasons()) == 0);
     }
@@ -59,7 +70,7 @@ abstract class AbstractRequest
      * 
      * @return array
      */
-    public function getInvalidReasons ()
+    public function getInvalidReasons()
     {
         if (! is_array($this->_invalidReasons)) {
             $this->_invalidReasons = $this->_validate();
@@ -74,7 +85,7 @@ abstract class AbstractRequest
      * 
      * @return array
      */
-    protected function _validate ()
+    protected function _validate()
     {
         return array();
     }
@@ -86,7 +97,7 @@ abstract class AbstractRequest
      * @param string $name
      * @return mixed
      */
-    protected function _getParam ($name)
+    protected function _getParam($name)
     {
         if ($this->isPostRequest()) {
             return $this->_getPostParam($name);
@@ -102,7 +113,7 @@ abstract class AbstractRequest
      * @param string $name
      * @return string
      */
-    protected function _getPostParam ($name)
+    protected function _getPostParam($name)
     {
         return $this->_httpRequest->getPost($name);
     }
@@ -114,8 +125,20 @@ abstract class AbstractRequest
      * @param string $name
      * @return string
      */
-    protected function _getGetParam ($name)
+    protected function _getGetParam($name)
     {
         return $this->_httpRequest->getQuery($name);
+    }
+
+
+    /**
+     * Returns the required HTTP header.
+     * 
+     * @param string $name
+     * @return \Zend\Http\Header\HeaderInterface|\ArrayIterator|null
+     */
+    protected function _getHeader($name)
+    {
+        return $this->_httpRequest->getHeader($name);
     }
 }
