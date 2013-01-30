@@ -14,9 +14,9 @@ use PhpIdServer\Client;
 class SharedSecret extends AbstractMethod
 {
 
-    const AUTH_INFO_SECRET = 'secret';
+    const AUTH_INFO_SECRET = 'auth';
 
-    const AUTH_DATA_SECRET = 'secret';
+    const AUTH_DATA_SECRET = 'auth';
 
 
     /**

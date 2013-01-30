@@ -74,7 +74,7 @@ $request->getPost()
 // Client authentication
 $request->getHeaders()
     ->addHeaders(array(
-    'Authorization' => 'dummy key=value'
+    'Authorization' => $clientAuthorization
 ));
 
 _dumpRequest($request);

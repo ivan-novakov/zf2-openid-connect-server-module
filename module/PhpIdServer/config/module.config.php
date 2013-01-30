@@ -256,7 +256,7 @@ return array(
                 )
             ),
             'secret' => array(
-                'class' => '\PhpIdServer\Client\Authentication\Method\Secret',
+                'class' => '\PhpIdServer\Client\Authentication\Method\SharedSecret',
                 'options' => array()
             ),
             'pki' => array(

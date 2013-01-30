@@ -188,8 +188,8 @@ class Token extends AbstractDispatcher
         $result = $clientAuthenticationManager->authenticate($request, $client);
         if (! $result->isAuthenticated()) {
             return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, 
-                sprintf("Client authentication failure with method '%s'", $client->getAuthenticationInfo()
-                    ->getMethod()));
+                sprintf("Client authentication failure with method '%s': %s", $client->getAuthenticationInfo()
+                    ->getMethod(), $result->getNotAuthenticatedReason()));
         }
         
         /*

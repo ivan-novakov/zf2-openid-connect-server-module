@@ -6,6 +6,8 @@ $authUri = $serverUri . '/phpid-server/oic/authorize';
 $tokenUri = $serverUri . '/phpid-server/oic/token';
 $userInfoUri = $serverUri . '/phpid-server/oic/userinfo';
 
+$clientAuthorization = 'secret auth=secretstring';
+
 //-----------------------
 function _getClient ()
 {
