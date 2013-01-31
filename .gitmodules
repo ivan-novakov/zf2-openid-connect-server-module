@@ -1,3 +1,0 @@
-[submodule "external/Shongo"]
-	path = external/Shongo
-	url = git@github.com:ivan-novakov/phpid-server-shongo.git

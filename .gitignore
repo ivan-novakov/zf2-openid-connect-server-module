@@ -1,3 +1,4 @@
+.gitmodules
 vendor
 composer.lock
 public/.htaccess
