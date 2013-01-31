@@ -94,8 +94,11 @@ class Manager
     public function authenticate(ClientRequestInterface $request, Client $client)
     {
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
-        $clientAuthenticationData = $request->getAuthenticationData();
+        if ('dummy' == $clientAuthenticationInfo->getMethod()) {
+            return new Result(true);
+        }
         
+        $clientAuthenticationData = $request->getAuthenticationData();        
         if ($clientAuthenticationInfo->getMethod() != $clientAuthenticationData->getMethod()) {
             return new Result(false, 'invalid authentication method');
         }

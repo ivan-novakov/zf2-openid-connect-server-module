@@ -19,15 +19,14 @@ $client = _getClient();
 $request = new \Zend\Http\Request();
 $request->setUri($authUri);
 $request->getQuery()
-    ->fromArray(
-    array(
-        'client_id' => $clientId,
-        'response_type' => 'code',
-        'scope' => 'openid',
-        'redirect_uri' => 'https://dummy',
-        'state' => uniqid(),
-        'prompt' => 'login'
-    ));
+    ->fromArray(array(
+    'client_id' => $clientId, 
+    'response_type' => 'code', 
+    'scope' => 'openid', 
+    'redirect_uri' => 'https://dummy', 
+    'state' => uniqid(), 
+    'prompt' => 'login'
+));
 
 $client->setAuth($userUsername, $userPassword, $userAuthType);
 
@@ -63,13 +62,12 @@ $request->setUri($tokenUri);
 $request->setMethod('POST');
 
 $request->getPost()
-    ->fromArray(
-    array(
-        'grant_type' => 'authorization_code',
-        'code' => $data['code'],
-        'redirect_uri' => 'https://dummy',
-        'client_id' => $clientId
-    ));
+    ->fromArray(array(
+    'grant_type' => 'authorization_code', 
+    'code' => $data['code'], 
+    'redirect_uri' => 'https://dummy', 
+    'client_id' => $clientId
+));
 
 // Client authentication
 $request->getHeaders()
