@@ -30,11 +30,15 @@ class Client extends Entity
 
     const FIELD_USER_AUTHENTICATION_HANDLER = 'user_authentication_handler';
 
+    const AUTH_FIELD_METHOD = 'method';
+
+    const AUTH_FIELD_OPTIONS = 'options';
+
     protected $_fields = array(
-        self::FIELD_ID,
-        self::FIELD_TYPE,
-        self::FIELD_AUTHENTICATION,
-        self::FIELD_REDIRECT_URI,
+        self::FIELD_ID, 
+        self::FIELD_TYPE, 
+        self::FIELD_AUTHENTICATION, 
+        self::FIELD_REDIRECT_URI, 
         self::FIELD_USER_AUTHENTICATION_HANDLER
     );
 
@@ -68,18 +72,18 @@ class Client extends Entity
      */
     public function getAuthenticationInfo()
     {
-        if (! ($this->_authenticationInfo instanceof Authentication\ClientInfo)) {
+        if (! ($this->_authenticationInfo instanceof Authentication\Info)) {
             $authentication = $this->getValue(self::FIELD_AUTHENTICATION);
-            if (! $authentication || ! isset($authentication['type'])) {
-                throw new Exception\IncompleteAuthenticationInfoException();
+            if (! $authentication || ! isset($authentication[self::AUTH_FIELD_METHOD])) {
+                throw new Exception\IncompleteAuthenticationInfoException(sprintf("Missing configuration field: '%s'", self::AUTH_FIELD_METHOD));
             }
             
             $options = array();
-            if (isset($authentication['options']) && is_array($authentication['options'])) {
-                $options = $authentication['options'];
+            if (isset($authentication[self::AUTH_FIELD_OPTIONS]) && is_array($authentication[self::AUTH_FIELD_OPTIONS])) {
+                $options = $authentication[self::AUTH_FIELD_OPTIONS];
             }
             
-            $this->_authenticationInfo = new Authentication\Info($authentication['type'], $options);
+            $this->_authenticationInfo = new Authentication\Info($authentication[self::AUTH_FIELD_METHOD], $options);
         }
         
         return $this->_authenticationInfo;

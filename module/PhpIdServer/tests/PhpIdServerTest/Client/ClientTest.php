@@ -45,7 +45,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             'id' => 'myClientId', 
             'type' => 'public', 
             'authentication' => array(
-                'type' => 'secret', 
+                'method' => 'secret', 
                 'options' => array(
                     'secret' => 'xxx'
                 )

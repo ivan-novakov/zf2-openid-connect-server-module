@@ -5,9 +5,9 @@
             "type" : "public",
             "redirect_uri" : "https://dummy",
             "authentication" : {
-                "type" : "secret",
+                "method" : "secret",
                 "options" : {
-                    "secret" : "testclientsecret"
+                    "auth" : "testclientsecret"
                 }
             },
             "user_authentication_handler" : "basic-auth"
@@ -18,7 +18,7 @@
             "type" : "confidential",
             "redirect_uri" : "https://hroch.cesnet.cz/phpid-client/endpoint",
             "authentication" : {
-                "type" : "pki",
+                "method" : "pki",
                 "options" : {
                     "certificate" : "xxx"
                 }
