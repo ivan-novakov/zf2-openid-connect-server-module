@@ -4,6 +4,7 @@ namespace PhpIdServerTest\Authentication\Controller;
 
 use PhpIdServer\User\User;
 use PhpIdServer\Authentication\Controller\ShibbolethController;
+use PhpIdServer;
 
 
 class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
@@ -15,13 +16,13 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     protected $_controller = null;
 
 
-    public function setUp ()
+    public function setUp()
     {
         $this->_controller = new ShibbolethController();
     }
 
 
-    public function testGetServerVars ()
+    public function testGetServerVars()
     {
         $serverVars = array(
             'foo' => 'bar'
@@ -32,7 +33,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetSystemVars ()
+    public function testGetSystemVars()
     {
         $serverVars = array(
             'foo' => 'bar', 
@@ -55,7 +56,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetAttributes ()
+    public function testGetAttributes()
     {
         $serverVars = array(
             'foo' => 'bar', 
@@ -77,7 +78,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetSystemVar ()
+    public function testGetSystemVar()
     {
         $systemVars = array(
             'foo' => 'bar'
@@ -95,7 +96,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetAttribute ()
+    public function testGetAttribute()
     {
         $attributes = array(
             'foo' => 'bar'
@@ -112,7 +113,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testExistsSession ()
+    public function testExistsSession()
     {
         $controller = $this->getMock('PhpIdServer\Authentication\Controller\ShibbolethController', array(
             'getSessionId'
@@ -131,9 +132,9 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testAuthenticateWithoutSession ()
+    public function testAuthenticateWithoutSession()
     {
-        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\AuthenticationException');
+        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\SessionNotFoundException');
         
         $controller = $this->_getControllerMock(array(
             'existsSession'
@@ -146,9 +147,30 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testAuthenticateWithNoUserId ()
+    public function testAuthenticationWithInvalidData()
     {
-        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\AuthenticationException');
+        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\InvalidUserDataException');
+        
+        $controller = $this->getMock('PhpIdServer\Authentication\Controller\ShibbolethController', array(
+            'existsSession', 
+            'getAttributes'
+        ));
+        $controller->expects($this->once())
+            ->method('existsSession')
+            ->will($this->returnValue(true));
+        $controller->expects($this->once())
+            ->method('getAttributes')
+            ->will($this->returnValue(array()));
+        
+        $controller->setAttributeFilter($this->_getAttributeFilterMock(false));
+        
+        $controller->authenticate();
+    }
+
+
+    public function testAuthenticateWithNoUserId()
+    {
+        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\MissingUserIdentityException');
         
         $controller = $this->_getControllerMock(array(
             'existsSession', 
@@ -161,6 +183,8 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributes')
             ->will($this->returnValue(array()));
         
+        $controller->setAttributeFilter($this->_getAttributeFilterMock());
+        
         $user = $this->_getUserMock(null);
         $controller->setUserFactory($this->_getUserFactoryMock($user));
         
@@ -168,7 +192,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testAuthenticateWithValidData ()
+    public function testAuthenticateWithValidData()
     {
         $userId = 'testuser';
         $userData = array(
@@ -186,6 +210,8 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getAttributes')
             ->will($this->returnValue($userData));
         
+        $controller->setAttributeFilter($this->_getAttributeFilterMock());
+        
         $user = $this->_getUserMock($userId);
         $controller->setUserFactory($this->_getUserFactoryMock($user));
         
@@ -198,13 +224,13 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
      * @param array $mockedMethods
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function _getControllerMock (array $mockedMethods)
+    protected function _getControllerMock(array $mockedMethods)
     {
         return $this->getMock('PhpIdServer\Authentication\Controller\ShibbolethController', $mockedMethods);
     }
 
 
-    protected function _getUserMock ($userId)
+    protected function _getUserMock($userId)
     {
         $user = $this->getMock('PhpIdServer\User\UserInterface');
         $user->expects($this->once())
@@ -215,7 +241,30 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getUserFactoryMock ($user)
+    /**
+     * @param boolean $valid
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _getAttributeFilterMock($valid = true)
+    {
+        $filter = $this->getMockBuilder('PhpIdServer\Authentication\AttributeFilter')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
+        if ($valid) {
+            $filter->expects($this->once())
+                ->method('validate');
+        } else {
+            $filter->expects($this->once())
+                ->method('validate')
+                ->will($this->throwException(new \RuntimeException()));
+        }
+        
+        return $filter;
+    }
+
+
+    protected function _getUserFactoryMock($user)
     {
         $userFactory = $this->getMock('PhpIdServer\User\UserFactoryInterface');
         $userFactory->expects($this->once())

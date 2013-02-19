@@ -4,8 +4,13 @@ namespace PhpIdServer\Authentication\Controller;
 
 use PhpIdServer\User\User;
 use PhpIdServer\Context\AuthorizeContext;
+use PhpIdServer\Authentication\AttributeFilter;
 
 
+/**
+ * The controller authenticates users with Shibboleth. For the purpose, it is required to secure the URL 
+ * of the controller using a Shibboleth service provider.
+ */
 class ShibbolethController extends AbstractController
 {
 
@@ -13,18 +18,84 @@ class ShibbolethController extends AbstractController
 
     const OPT_USER_ATTRIBUTES_MAP = 'user_attributes_map';
 
+    const OPT_ATTRIBUTE_FILTER = 'attribute_filter';
+
     const SYSTEM_VAR_SESSION_ID = 'session_id';
 
     /**
-     * Server environment vars.
+     * Server environment vars (usually $_SERVER)
      * 
      * @var array
      */
     protected $_serverVars = null;
 
+    /**
+     * Variables associated with the Shibboleth session.
+     * 
+     * @var array
+     */
     protected $_systemVars = null;
 
+    /**
+     * Variables holding the user attributes.
+     * 
+     * @var array
+     */
     protected $_attributes = null;
+
+    /**
+     * Attribute filter.
+     * 
+     * @var AttributeFilter
+     */
+    protected $_attributeFilter = null;
+
+
+    /**
+     * Sets the attribute filter.
+     * 
+     * @param AttributeFilter $attributeFilter
+     */
+    public function setAttributeFilter(AttributeFilter $attributeFilter)
+    {
+        $this->_attributeFilter = $attributeFilter;
+    }
+
+
+    /**
+     * Returns the attribute filter.
+     * 
+     * @return AttributeFilter
+     */
+    public function getAttributeFilter()
+    {
+        if (! ($this->_attributeFilter instanceof AttributeFilter)) {
+            $config = $this->getOption(self::OPT_ATTRIBUTE_FILTER);
+            if (! is_array($config)) {
+                $config = array();
+            }
+            $this->_attributeFilter = new AttributeFilter($config);
+        }
+        
+        return $this->_attributeFilter;
+    }
+
+
+    /**
+     * Returns a specific server environment variable.
+     * 
+     * @param string $name
+     * @return string|null
+     */
+    public function getServerVar($name)
+    {
+        $serverVars = $this->getServerVars();
+        if (isset($serverVars[$name])) {
+            return $serverVars[$name];
+        }
+        
+        return null;
+    }
 
 
     /**
@@ -32,7 +103,7 @@ class ShibbolethController extends AbstractController
      * 
      * @return array
      */
-    public function getServerVars ()
+    public function getServerVars()
     {
         if (null === $this->_serverVars) {
             $this->_serverVars = $_SERVER;
@@ -47,7 +118,7 @@ class ShibbolethController extends AbstractController
      * 
      * @param array $serverVars
      */
-    public function setServerVars (array $serverVars)
+    public function setServerVars(array $serverVars)
     {
         $this->_serverVars = $serverVars;
     }
@@ -58,7 +129,7 @@ class ShibbolethController extends AbstractController
      * 
      * @return boolean
      */
-    public function existsSession ()
+    public function existsSession()
     {
         return ($this->getSessionId() !== null);
     }
@@ -69,7 +140,7 @@ class ShibbolethController extends AbstractController
      * 
      * @return integer|null
      */
-    public function getSessionId ()
+    public function getSessionId()
     {
         return $this->getSystemVar(self::SYSTEM_VAR_SESSION_ID);
     }
@@ -81,7 +152,7 @@ class ShibbolethController extends AbstractController
      * @param string $name
      * @return string|null
      */
-    public function getSystemVar ($name)
+    public function getSystemVar($name)
     {
         $systemVars = $this->getSystemVars();
         if (isset($systemVars[$name])) {
@@ -97,7 +168,7 @@ class ShibbolethController extends AbstractController
      * 
      * @return array
      */
-    public function getSystemVars ()
+    public function getSystemVars()
     {
         if (null === $this->_systemVars) {
             $systemVars = array();
@@ -118,7 +189,7 @@ class ShibbolethController extends AbstractController
      * @param string $name
      * @return string|null
      */
-    public function getAttribute ($name)
+    public function getAttribute($name)
     {
         $attributes = $this->getAttributes();
         if (isset($attributes[$name])) {
@@ -134,7 +205,7 @@ class ShibbolethController extends AbstractController
      * 
      * @return array
      */
-    public function getAttributes ()
+    public function getAttributes()
     {
         if (null === $this->_attributes) {
             $attributes = array();
@@ -151,21 +222,29 @@ class ShibbolethController extends AbstractController
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Authentication\Controller\AbstractController::authenticate()
      */
-    public function authenticate ()
+    public function authenticate()
     {
         if (! $this->existsSession()) {
-            throw new Exception\AuthenticationException('No Shibboleth session');
+            throw new Exception\SessionNotFoundException('No Shibboleth session');
         }
         
         $attributes = $this->getAttributes();
+        
+        try {
+            $this->getAttributeFilter()
+                ->validate($attributes);
+        } catch (\Exception $e) {
+            throw new Exception\InvalidUserDataException(sprintf("Invalid user data: %s", $e->getMessage()));
+        }
+        
         $user = $this->getUserFactory()
             ->createUser($attributes);
         
         if (! $user->getId()) {
-            throw new Exception\AuthenticationException('No user identifier');
+            throw new Exception\MissingUserIdentityException('No user identifier');
         }
         
         return $user;
@@ -179,7 +258,7 @@ class ShibbolethController extends AbstractController
      * @param array $map
      * @return array
      */
-    protected function _getRemappedVars (array $vars, array $map)
+    protected function _getRemappedVars(array $vars, array $map)
     {
         $mappedVars = array();
         foreach ($map as $inputVarName => $mappedVarName) {
