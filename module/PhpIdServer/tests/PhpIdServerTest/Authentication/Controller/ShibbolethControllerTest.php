@@ -78,6 +78,49 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testGetAttributesWithFilter()
+    {
+        $filteredAttributes = array(
+            'eppn' => 'testuser'
+        );
+        
+        $expectedAttributes = array(
+            'uid' => 'testuser'
+        );
+        
+        $controller = new ShibbolethController();
+        $controller->setOptions(array(
+            ShibbolethController::OPT_USER_ATTRIBUTES_MAP => array(
+                'eppn' => 'uid'
+            )
+        ));
+        $controller->setServerVars(array(
+            'eppn' => 'testuser', 
+            'mail' => 'testuser@example.org'
+        ));
+        $controller->setAttributeFilter($this->_getAttributeFilterMock(true, $filteredAttributes));
+        
+        $attributes = $controller->getAttributes();
+        
+        $this->assertSame($expectedAttributes, $attributes);
+    }
+
+
+    public function testGetAttributesWithInvalidData()
+    {
+        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\InvalidUserDataException', 'invalid data');
+        
+        $controller = new ShibbolethController();
+        $controller->setOptions(array(
+            ShibbolethController::OPT_USER_ATTRIBUTES_MAP => array()
+        ));
+        $controller->setServerVars(array());
+        $controller->setAttributeFilter($this->_getAttributeFilterMock(false));
+        
+        $controller->getAttributes();
+    }
+
+
     public function testGetSystemVar()
     {
         $systemVars = array(
@@ -147,27 +190,6 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testAuthenticationWithInvalidData()
-    {
-        $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\InvalidUserDataException');
-        
-        $controller = $this->getMock('PhpIdServer\Authentication\Controller\ShibbolethController', array(
-            'existsSession', 
-            'getAttributes'
-        ));
-        $controller->expects($this->once())
-            ->method('existsSession')
-            ->will($this->returnValue(true));
-        $controller->expects($this->once())
-            ->method('getAttributes')
-            ->will($this->returnValue(array()));
-        
-        $controller->setAttributeFilter($this->_getAttributeFilterMock(false));
-        
-        $controller->authenticate();
-    }
-
-
     public function testAuthenticateWithNoUserId()
     {
         $this->setExpectedException('PhpIdServer\Authentication\Controller\Exception\MissingUserIdentityException');
@@ -182,8 +204,6 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
         $controller->expects($this->once())
             ->method('getAttributes')
             ->will($this->returnValue(array()));
-        
-        $controller->setAttributeFilter($this->_getAttributeFilterMock());
         
         $user = $this->_getUserMock(null);
         $controller->setUserFactory($this->_getUserFactoryMock($user));
@@ -209,8 +229,6 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
         $controller->expects($this->once())
             ->method('getAttributes')
             ->will($this->returnValue($userData));
-        
-        $controller->setAttributeFilter($this->_getAttributeFilterMock());
         
         $user = $this->_getUserMock($userId);
         $controller->setUserFactory($this->_getUserFactoryMock($user));
@@ -245,7 +263,7 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
      * @param boolean $valid
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function _getAttributeFilterMock($valid = true)
+    protected function _getAttributeFilterMock($valid = true, array $filteredAttributes = array())
     {
         $filter = $this->getMockBuilder('PhpIdServer\Authentication\AttributeFilter')
             ->disableOriginalConstructor()
@@ -254,11 +272,11 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
         if ($valid) {
             $filter->expects($this->once())
                 ->method('filterValues')
-                ->will($this->returnValue(array()));
+                ->will($this->returnValue($filteredAttributes));
         } else {
             $filter->expects($this->once())
                 ->method('filterValues')
-                ->will($this->throwException(new \RuntimeException()));
+                ->will($this->throwException(new \RuntimeException('invalid data')));
         }
         
         return $filter;

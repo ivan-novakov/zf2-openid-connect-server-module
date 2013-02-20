@@ -130,17 +130,41 @@ class AttributeFilterTest extends \PHPUnit_Framework_TestCase
                                 'name' => 'email_address'
                             )
                         )
+                    ), 
+                    'mail' => array(
+                        'name' => 'mail', 
+                        'required' => true, 
+                        'validators' => array(
+                            array(
+                                'name' => 'email_address'
+                            )
+                        )
+                    ), 
+                    'givenname' => array(
+                        'name' => 'givenname', 
+                        'required' => true
+                    ), 
+                    'sn' => array(
+                        'name' => 'sn', 
+                        'required' => true
                     )
                 ), 
                 // $attributes
                 array(
-                    'eppn' => 'testuser@example.org'
+                    'eppn' => 'testuser@example.org', 
+                    'mail' => 'testuser@mail.example.org', 
+                    'givenname' => 'Test', 
+                    'sn' => 'User',
+                    'foo' => 'bar'
                 ), 
                 // $isValid
                 true, 
                 // $expectedFilteredAttributes
                 array(
-                    'eppn' => 'testuser@example.org'
+                    'eppn' => 'testuser@example.org', 
+                    'mail' => 'testuser@mail.example.org', 
+                    'givenname' => 'Test', 
+                    'sn' => 'User'
                 )
             )
         );

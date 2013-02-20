@@ -187,7 +187,36 @@ return array(
                     'sn' => User::FIELD_FAMILY_NAME, 
                     'mail' => User::FIELD_EMAIL
                 ), 
-                'attribute_filter' => array()
+                'attribute_filter' => array(
+                    'REMOTE_USER' => array(
+                        'name' => 'eppn', 
+                        'required' => true, 
+                        /*
+                        'validators' => array(
+                            array(
+                                'name' => 'email_address'
+                            )
+                        )
+                        */
+                    ), 
+                    'mail' => array(
+                        'name' => 'mail', 
+                        'required' => true, 
+                        'validators' => array(
+                            array(
+                                'name' => 'email_address'
+                            )
+                        )
+                    ), 
+                    'givenName' => array(
+                        'name' => 'givenName', 
+                        'required' => true
+                    ), 
+                    'sn' => array(
+                        'name' => 'sn', 
+                        'required' => true
+                    )
+                )
             )
         )
     ), 

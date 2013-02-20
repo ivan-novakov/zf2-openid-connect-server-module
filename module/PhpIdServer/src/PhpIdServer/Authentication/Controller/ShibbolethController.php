@@ -209,8 +209,19 @@ class ShibbolethController extends AbstractController
         if (null === $this->_attributes) {
             $attributes = array();
             $attributesMap = $this->getOption(self::OPT_USER_ATTRIBUTES_MAP);
+            $serverVars = $this->getServerVars();
+            
+            try {
+                $attributeFilter = $this->getAttributeFilter();
+                if ($attributeFilter instanceof AttributeFilter) {
+                    $serverVars = $attributeFilter->filterValues($serverVars);
+                }
+            } catch (\Exception $e) {
+                throw new Exception\InvalidUserDataException(sprintf("Invalid user data: %s", $e->getMessage()));
+            }
+            
             if (is_array($attributesMap)) {
-                $attributes = $this->_getRemappedVars($this->getServerVars(), $attributesMap);
+                $attributes = $this->_getRemappedVars($serverVars, $attributesMap);
             }
             
             $this->_attributes = $attributes;
@@ -231,15 +242,6 @@ class ShibbolethController extends AbstractController
         }
         
         $attributes = $this->getAttributes();
-        
-        try {
-            $attributeFilter = $this->getAttributeFilter();
-            if ($attributeFilter instanceof AttributeFilter) {
-                $attributes = $attributeFilter->filterValues($attributes);
-            }
-        } catch (\Exception $e) {
-            throw new Exception\InvalidUserDataException(sprintf("Invalid user data: %s", $e->getMessage()));
-        }
         
         $user = $this->getUserFactory()
             ->createUser($attributes);
