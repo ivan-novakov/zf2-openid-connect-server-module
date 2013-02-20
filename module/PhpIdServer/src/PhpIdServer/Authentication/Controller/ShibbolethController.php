@@ -14,10 +14,19 @@ use PhpIdServer\Authentication\AttributeFilter;
 class ShibbolethController extends AbstractController
 {
 
+    /**
+     * Array for mapping system server variables to internal system variables.
+     */
     const OPT_SYSTEM_ATTRIBUTES_MAP = 'system_attributes_map';
 
+    /**
+     * Array for mapping user attributes from the server environment to user entity attributes.
+     */
     const OPT_USER_ATTRIBUTES_MAP = 'user_attributes_map';
 
+    /**
+     * Configuration array for the attribute filter object.
+     */
     const OPT_ATTRIBUTE_FILTER = 'attribute_filter';
 
     const SYSTEM_VAR_SESSION_ID = 'session_id';

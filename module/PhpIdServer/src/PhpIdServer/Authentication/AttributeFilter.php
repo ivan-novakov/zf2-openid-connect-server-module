@@ -6,6 +6,14 @@ use Zend\InputFilter\InputFilterInterface;
 use Zend\InputFilter\Factory;
 
 
+/**
+ * The class validates and filters raw user attribute data. 
+ * 
+ * It encapsulates the ZF2 InputFilter class:
+ * https://packages.zendframework.com/docs/latest/manual/en/index.html#zend-inputfilter
+ * 
+ * @see https://packages.zendframework.com/docs/latest/manual/en/index.html#zend-inputfilter
+ */
 class AttributeFilter
 {
 
