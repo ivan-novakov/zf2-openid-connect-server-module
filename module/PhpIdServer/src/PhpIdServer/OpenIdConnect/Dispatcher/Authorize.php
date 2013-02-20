@@ -172,7 +172,7 @@ class Authorize extends AbstractDispatcher
         if ($authenticationInfo && ! $authenticationInfo->isExpired($this->_previousAuthenticationErrorTimeout) && ($error = $authenticationInfo->getError())) {
             $description = $authenticationInfo->getErrorDescription();
             
-            return $this->errorResponse(Error::ERROR_SERVER_ERROR, sprintf("Previous authentication error: '%s'", $error));
+            return $this->errorResponse(Error::ERROR_SERVER_ERROR, sprintf("Authentication error: '%s' (%s)", $error, $description));
         }
         
         $context->setClient($client);

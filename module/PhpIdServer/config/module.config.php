@@ -189,31 +189,7 @@ return array(
                 ), 
                 'attribute_filter' => array(
                     'REMOTE_USER' => array(
-                        'name' => 'eppn', 
-                        'required' => true, 
-                        /*
-                        'validators' => array(
-                            array(
-                                'name' => 'email_address'
-                            )
-                        )
-                        */
-                    ), 
-                    'mail' => array(
-                        'name' => 'mail', 
-                        'required' => true, 
-                        'validators' => array(
-                            array(
-                                'name' => 'email_address'
-                            )
-                        )
-                    ), 
-                    'givenName' => array(
-                        'name' => 'givenName', 
-                        'required' => true
-                    ), 
-                    'sn' => array(
-                        'name' => 'sn', 
+                        'name' => 'remote_user', 
                         'required' => true
                     )
                 )

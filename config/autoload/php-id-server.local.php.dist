@@ -47,5 +47,36 @@ return array(
     
     'user_info_mapper' => array(
         'class' => '\PhpIdServer\User\UserInfo\Mapper\ToArray'
+    ),
+    
+    'authentication_handlers' => array(
+        
+        'shibboleth' => array(
+            'options' => array(
+                'attribute_filter' => array(
+                    'REMOTE_USER' => array(
+                        'name' => 'eppn', 
+                        'required' => true
+                    ), 
+                    'mail' => array(
+                        'name' => 'mail', 
+                        'required' => true, 
+                        'validators' => array(
+                            array(
+                                'name' => 'email_address'
+                            )
+                        )
+                    ), 
+                    'givenName' => array(
+                        'name' => 'givenName', 
+                        'required' => true
+                    ), 
+                    'sn' => array(
+                        'name' => 'sn', 
+                        'required' => true
+                    )
+                )
+            )
+        )
     )
 );

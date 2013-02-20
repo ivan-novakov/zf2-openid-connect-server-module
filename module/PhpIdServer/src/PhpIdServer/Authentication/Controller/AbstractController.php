@@ -33,7 +33,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @param array|\Traversable $options
      */
-    public function setOptions ($options)
+    public function setOptions($options)
     {
         if (! is_array($options)) {
             $options = array();
@@ -50,7 +50,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      * @param mixed $defaultValue
      * @return mixed|null
      */
-    public function getOption ($name, $defaultValue = null)
+    public function getOption($name, $defaultValue = null)
     {
         return $this->_options->get($name, $defaultValue);
     }
@@ -61,7 +61,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @return string
      */
-    public function getLabel ()
+    public function getLabel()
     {
         return $this->getOption('label', 'unknown');
     }
@@ -72,7 +72,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @param UserFactoryInterface $userFactory
      */
-    public function setUserFactory (UserFactoryInterface $userFactory)
+    public function setUserFactory(UserFactoryInterface $userFactory)
     {
         $this->_userFactory = $userFactory;
     }
@@ -83,19 +83,19 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @return UserFactoryInterface
      */
-    public function getUserFactory ()
+    public function getUserFactory()
     {
         return $this->_userFactory;
     }
 
 
-    public function indexAction ()
+    public function indexAction()
     {
         return $this->getResponse();
     }
 
 
-    public function authenticateAction ()
+    public function authenticateAction()
     {
         $this->_logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));
         
@@ -110,6 +110,9 @@ abstract class AbstractController extends BaseController implements Authenticati
             
             $context->setUser($user);
             $authenticationInfo = $this->_initSuccessAuthenticationInfo();
+        } catch (Exception\InvalidUserDataException $e) {
+            $this->_logError(sprintf("Invalid user data exception: %s", $e->getMessage()));
+            $authenticationInfo = $this->_initFailureAuthenticationInfo('invalid_user_data', $e->getMessage());
         } catch (Exception\AuthenticationException $e) {
             $this->_logError(sprintf("Authentication exception: %s (%s)", $e->getError(), $e->getDescription()));
             $authenticationInfo = $this->_initFailureAuthenticationInfo($e->getError(), $e->getDescription());
@@ -134,7 +137,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @return User
      */
-    abstract public function authenticate ();
+    abstract public function authenticate();
 
 
     /**
@@ -142,19 +145,19 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @return \PhpIdServer\Authentication\Controller\Info
      */
-    protected function _initSuccessAuthenticationInfo ()
+    protected function _initSuccessAuthenticationInfo()
     {
         return Info::factorySuccess($this->getLabel());
     }
 
 
-    protected function _initFailureAuthenticationInfo ($error, $description = '')
+    protected function _initFailureAuthenticationInfo($error, $description = '')
     {
         return Info::factoryFailure($this->getLabel(), $error, $description);
     }
 
 
-    protected function _formatLogMessage ($message)
+    protected function _formatLogMessage($message)
     {
         return sprintf("CONTROLLER AUTH [%s] %s", $this->getLabel(), $message);
     }
