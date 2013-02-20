@@ -253,10 +253,11 @@ class ShibbolethControllerTest extends \PHPUnit_Framework_TestCase
         
         if ($valid) {
             $filter->expects($this->once())
-                ->method('validate');
+                ->method('filterValues')
+                ->will($this->returnValue(array()));
         } else {
             $filter->expects($this->once())
-                ->method('validate')
+                ->method('filterValues')
                 ->will($this->throwException(new \RuntimeException()));
         }
         

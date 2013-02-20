@@ -22,7 +22,7 @@ class AttributeFilter
      * 
      * @param \Traversable|array $config
      */
-    public function __construct($config, Factory $inputFilterFactory = null)
+    public function __construct(array $config, Factory $inputFilterFactory = null)
     {
         if (null === $inputFilterFactory) {
             $inputFilterFactory = new Factory();
@@ -42,11 +42,13 @@ class AttributeFilter
      * @param array $attributes
      * @throws Exception\InvalidInputException
      */
-    public function validate(array $attributes)
+    public function filterValues(array $attributes)
     {
         $this->inputFilter->setData($attributes);
         if (! $this->inputFilter->isValid()) {
             throw new Exception\InvalidInputException($this->inputFilter->getMessages());
         }
+        
+        return $this->inputFilter->getValues();
     }
 }

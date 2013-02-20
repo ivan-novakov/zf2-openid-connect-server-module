@@ -54,6 +54,95 @@ class AttributeFilterTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($inputFilter));
         
         $filter = new AttributeFilter(array(), $factory);
-        $filter->validate($attributes);
+        $filter->filterValues($attributes);
+    }
+
+
+    /**
+     * @dataProvider validationDataProvider
+     */
+    public function testValidateWithData(array $inputFilterConfig, array $attributes, $isValid, 
+        array $expectedFilteredAttributes)
+    {
+        $filter = new AttributeFilter($inputFilterConfig);
+        
+        if (! $isValid) {
+            $this->setExpectedException('PhpIdServer\Authentication\Exception\InvalidInputException');
+        }
+        
+        $filteredAttributes = $filter->filterValues($attributes);
+        $this->assertSame($expectedFilteredAttributes, $filteredAttributes);
+    }
+
+
+    public function validationDataProvider()
+    {
+        return array(
+            
+            array(
+                // $inputFilterConfig
+                array(
+                    'eppn' => array(
+                        'name' => 'eppn', 
+                        'required' => true
+                    )
+                ), 
+                // $attributes
+                array(
+                    'eppn' => 'testuser', 
+                    'mail' => 'testuser@example.org'
+                ), 
+                // $isValid
+                true, 
+                // $expectedFilteredAttributes
+                array(
+                    'eppn' => 'testuser'
+                )
+            ), 
+            
+            array(
+                // $inputFilterConfig
+                array(
+                    'eppn' => array(
+                        'name' => 'eppn', 
+                        'required' => true
+                    )
+                ), 
+                // $attributes
+                array(
+                    'uid' => 'testuser', 
+                    'mail' => 'testuser@example.org'
+                ), 
+                // $isValid
+                false, 
+                // $expectedFilteredAttributes
+                array()
+            ), 
+            
+            array(
+                // $inputFilterConfig
+                array(
+                    'eppn' => array(
+                        'name' => 'eppn', 
+                        'required' => true, 
+                        'validators' => array(
+                            array(
+                                'name' => 'email_address'
+                            )
+                        )
+                    )
+                ), 
+                // $attributes
+                array(
+                    'eppn' => 'testuser@example.org'
+                ), 
+                // $isValid
+                true, 
+                // $expectedFilteredAttributes
+                array(
+                    'eppn' => 'testuser@example.org'
+                )
+            )
+        );
     }
 }

@@ -71,10 +71,9 @@ class ShibbolethController extends AbstractController
     {
         if (! ($this->_attributeFilter instanceof AttributeFilter)) {
             $config = $this->getOption(self::OPT_ATTRIBUTE_FILTER);
-            if (! is_array($config)) {
-                $config = array();
+            if (is_array($config)) {
+                $this->_attributeFilter = new AttributeFilter($config);
             }
-            $this->_attributeFilter = new AttributeFilter($config);
         }
         
         return $this->_attributeFilter;
@@ -234,8 +233,10 @@ class ShibbolethController extends AbstractController
         $attributes = $this->getAttributes();
         
         try {
-            $this->getAttributeFilter()
-                ->validate($attributes);
+            $attributeFilter = $this->getAttributeFilter();
+            if ($attributeFilter instanceof AttributeFilter) {
+                $attributes = $attributeFilter->filterValues($attributes);
+            }
         } catch (\Exception $e) {
             throw new Exception\InvalidUserDataException(sprintf("Invalid user data: %s", $e->getMessage()));
         }
