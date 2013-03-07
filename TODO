@@ -2,3 +2,6 @@
 - client validator
   - validate match between client ID and redirect URI
   - ...
+  
+- more verbose logs
+  - show user ID in log  
