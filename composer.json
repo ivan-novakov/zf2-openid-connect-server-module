@@ -3,8 +3,9 @@
     "description" : "phpID Server",
 
     "require" : {
-        "php" : "5.3.3",
-        "zendframework/zendframework" : "2.1.0",
+        "php" : ">=5.3.3",
+        "zendframework/zendframework" : "2.*",
         "webino/zf2nette-debug" : "1.0.1"
     }
+    
 }
