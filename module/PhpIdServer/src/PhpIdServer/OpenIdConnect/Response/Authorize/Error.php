@@ -119,7 +119,7 @@ class Error extends AbstractAuthorizeResponse
 
     protected function _constructRedirectUri ()
     {
-        return sprintf('%s#%s', parent::_constructRedirectUri(), http_build_query(array(
+        return sprintf('%s?%s', parent::_constructRedirectUri(), http_build_query(array(
             'error' => $this->_errorMessage, 
             'error_description' => $this->_errorDescription
         )));
