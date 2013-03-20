@@ -1,7 +1,0 @@
-.gitmodules
-vendor
-composer.lock
-public/.htaccess
-data/auth/users.php
-data/client/metadata.json
-tmp/client_common.php
