@@ -1,3 +1,4 @@
+- handle multivalue Shibboleth attributes
 
 - client validator
   - validate match between client ID and redirect URI
