@@ -4,7 +4,8 @@ return array(
     'modules' => array(
         'PhpIdServer', 
         'Shongo',
-        'ZF2NetteDebug'
+        'ZF2NetteDebug',
+      
     ), 
     
     'module_listener_options' => array(

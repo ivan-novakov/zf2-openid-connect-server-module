@@ -1,11 +1,20 @@
 {
     "name" : "ivan-novakov/phpid-server",
-    "description" : "phpID Server",
+    "description" : "phpID Server - OpenID Connect implementation in PHP",
+    "homepage" : "https://github.com/ivan-novakov/phpid-server",
+    "license" : "FreeBSD",
+    "authors" : [
+        {
+            "name" : "Ivan Novakov",
+            "homepage": "http://novakov.cz/"
+        }
+    ],
 
     "require" : {
         "php" : ">=5.3.3",
         "zendframework/zendframework" : "2.*",
+        "ivan-novakov/phpid-server-shongo": "dev-master",
         "webino/zf2nette-debug" : "1.0.1"
     }
-    
+
 }
