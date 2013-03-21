@@ -14,13 +14,9 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
 {
 
 
-    public function getAutoloaderConfig ()
+    public function getAutoloaderConfig()
     {
         return array(
-            
-            'Zend\Loader\ClassMapAutoloader' => array(
-                __DIR__ . '/autoload_classmap.php'
-            ), 
             
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
@@ -32,13 +28,13 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
     }
 
 
-    public function getConfig ()
+    public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
 
 
-    public function onBootstrap (EventInterface $e)
+    public function onBootstrap(EventInterface $e)
     {
         /* @var $e MvcEvent */
         $eventManager = $e->getApplication()
@@ -47,14 +43,14 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         $moduleRouteListener->attach($eventManager);
         
         //$eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
-        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function  (MvcEvent $e)
+        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function (MvcEvent $e)
         {
             _dump('ERROR IN DISPATCH: ' . $e->getError());
         }, 100);
     }
 
 
-    public function getServiceConfig ()
+    public function getServiceConfig()
     {
         //return '\PhpIdServer\ServiceManager\ServiceManagerConfig';
         return new \PhpIdServer\ServiceManager\ServiceManagerConfig();
