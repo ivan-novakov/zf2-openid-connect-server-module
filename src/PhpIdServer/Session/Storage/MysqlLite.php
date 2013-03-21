@@ -10,6 +10,9 @@ use PhpIdServer\Session\Token\RefreshToken;
 use PhpIdServer\Session\Token\AuthorizationCode;
 use PhpIdServer\Session\SessionHydrator;
 use PhpIdServer\Session\Session;
+use Zend\Db\Sql\Sql;
+use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\SqlInterface;
 
 
 class MysqlLite extends AbstractStorage
@@ -26,49 +29,54 @@ class MysqlLite extends AbstractStorage
     const OPT_REFRESH_TOKEN_TABLE = 'refresh_token_table';
 
     /**
-     * The SQL abstraction object.
+     * DB adapter.
      * 
-     * @var \Zend\Db\Adapter\Adapter
+     * @var Adapter
      */
-    protected $_dbAdapter = NULL;
+    protected $dbAdapter = NULL;
+
+    /**
+     * SQL abstraction.
+     * 
+     * @var Sql
+     */
+    protected $sql = NULL;
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadSession()
      * @return Session
      */
-    public function loadSession ($sessionId)
+    public function loadSession($sessionId)
     {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
+        $sql = $this->getSql();
         
         $select = $sql->select($this->_getSessionTableName());
         $select->where(array(
             Session::FIELD_ID => $sessionId
         ));
         
-        $result = $this->_sqlQuery($adapter, $sql, $select);
+        $result = $this->executeSqlQuery($select);
         return $this->_createSessionFromResult($result);
     }
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::saveSession()
      */
-    public function saveSession (Session $session)
+    public function saveSession(Session $session)
     {
-        $adapter = $this->_getAdapter();
         try {
             //$this->_beginTransaction($adapter);
             
 
-            $sql = $this->_getSql($adapter);
+            $sql = $this->getSql();
             $insert = $sql->insert($this->_getSessionTableName());
             $insert->values($this->_sessionToArray($session));
             
-            $this->_sqlQuery($adapter, $sql, $insert);
+            $result = $this->executeSqlQuery($insert);
             //$this->_commit($adapter);
         } catch (\Exception $e) {
             //$this->_rollback($adapter);
@@ -78,21 +86,20 @@ class MysqlLite extends AbstractStorage
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadAuthorizationCode()
      * @return AuthorizationCode
      */
-    public function loadAuthorizationCode ($code)
+    public function loadAuthorizationCode($code)
     {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
+        $sql = $this->getSql();
         
         $select = $sql->select($this->_getAuthoriozationCodeTableName());
         $select->where(array(
             AuthorizationCode::FIELD_CODE => $code
         ));
         
-        $result = $this->_sqlQuery($adapter, $sql, $select);
+        $result = $this->executeSqlQuery($select);
         if (! $result->count()) {
             return NULL;
         }
@@ -106,20 +113,18 @@ class MysqlLite extends AbstractStorage
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::saveAuthorizationCode()
      */
-    public function saveAuthorizationCode (AuthorizationCode $authorizationCode)
+    public function saveAuthorizationCode(AuthorizationCode $authorizationCode)
     {
-        $adapter = $this->_getAdapter();
         try {
-            
-            $sql = $this->_getSql($adapter);
+            $sql = $this->getSql();
             $insert = $sql->insert($this->_getAuthoriozationCodeTableName());
             $insert->values($this->getAuthorizationCodeHydrator()
                 ->extract($authorizationCode));
             
-            $this->_sqlQuery($adapter, $sql, $insert);
+            $result = $this->executeSqlQuery($insert);
         } catch (\Exception $e) {
             throw new Exception\SaveException($authorizationCode, $e);
         }
@@ -127,41 +132,38 @@ class MysqlLite extends AbstractStorage
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::deleteAuthorizationCode()
      * @return AuthorizationCode
      */
-    public function deleteAuthorizationCode (AuthorizationCode $authorizationCode)
+    public function deleteAuthorizationCode(AuthorizationCode $authorizationCode)
     {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
-        
+        $sql = $this->getSql();
         $delete = $sql->delete($this->_getAuthoriozationCodeTableName());
         
         $delete->where(array(
             AuthorizationCode::FIELD_CODE => $authorizationCode->getCode()
         ));
         
-        $this->_sqlQuery($adapter, $sql, $delete);
+        $result = $this->executeSqlQuery($delete);
     }
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::loadAccessToken()
      * @return AccessToken
      */
-    public function loadAccessToken ($token)
+    public function loadAccessToken($token)
     {
-        $adapter = $this->_getAdapter();
-        $sql = $this->_getSql($adapter);
+        $sql = $this->getSql();
         
         $select = $sql->select($this->_getAccessTokenTableName());
         $select->where(array(
             AccessToken::FIELD_TOKEN => $token
         ));
         
-        $result = $this->_sqlQuery($adapter, $sql, $select);
+        $result = $this->executeSqlQuery($select);
         if (! $result->count()) {
             return NULL;
         }
@@ -175,36 +177,34 @@ class MysqlLite extends AbstractStorage
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Session\Storage\StorageInterface::saveAccessToken()
      */
-    public function saveAccessToken (AccessToken $accessToken)
+    public function saveAccessToken(AccessToken $accessToken)
     {
-        $adapter = $this->_getAdapter();
-        
         try {
-            $sql = $this->_getSql($adapter);
+            $sql = $this->getSql();
             
             $insert = $sql->insert($this->_getAccessTokenTableName());
             $insert->values($this->getAccessTokenHydrator()
                 ->extract($accessToken));
             
-            $this->_sqlQuery($adapter, $sql, $insert);
+            $result = $this->executeSqlQuery($insert);
         } catch (\Exception $e) {
             throw new Exception\SaveException($accessToken, $e);
         }
     }
 
 
-    public function loadRefreshToken ($code)
+    public function loadRefreshToken($code)
     {}
 
 
-    public function saveRefreshToken (RefreshToken $refreshToken)
+    public function saveRefreshToken(RefreshToken $refreshToken)
     {}
 
 
-    protected function _createSessionFromResult (Db\ResultSet\ResultSet $result)
+    protected function _createSessionFromResult(Db\ResultSet\ResultSet $result)
     {
         if (! $result->count()) {
             return NULL;
@@ -220,7 +220,7 @@ class MysqlLite extends AbstractStorage
      * @param Session $session
      * @return array
      */
-    protected function _sessionToArray (Session $session)
+    protected function _sessionToArray(Session $session)
     {
         $hydrator = $this->getSessionHydrator();
         return $hydrator->extractData($session);
@@ -233,7 +233,7 @@ class MysqlLite extends AbstractStorage
      * @param array $data
      * @return Session
      */
-    protected function _arrayToSession (Array $data)
+    protected function _arrayToSession(Array $data)
     {
         $hydrator = $this->getSessionHydrator();
         $session = new Session();
@@ -244,52 +244,25 @@ class MysqlLite extends AbstractStorage
     }
 
 
-    /**
-     * Returns the SQL abstraction object.
-     * 
-     * @return \Zend\Db\Adapter\Adapter
-     */
-    protected function _getAdapter ()
-    {
-        if (! ($this->_dbAdapter instanceof \Zend\Db\Adapter\Adapter)) {
-            $this->_dbAdapter = new \Zend\Db\Adapter\Adapter($this->_options->get(self::OPT_ADAPTER));
-        }
-        
-        return $this->_dbAdapter;
-    }
-
-
-    /**
-     * Returns the SQL abstraction object.
-     * 
-     * @param \Zend\Db\Adapter\Adapter $adapter
-     * @return \Zend\Db\Sql\Sql
-     */
-    protected function _getSql (\Zend\Db\Adapter\Adapter $adapter)
-    {
-        return new \Zend\Db\Sql\Sql($adapter);
-    }
-
-
-    protected function _getSessionTableName ()
+    protected function _getSessionTableName()
     {
         return $this->_options->get(self::OPT_SESSION_TABLE);
     }
 
 
-    protected function _getAuthoriozationCodeTableName ()
+    protected function _getAuthoriozationCodeTableName()
     {
         return $this->_options->get(self::OPT_AUTHORIZATION_CODE_TABLE);
     }
 
 
-    protected function _getAccessTokenTableName ()
+    protected function _getAccessTokenTableName()
     {
         return $this->_options->get(self::OPT_ACCESS_TOKEN_TABLE);
     }
 
 
-    protected function _getRefreshTokenTableName ()
+    protected function _getRefreshTokenTableName()
     {
         return $this->_options->get(self::OPT_REFRESH_TOKEN_TABLE);
     }
@@ -298,9 +271,9 @@ class MysqlLite extends AbstractStorage
     /**
      * "Shortcut" for starting a transaction.
      * 
-     * @param \Zend\Db\Adapter\Adapter $adapter
+     * @param Adapter $adapter
      */
-    protected function _beginTransaction (\Zend\Db\Adapter\Adapter $adapter)
+    protected function _beginTransaction(\Zend\Db\Adapter\Adapter $adapter)
     {
         $adapter->getDriver()
             ->getConnection()
@@ -311,9 +284,9 @@ class MysqlLite extends AbstractStorage
     /**
      * "Shortcut" for commiting a transaction.
      * 
-     * @param \Zend\Db\Adapter\Adapter $adapter
+     * @param Adapter $adapter
      */
-    protected function _commit (\Zend\Db\Adapter\Adapter $adapter)
+    protected function _commit(\Zend\Db\Adapter\Adapter $adapter)
     {
         $adapter->getDriver()
             ->getConnection()
@@ -324,9 +297,9 @@ class MysqlLite extends AbstractStorage
     /**
      * "Shortcut" for rolling back a transaction.
      * 
-     * @param \Zend\Db\Adapter\Adapter $adapter
+     * @param Adapter $adapter
      */
-    protected function _rollback (\Zend\Db\Adapter\Adapter $adapter)
+    protected function _rollback(\Zend\Db\Adapter\Adapter $adapter)
     {
         $adapter->getDriver()
             ->getConnection()
@@ -335,15 +308,119 @@ class MysqlLite extends AbstractStorage
 
 
     /**
-     * "Shortcut" for executing queries.
+     * Sets the DB adapter.
      * 
-     * @param Db\Adapter\Adapter $adapter
-     * @param Db\Sql\Sql $sql
-     * @param Db\Sql\SqlInterface $sqlObject
-     * @return Db\ResultSet\Zend\Db\ResultSet
+     * @param Adapter $dbAdapter
      */
-    protected function _sqlQuery (Db\Adapter\Adapter $adapter, Db\Sql\Sql $sql, Db\Sql\SqlInterface $sqlObject)
+    public function setAdapter(Adapter $dbAdapter)
     {
-        return $adapter->query($sql->getSqlStringForSqlObject($sqlObject), $adapter::QUERY_MODE_EXECUTE);
+        $this->dbAdapter = $dbAdapter;
+        
+        /*
+         * temp fix
+         */
+        $driver = $this->dbAdapter->getDriver();
+        $driver->getConnection()
+            ->connect();
+        $this->dbAdapter->getPlatform()
+            ->setDriver($driver);
+        /* --- */
+        
+        $this->setSqlFromAdapter($dbAdapter);
+    }
+
+
+    /**
+     * Returns the SQL abstraction object.
+     *
+     * @return Adapter
+     */
+    public function getAdapter()
+    {
+        if (! ($this->dbAdapter instanceof Adapter)) {
+            $this->setAdapter($this->createAdapter());
+        }
+        
+        return $this->dbAdapter;
+    }
+
+
+    /**
+     * Returns the SQL abstraction object.
+     * 
+     * @return Sql
+     */
+    public function getSql()
+    {
+        if (! ($this->sql instanceof Sql)) {
+            $this->setSqlFromAdapter($this->getAdapter());
+        }
+        return $this->sql;
+    }
+
+
+    /**
+     * Sets the SQL abstraction object.
+     * 
+     * @param Sql $sql
+     */
+    public function setSql(Sql $sql)
+    {
+        $this->sql = $sql;
+    }
+
+
+    /**
+     * Sets the SQL abstraction object for the corresponding DB adapter.
+     * 
+     * @param Adapter $dbAdapter
+     */
+    public function setSqlFromAdapter(Adapter $dbAdapter)
+    {
+        $this->setSql($this->createSql($dbAdapter));
+    }
+
+
+    /**
+     * Creates a DB adapter based on the passed options (or the configured options).
+     * 
+     * @param array $dbOptions
+     * @return Adapter
+     */
+    protected function createAdapter(array $dbOptions = null)
+    {
+        if (null === $dbOptions) {
+            $dbOptions = $this->_options->get(self::OPT_ADAPTER);
+        }
+        
+        return new Adapter($dbOptions);
+    }
+
+
+    /**
+     * Creates a SQL abstraction object based on the provided DB adapter.
+     * 
+     * @param Adapter $dbAdapter
+     * @return Sql
+     */
+    protected function createSql(Adapter $dbAdapter)
+    {
+        return new Sql($dbAdapter);
+    }
+
+
+    /**
+     * Executes the SQL object and returns the result.
+     * 
+     * @param SqlInterface $sqlObject
+     * @return \Zend\Db\Adapter\Driver\StatementInterface|\Zend\Db\ResultSet\Zend\Db\ResultSet|\Zend\Db\Adapter\Driver\ResultInterface|\Zend\Db\ResultSet\Zend\Db\ResultSetInterface
+     */
+    protected function executeSqlQuery(SqlInterface $sqlObject)
+    {
+        $sqlString = $this->getSql()
+            ->getSqlStringForSqlObject($sqlObject);
+        $result = $this->dbAdapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
+        
+        return $result;
     }
 }
