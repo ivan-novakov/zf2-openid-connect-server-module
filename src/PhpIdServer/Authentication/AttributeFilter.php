@@ -32,7 +32,6 @@ class AttributeFilter
      */
     public function __construct(array $config, Factory $inputFilterFactory = null)
     {
-        _dump($config);
         if (null === $inputFilterFactory) {
             $inputFilterFactory = new Factory();
         }
