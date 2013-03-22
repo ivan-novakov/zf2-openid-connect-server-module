@@ -81,7 +81,7 @@ class ShibbolethController extends AbstractController
         if (! ($this->_attributeFilter instanceof AttributeFilter)) {
             $config = $this->getOption(self::OPT_ATTRIBUTE_FILTER);
             if (is_array($config)) {
-                $this->_attributeFilter = new AttributeFilter($config);
+                $this->_attributeFilter = new AttributeFilter($config, $this->getUserInputFilterFactory());
             }
         }
         

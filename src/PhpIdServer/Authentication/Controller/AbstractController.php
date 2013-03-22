@@ -8,6 +8,7 @@ use PhpIdServer\Authentication\Info;
 use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
 use PhpIdServer\Context;
+use Zend\InputFilter\Factory;
 
 
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
@@ -26,6 +27,13 @@ abstract class AbstractController extends BaseController implements Authenticati
      * @var UserFactoryInterface
      */
     protected $_userFactory = null;
+
+    /**
+     * User input filter factory.
+     * 
+     * @var Factory
+     */
+    protected $userInputFilterFactory = null;
 
 
     /**
@@ -89,12 +97,38 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
+    /**
+     * Sets the user input filter factory.
+     * 
+     * @param Factory $userInputFilterFactory
+     */
+    public function setUserInputFilterFactory(Factory $userInputFilterFactory)
+    {
+        $this->userInputFilterFactory = $userInputFilterFactory;
+    }
+
+
+    /**
+     * Returns the user input filter factory.
+     * 
+     * @return Factory
+     */
+    public function getUserInputFilterFactory()
+    {
+        return $this->userInputFilterFactory;
+    }
+
+
     public function indexAction()
     {
         return $this->getResponse();
     }
 
 
+    /**
+     * {@inheritdoc}
+     * @see \PhpIdServer\Authentication\Controller\AuthenticationControllerInterface::authenticateAction()
+     */
     public function authenticateAction()
     {
         $this->_logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));

@@ -269,5 +269,9 @@ return array(
                 'options' => array()
             )
         )
+    ), 
+    
+    'filter_invokables' => array(
+        'shibboleth_serialized_value' => 'PhpIdServer\Util\Filter\ShibbolethSerializedValue'
     )
 );

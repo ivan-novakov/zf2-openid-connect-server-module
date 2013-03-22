@@ -20,7 +20,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * (non-PHPdoc)
      * @see \Zend\ServiceManager\AbstractFactoryInterface::canCreateServiceWithName()
      */
-    public function canCreateServiceWithName (ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         return (null !== $this->_getControllerConfig($serviceLocator, $requestedName));
     }
@@ -31,7 +31,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * @see \Zend\ServiceManager\AbstractFactoryInterface::createServiceWithName()
      * @return AuthenticationControllerInterface
      */
-    public function createServiceWithName (ServiceLocatorInterface $serviceLocator, $name, $requestedName)
+    public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
         $controllerConfig = $this->_getControllerConfig($serviceLocator, $requestedName);
         if (! $controllerConfig) {
@@ -62,8 +62,10 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         }
         
         $controller->setOptions($options);
-        $controller->setUserFactory($this->_getServiceManager($serviceLocator)
-            ->get('UserFactory'));
+        
+        $sm = $this->_getServiceManager($serviceLocator);
+        $controller->setUserFactory($sm->get('UserFactory'));
+        $controller->setUserInputFilterFactory($sm->get('PhpIdServer\InputFilterFactory'));
         
         return $controller;
     }
@@ -77,7 +79,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * @throws ServiceManagerException\ConfigNotFoundException
      * @return array|null
      */
-    protected function _getControllerConfig (ServiceLocatorInterface $serviceLocator, $requestedName)
+    protected function _getControllerConfig(ServiceLocatorInterface $serviceLocator, $requestedName)
     {
         $config = $this->_getServiceManager($serviceLocator)
             ->get('Config');
@@ -102,7 +104,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * @param ServiceLocatorInterface $serviceLocator
      * @return ServiceManager
      */
-    protected function _getServiceManager (ServiceLocatorInterface $serviceLocator)
+    protected function _getServiceManager(ServiceLocatorInterface $serviceLocator)
     {
         return $serviceLocator->getServiceLocator();
     }
