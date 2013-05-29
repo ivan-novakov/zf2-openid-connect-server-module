@@ -45,7 +45,7 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         //$eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function (MvcEvent $e)
         {
-            _dump('ERROR IN DISPATCH: ' . $e->getError());
+            error_log('ERROR IN DISPATCH: ' . $e->getError());
         }, 100);
     }
 
