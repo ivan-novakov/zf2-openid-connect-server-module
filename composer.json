@@ -1,8 +1,11 @@
 {
     "name" : "ivan-novakov/phpid-server",
-    "description" : "phpID Server - OpenID Connect implementation in PHP",
+    "description" : "OpenID Connect server implementation in PHP as a Zend Framework 2 module",
     "homepage" : "https://github.com/ivan-novakov/phpid-server",
-    "license" : "FreeBSD",
+    "license" : "BSD-3-Clause",
+    "keywords" : [
+        "openid connect", "authentication"
+    ],
     "authors" : [
         {
             "name" : "Ivan Novakov",
@@ -12,7 +15,7 @@
 
     "require" : {
         "php" : ">=5.3.3",
-        "zendframework/zendframework" : "2.*"
+        "zendframework/zendframework" : ">=2.2.0"
     },
 
     "autoload" : {
