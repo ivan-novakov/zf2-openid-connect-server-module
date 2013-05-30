@@ -17,23 +17,22 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \Zend\ServiceManager\AbstractFactoryInterface::canCreateServiceWithName()
      */
     public function canCreateServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        return (null !== $this->_getControllerConfig($serviceLocator, $requestedName));
+        return (null !== $this->getControllerConfig($serviceLocator, $requestedName));
     }
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \Zend\ServiceManager\AbstractFactoryInterface::createServiceWithName()
-     * @return AuthenticationControllerInterface
      */
     public function createServiceWithName(ServiceLocatorInterface $serviceLocator, $name, $requestedName)
     {
-        $controllerConfig = $this->_getControllerConfig($serviceLocator, $requestedName);
+        $controllerConfig = $this->getControllerConfig($serviceLocator, $requestedName);
         if (! $controllerConfig) {
             throw new ServiceManagerException\ConfigNotFoundException("authentication_handlers/$requestedName");
         }
@@ -48,7 +47,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         }
         
         $controller = new $className();
-        /* @var $controller AuthenticationControllerInterface */
+        /* @var $controller \PhpIdServer\Authentication\Controller\AbstractController */
         if (! ($controller instanceof AuthenticationControllerInterface)) {
             throw new Exception\InvalidControllerException(sprintf("Controller '%s' is not a valid authentication controller", $requestedName));
         }
@@ -63,9 +62,13 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         
         $controller->setOptions($options);
         
-        $sm = $this->_getServiceManager($serviceLocator);
-        $controller->setUserFactory($sm->get('UserFactory'));
+        $sm = $this->getServiceManager($serviceLocator);
+        
+        $controller->setUserFactory($sm->get('PhpIdServer\UserFactory'));
         $controller->setUserInputFilterFactory($sm->get('PhpIdServer\InputFilterFactory'));
+        $controller->setAuthorizeContext($sm->get('PhpIdServer\AuthorizeContext'));
+        $controller->setContextStorage($sm->get('PhpIdServer\ContextStorage'));
+        $controller->setLogger($sm->get('PhpIdServer\Logger'));
         
         return $controller;
     }
@@ -79,10 +82,9 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * @throws ServiceManagerException\ConfigNotFoundException
      * @return array|null
      */
-    protected function _getControllerConfig(ServiceLocatorInterface $serviceLocator, $requestedName)
+    protected function getControllerConfig(ServiceLocatorInterface $serviceLocator, $requestedName)
     {
-        $config = $this->_getServiceManager($serviceLocator)
-            ->get('Config');
+        $config = $this->getServiceManager($serviceLocator)->get('Config');
         
         if (! isset($config['authentication_handlers']) || ! is_array($config['authentication_handlers'])) {
             throw new ServiceManagerException\ConfigNotFoundException('authentication_handlers');
@@ -104,7 +106,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
      * @param ServiceLocatorInterface $serviceLocator
      * @return ServiceManager
      */
-    protected function _getServiceManager(ServiceLocatorInterface $serviceLocator)
+    protected function getServiceManager(ServiceLocatorInterface $serviceLocator)
     {
         return $serviceLocator->getServiceLocator();
     }

@@ -11,7 +11,7 @@ class AuthorizeContextFactory implements \Zend\ServiceManager\FactoryInterface
 
     public function createService (\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
     {
-        $contextStorage = $serviceLocator->get('ContextStorage');
+        $contextStorage = $serviceLocator->get('PhpIdServer\ContextStorage');
         
         $context = $contextStorage->load();
         if (! $context) {

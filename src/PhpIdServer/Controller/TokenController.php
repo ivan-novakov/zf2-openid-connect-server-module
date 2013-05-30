@@ -6,7 +6,7 @@ namespace PhpIdServer\Controller;
 class TokenController extends AbstractTokenController
 {
 
-    protected $_logIdent = 'token';
+    protected $logIdent = 'token';
 
 
     public function indexAction ()

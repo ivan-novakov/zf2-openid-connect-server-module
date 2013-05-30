@@ -2,22 +2,18 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
-use PhpIdServer\User\User;
-use PhpIdServer\Context\AuthorizeContext;
-
 
 class DummyController extends AbstractController
 {
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Authentication\Controller\AbstractController::authenticate()
      */
-    public function authenticate ()
+    public function authenticate()
     {
-        $user = $this->getUserFactory()
-            ->createUser($this->getOption('identity'));
+        $user = $this->getUserFactory()->createUser($this->getOption('identity'));
         return $user;
     }
 }

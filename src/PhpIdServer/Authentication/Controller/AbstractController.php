@@ -7,8 +7,8 @@ use PhpIdServer\User\UserInterface;
 use PhpIdServer\Authentication\Info;
 use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
-use PhpIdServer\Context;
 use Zend\InputFilter\Factory;
+use PhpIdServer\Context\AuthorizeContext;
 
 
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
@@ -19,14 +19,14 @@ abstract class AbstractController extends BaseController implements Authenticati
      * 
      * @var Options
      */
-    protected $_options = null;
+    protected $options = null;
 
     /**
      * User factory.
      * 
      * @var UserFactoryInterface
      */
-    protected $_userFactory = null;
+    protected $userFactory = null;
 
     /**
      * User input filter factory.
@@ -34,6 +34,11 @@ abstract class AbstractController extends BaseController implements Authenticati
      * @var Factory
      */
     protected $userInputFilterFactory = null;
+
+    /**
+     * @var AuthorizeContext
+     */
+    protected $authorizeContext = null;
 
 
     /**
@@ -47,7 +52,7 @@ abstract class AbstractController extends BaseController implements Authenticati
             $options = array();
         }
         
-        $this->_options = new Options($options);
+        $this->options = new Options($options);
     }
 
 
@@ -60,7 +65,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      */
     public function getOption($name, $defaultValue = null)
     {
-        return $this->_options->get($name, $defaultValue);
+        return $this->options->get($name, $defaultValue);
     }
 
 
@@ -82,7 +87,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      */
     public function setUserFactory(UserFactoryInterface $userFactory)
     {
-        $this->_userFactory = $userFactory;
+        $this->userFactory = $userFactory;
     }
 
 
@@ -93,7 +98,7 @@ abstract class AbstractController extends BaseController implements Authenticati
      */
     public function getUserFactory()
     {
-        return $this->_userFactory;
+        return $this->userFactory;
     }
 
 
@@ -119,6 +124,28 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
+    /**
+     * Sets the authorize context.
+     * 
+     * @param AuthorizeContext $authorizeContext
+     */
+    public function setAuthorizeContext(AuthorizeContext $authorizeContext)
+    {
+        $this->authorizeContext = $authorizeContext;
+    }
+
+
+    /**
+     * Returns the authorize context.
+     * 
+     * @return \PhpIdServer\Context\AuthorizeContext
+     */
+    public function getAuthorizeContext()
+    {
+        return $this->authorizeContext;
+    }
+
+
     public function indexAction()
     {
         return $this->getResponse();
@@ -133,8 +160,8 @@ abstract class AbstractController extends BaseController implements Authenticati
     {
         $this->_logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));
         
-        $context = $this->getServiceLocator()
-            ->get('AuthorizeContext');
+        // $context = $this->getServiceLocator()->get('AuthorizeContext');
+        $context = $this->getAuthorizeContext();
         
         try {
             $user = $this->authenticate();
@@ -156,7 +183,8 @@ abstract class AbstractController extends BaseController implements Authenticati
         }
         
         $context->setAuthenticationInfo($authenticationInfo);
-        $this->_saveContext($context);
+        // $this->_saveContext($context);
+        $this->getContextStorage()->save($context);
         
         $authorizeRoute = 'php-id-server/authorize-endpoint';
         

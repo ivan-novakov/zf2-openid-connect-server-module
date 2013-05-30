@@ -1,6 +1,10 @@
 <?php
 $vars = (array) $this->vars();
+
+/* @var $e \Zend\View\Exception\RuntimeException */
+$e = $vars['exception'];
+
 error_log('Exception dump from error/error.phtml:');
 error_log('--------------------------------------');
-error_log((string) $vars['exception']);
+error_log((string) $e);
 error_log('--------------------------------------');

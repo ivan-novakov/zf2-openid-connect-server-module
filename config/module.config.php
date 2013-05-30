@@ -6,12 +6,12 @@ return array(
     
     'controllers' => array(
         'invokables' => array(
-            'controller-index' => 'PhpIdServer\Controller\IndexController',
-            'controller-discovery' => 'PhpIdServer\Controller\DiscoveryController',
-            'controller-authorize' => 'PhpIdServer\Controller\AuthorizeController',
-            'controller-token' => 'PhpIdServer\Controller\TokenController',
-            'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController',
-            'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
+            //'controller-index' => 'PhpIdServer\Controller\IndexController',
+            //'controller-discovery' => 'PhpIdServer\Controller\DiscoveryController',
+            //'controller-authorize' => 'PhpIdServer\Controller\AuthorizeController',
+            //'controller-token' => 'PhpIdServer\Controller\TokenController',
+            //'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController',
+            //'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
         ),
         
         'abstract_factories' => array(
@@ -28,7 +28,7 @@ return array(
                 'options' => array(
                     'route' => '/',
                     'defaults' => array(
-                        'controller' => 'controller-index',
+                        'controller' => 'PhpIdServer\IndexController',
                         'action' => 'index'
                     )
                 )
@@ -53,7 +53,7 @@ return array(
                         'options' => array(
                             'route' => '/openid-configuration',
                             'defaults' => array(
-                                'controller' => 'controller-discovery',
+                                'controller' => 'PhpIdServer\DiscoveryController',
                                 'action' => 'index'
                             )
                         )
@@ -69,7 +69,7 @@ return array(
                     
                     'route' => '/oic',
                     'defaults' => array(
-                        'controller' => 'controller-index',
+                        'controller' => 'PhpIdServer\IndexController',
                         'action' => 'index'
                     )
                 ),
@@ -82,7 +82,7 @@ return array(
                         'options' => array(
                             'route' => '/authorize',
                             'defaults' => array(
-                                'controller' => 'controller-authorize',
+                                'controller' => 'PhpIdServer\AuthorizeController',
                                 'action' => 'index'
                             )
                         )
@@ -94,7 +94,7 @@ return array(
                         'options' => array(
                             'route' => '/token',
                             'defaults' => array(
-                                'controller' => 'controller-token',
+                                'controller' => 'PhpIdServer\TokenController',
                                 'action' => 'index'
                             )
                         )
@@ -106,7 +106,7 @@ return array(
                         'options' => array(
                             'route' => '/userinfo',
                             'defaults' => array(
-                                'controller' => 'controller-userinfo',
+                                'controller' => 'PhpIdServer\UserinfoController',
                                 'action' => 'index'
                             )
                         )
@@ -148,8 +148,8 @@ return array(
     
     'service_manager' => array(
         'factories' => array(
-            'AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
-            'ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
+            //'AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
+            //'ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
             'SessionManager' => 'PhpIdServer\Session\SessionManagerFactory',
             'SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory',
             'ClientRegistryStorage' => 'PhpIdServer\Client\Registry\StorageFactory',

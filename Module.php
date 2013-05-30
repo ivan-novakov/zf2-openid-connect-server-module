@@ -8,9 +8,10 @@ use Zend\Mvc\ModuleRouteListener;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
+use Zend\ModuleManager\Feature\ControllerProviderInterface;
 
 
-class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface
+class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface, ControllerProviderInterface
 {
 
 
@@ -37,12 +38,11 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
     public function onBootstrap(EventInterface $e)
     {
         /* @var $e MvcEvent */
-        $eventManager = $e->getApplication()
-            ->getEventManager();
+        $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
         
-        //$eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
+        // $eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
         $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function (MvcEvent $e)
         {
             error_log('ERROR IN DISPATCH: ' . $e->getError());
@@ -52,7 +52,13 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
 
     public function getServiceConfig()
     {
-        //return '\PhpIdServer\ServiceManager\ServiceManagerConfig';
-        return new \PhpIdServer\ServiceManager\ServiceManagerConfig();
+        // return '\PhpIdServer\ServiceManager\ServiceManagerConfig';
+        return new ServiceManager\ServiceManagerConfig();
+    }
+
+
+    public function getControllerConfig()
+    {
+        return new ServiceManager\ControllerManagerConfig();
     }
 }

@@ -1,0 +1,64 @@
+<?php
+
+namespace PhpIdServer\ServiceManager;
+
+use Zend\ServiceManager\Config;
+use PhpIdServer\Controller\IndexController;
+use Zend\Mvc\Controller\ControllerManager;
+use PhpIdServer\Controller\DiscoveryController;
+use PhpIdServer\Controller\AuthorizeController;
+use PhpIdServer\Controller\TokenController;
+use PhpIdServer\Controller\UserinfoController;
+
+
+class ControllerManagerConfig extends Config
+{
+
+
+    public function getFactories()
+    {
+        return array(
+            'PhpIdServer\IndexController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new IndexController();
+                return $controller;
+            },
+            
+            'PhpIdServer\DiscoveryController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new DiscoveryController();
+                return $controller;
+            },
+            
+            'PhpIdServer\AuthorizeController' => function (ControllerManager $controllerManager)
+            {
+                $sm = $controllerManager->getServiceLocator();
+                
+                $controller = new AuthorizeController();
+                $controller->setLogger($sm->get('PhpIdServer\Logger'));
+                $controller->setContextStorage($sm->get('PhpIdServer\ContextStorage'));
+                $controller->setAuthorizeContext($sm->get('PhpIdServer\AuthorizeContext'));
+                $controller->setAuthorizeDispatcher($sm->get('PhpIdServer\AuthorizeDispatcher'));
+                $controller->setAuthenticationManager($sm->get('PhpIdServer\AuthenticationManager'));
+                
+                return $controller;
+            },
+            
+            'PhpIdServer\TokenController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new TokenController();
+                
+                $controller->setLogger($sm->get('PhpIdServer\Logger'));
+                
+                return $controller;
+            },
+            
+            'PhpIdServer\UserinfoController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new UserinfoController();
+                
+                return $controller;
+            }
+        );
+    }
+}

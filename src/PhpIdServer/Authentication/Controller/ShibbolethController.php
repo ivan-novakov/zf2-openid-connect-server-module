@@ -2,8 +2,6 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
-use PhpIdServer\User\User;
-use PhpIdServer\Context\AuthorizeContext;
 use PhpIdServer\Authentication\AttributeFilter;
 
 
@@ -252,8 +250,7 @@ class ShibbolethController extends AbstractController
         
         $attributes = $this->getAttributes();
         
-        $user = $this->getUserFactory()
-            ->createUser($attributes);
+        $user = $this->getUserFactory()->createUser($attributes);
         
         if (! $user->getId()) {
             throw new Exception\MissingUserIdentityException('No user identifier');

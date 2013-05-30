@@ -25,10 +25,13 @@ class ServiceManagerConfig extends Config
     {
         return array(
             
+            'PhpIdServer\AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
+            'PhpIdServer\ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
+            
             /*
              * Main logger object
              */
-            'Logger' => function (ServiceManager $sm)
+            'PhpIdServer\Logger' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 $loggerConfig = $config['logger'];
@@ -89,7 +92,7 @@ class ServiceManagerConfig extends Config
             /*
              * User/UserFactory
              */
-            'UserFactory' => function (ServiceManager $sm)
+            'PhpIdServer\UserFactory' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['user_factory'])) {
@@ -182,7 +185,7 @@ class ServiceManagerConfig extends Config
             /*
              * Authentication/Manager
              */
-            'AuthenticationManager' => function (ServiceManager $sm)
+            'PhpIdServer\AuthenticationManager' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['authentication'])) {
@@ -190,7 +193,7 @@ class ServiceManagerConfig extends Config
                 }
                 
                 $manager = new Authentication\Manager($config['authentication']);
-                $manager->setContext($sm->get('AuthorizeContext'));
+                $manager->setContext($sm->get('PhpIdServer\AuthorizeContext'));
                 
                 return $manager;
             }, 
@@ -211,11 +214,11 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Dispatcher/Authorize
              */
-            'AuthorizeDispatcher' => function (ServiceManager $sm)
+            'PhpIdServer\AuthorizeDispatcher' => function (ServiceManager $sm)
             {
                 $dispatcher = new Dispatcher\Authorize();
                 
-                $dispatcher->setContext($sm->get('AuthorizeContext'));
+                $dispatcher->setContext($sm->get('PhpIdServer\AuthorizeContext'));
                 $dispatcher->setAuthorizeResponse($sm->get('AuthorizeResponse'));
                 $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
                 $dispatcher->setSessionManager($sm->get('SessionManager'));

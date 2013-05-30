@@ -2,9 +2,6 @@
 
 namespace PhpIdServer\Authentication\Controller;
 
-use PhpIdServer\User\User;
-use PhpIdServer\Context\AuthorizeContext;
-
 
 class BasicAuthController extends AbstractController
 {
@@ -14,12 +11,11 @@ class BasicAuthController extends AbstractController
      * (non-PHPdoc)
      * @see \PhpIdServer\Authentication\Controller\AbstractController::authenticate()
      */
-    public function authenticate ()
+    public function authenticate()
     {
         $request = $this->getRequest();
         
-        $authHeader = $request->getHeaders()
-            ->get('Authorization');
+        $authHeader = $request->getHeaders()->get('Authorization');
         
         if (! $authHeader) {
             throw new Exception\AuthenticationException('No authorization header');
@@ -45,8 +41,7 @@ class BasicAuthController extends AbstractController
         foreach ($users as $user) {
             if ($username == $user['authentication']['username']) {
                 if ($password == $user['authentication']['password']) {
-                    return $this->getUserFactory()
-                        ->createUser($user['data']);
+                    return $this->getUserFactory()->createUser($user['data']);
                 }
                 
                 throw new Exception\AuthenticationException(sprintf("Invalid password for user '%s'", $username));
@@ -57,7 +52,7 @@ class BasicAuthController extends AbstractController
     }
 
 
-    protected function _getUsers ()
+    protected function _getUsers()
     {
         $file = $this->getOption('file');
         if (! file_exists($file)) {

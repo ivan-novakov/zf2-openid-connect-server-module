@@ -6,7 +6,7 @@ namespace PhpIdServer\Controller;
 class UserinfoController extends AbstractTokenController
 {
 
-    protected $_logIdent = 'userinfo';
+    protected $logIdent = 'userinfo';
 
 
     public function indexAction ()

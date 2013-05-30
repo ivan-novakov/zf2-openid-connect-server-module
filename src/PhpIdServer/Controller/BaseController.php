@@ -3,13 +3,68 @@
 namespace PhpIdServer\Controller;
 
 use PhpIdServer\Context\AuthorizeContext;
-use PhpIdServer\Client\Registry;
+use PhpIdServer\Context\Storage\StorageInterface;
+use Zend\Log\Logger;
 
 
 abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionController
 {
 
-    protected $_logIdent = 'abstract base';
+    /**
+     * @var StorageInterface
+     */
+    protected $contextStorage = null;
+
+    /**
+     * @var Logger
+     */
+    protected $logger = null;
+
+    protected $logIdent = 'abstract base';
+
+
+    /**
+     * Sets the context storage.
+     * 
+     * @param StorageInterface $contextStorage
+     */
+    public function setContextStorage(StorageInterface $contextStorage)
+    {
+        $this->contextStorage = $contextStorage;
+    }
+
+
+    /**
+     * Returns the context storage.
+     * 
+     * @return StorageInterface
+     */
+    public function getContextStorage()
+    {
+        return $this->contextStorage;
+    }
+
+
+    /**
+     * Sets the logger.
+     * 
+     * @param Logger $logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
+
+    /**
+     * Returns the logger.
+     * 
+     * @return Logger
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
 
 
     /**
@@ -17,75 +72,76 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
      * 
      * @return \Zend\ServiceManager\ServiceManager
      */
-    protected function _getServiceManager ()
+    /*
+    protected function _getServiceManager()
     {
         return $this->getServiceLocator();
     }
-
-
-    protected function _saveContext (AuthorizeContext $context)
+    */
+    protected function saveContext(AuthorizeContext $context)
     {
-        $this->getServiceLocator()
-            ->get('ContextStorage')
-            ->save($context);
+        // $this->getServiceLocator()->get('ContextStorage')->save($context);
+        $this->getContextStorage()->save($context);
     }
 
 
-    protected function _debug ($message)
+    protected function clearContext()
+    {
+        $this->getContextStorage()->clear();
+    }
+
+
+    protected function _debug($message)
     {
         $this->_logDebug($message);
     }
 
 
-    protected function _logDebug ($message)
+    protected function _logDebug($message)
     {
         $this->_log($message, \Zend\Log\Logger::DEBUG);
     }
 
 
-    protected function _logInfo ($message)
+    protected function _logInfo($message)
     {
         $this->_log($message, \Zend\Log\Logger::INFO);
     }
 
 
-    protected function _logError ($message)
+    protected function _logError($message)
     {
         $this->_log($message, \Zend\Log\Logger::ERR);
     }
 
 
-    protected function _log ($message, $priority = \Zend\Log\Logger::INFO)
+    protected function _log($message, $priority = \Zend\Log\Logger::INFO)
     {
-        $this->_getServiceManager()
-            ->get('Logger')
-            ->log($priority, $this->_formatLogMessage($message));
+        // $this->_getServiceManager()->get('Logger')->log($priority, $this->_formatLogMessage($message));
+        $this->getLogger()->log($priority, $this->_formatLogMessage($message));
     }
 
 
-    protected function _formatLogMessage ($message)
+    protected function _formatLogMessage($message)
     {
-        return sprintf("CONTROLLER [%s] %s", $this->_logIdent, $message);
+        return sprintf("CONTROLLER [%s] %s", $this->logIdent, $message);
     }
 
 
-    protected function _redirectToRoute ($routeName, Array $params = array(), Array $options = array())
+    protected function _redirectToRoute($routeName, Array $params = array(), Array $options = array())
     {
-        $path = $this->url()
-            ->fromRoute($routeName, $params, $options);
+        $path = $this->url()->fromRoute($routeName, $params, $options);
         
         $uri = new \Zend\Uri\Http($this->_getBaseUri());
         $uri->setPath($path);
         
-        return $this->redirect()
-            ->toUrl($uri->toString());
+        return $this->redirect()->toUrl($uri->toString());
     }
 
 
-    protected function _getBaseUri ()
+    protected function _getBaseUri()
     {
-        $uri = $this->getRequest()
-            ->getUri();
+        $uri = $this->getRequest()->getUri();
         $uri->setPath('');
         $uri->setQuery(array());
         $uri->setFragment('');
@@ -100,7 +156,7 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
      * @param \Exception $e
      * @param string $label
      */
-    protected function _handleException (\Exception $e, $label = 'Exception')
+    protected function _handleException(\Exception $e, $label = 'Exception')
     {
         _dump("$e");
         return $this->_handleError(sprintf("%s: [%s] %s", $label, get_class($e), $e->getMessage()));
@@ -113,7 +169,7 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
      * @param string $message
      * @return \Zend\Stdlib\ResponseInterface
      */
-    protected function _handleError ($message)
+    protected function _handleError($message)
     {
         $this->_logError($message);
         $this->_logInfo('returnning error response...');

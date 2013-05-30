@@ -3,26 +3,110 @@
 namespace PhpIdServer\Controller;
 
 use PhpIdServer\OpenIdConnect\Response;
+use PhpIdServer\Context\AuthorizeContext;
+use PhpIdServer\OpenIdConnect\Dispatcher;
+use PhpIdServer\Authentication;
 
 
 class AuthorizeController extends BaseController
 {
 
-    protected $_logIdent = 'authorize';
+    /**
+     * @var AuthorizeContext
+     */
+    protected $authorizeContext = null;
+
+    /**
+     * @var Dispatcher\Authorize
+     */
+    protected $authorizeDispatcher = null;
+
+    /**
+     * @var Authentication\Manager
+     */
+    protected $authenticationManager = null;
+
+    protected $logIdent = 'authorize';
 
 
-    public function indexAction ()
+    /**
+     * Sets the authorize context.
+     * 
+     * @param AuthorizeContext $authorizeContext
+     */
+    public function setAuthorizeContext(AuthorizeContext $authorizeContext)
+    {
+        $this->authorizeContext = $authorizeContext;
+    }
+
+
+    /**
+     * Returns the authorize context.
+     * 
+     * @return AuthorizeContext
+     */
+    public function getAuthorizeContext()
+    {
+        return $this->authorizeContext;
+    }
+
+
+    /**
+     * Sets the authorize dispatcher.
+     * 
+     * @param Dispatcher\Authorize $authorizeDispatcher
+     */
+    public function setAuthorizeDispatcher(Dispatcher\Authorize $authorizeDispatcher)
+    {
+        $this->authorizeDispatcher = $authorizeDispatcher;
+    }
+
+
+    /**
+     * Returns the authorize dispatcher.
+     * 
+     * @return Dispatcher\Authorize
+     */
+    public function getAuthorizeDispatcher()
+    {
+        return $this->authorizeDispatcher;
+    }
+
+
+    /**
+     * Sets the authentication manager.
+     * 
+     * @param Authentication\Manager $authenticationManager
+     */
+    public function setAuthenticationManager(Authentication\Manager $authenticationManager)
+    {
+        $this->authenticationManager = $authenticationManager;
+    }
+
+
+    /**
+     * Returns the authentication manager.
+     * 
+     * @return Authentication\Manager
+     */
+    public function getAuthenticationManager()
+    {
+        return $this->authenticationManager;
+    }
+
+
+    public function indexAction()
     {
         $this->_logInfo($_SERVER['REQUEST_URI']);
         
         $response = null;
-        $serviceManager = $this->_getServiceManager();
+        // $serviceManager = $this->_getServiceManager();
         
-        $context = $serviceManager->get('AuthorizeContext');
-        /* @var $context \PhpIdServer\Context\Authorize */
+        // $context = $serviceManager->get('AuthorizeContext');
+        $context = $this->getAuthorizeContext();
         
-        $dispatcher = $serviceManager->get('AuthorizeDispatcher');
-        /* @var $dispatcher \PhpIdServer\OpenIdConnect\Dispatcher\Authorize */
+        // $dispatcher = $serviceManager->get('AuthorizeDispatcher');
+        $dispatcher = $this->getAuthorizeDispatcher();
         
         /*
          * User authentication
@@ -38,13 +122,14 @@ class AuthorizeController extends BaseController
                 }
                 
                 $this->_logInfo('preDispatch OK');
-                $this->_saveContext($context);
+                $this->saveContext($context);
             } catch (\Exception $e) {
                 $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
                 return $this->_errorResponse($response, 'General error in preDispatch');
             }
             
-            $manager = $serviceManager->get('AuthenticationManager');
+            // $manager = $serviceManager->get('AuthenticationManager');
+            $manager = $this->getAuthenticationManager();
             
             $authenticationHandlerName = $manager->getAuthenticationHandler();
             $this->_logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
@@ -59,12 +144,11 @@ class AuthorizeController extends BaseController
          */
         // [...]
         
-
         /*
          * Clear context (!)
          */
-        $serviceManager->get('ContextStorage')
-            ->clear();
+        // $serviceManager->get('ContextStorage')->clear();
+        $this->clearContext();
         
         /*
          * Dispatching response
@@ -85,7 +169,7 @@ class AuthorizeController extends BaseController
     }
 
 
-    protected function _validResponse (Response\Authorize\Simple $response)
+    protected function _validResponse(Response\Authorize\Simple $response)
     {
         $this->_logInfo('dispatch OK, returning response...');
         
@@ -93,7 +177,7 @@ class AuthorizeController extends BaseController
     }
 
 
-    protected function _errorResponse (Response\Authorize\Error $response, $label = 'Error')
+    protected function _errorResponse(Response\Authorize\Error $response, $label = 'Error')
     {
         $this->_logError(sprintf("%s: %s (%s)", $label, $response->getErrorMessage(), $response->getErrorDescription()));
         
