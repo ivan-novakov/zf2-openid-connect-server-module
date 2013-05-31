@@ -15,6 +15,14 @@ class ControllerManagerConfig extends Config
 {
 
 
+    public function getAbstractFactories()
+    {
+        return array(
+            'PhpIdServer\Authentication\Controller\ControllerAbstractFactory'
+        );
+    }
+
+
     public function getFactories()
     {
         return array(

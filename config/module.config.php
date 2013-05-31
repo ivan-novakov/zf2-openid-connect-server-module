@@ -4,21 +4,6 @@ use PhpIdServer\User\User;
 
 return array(
     
-    'controllers' => array(
-        'invokables' => array(
-            //'controller-index' => 'PhpIdServer\Controller\IndexController',
-            //'controller-discovery' => 'PhpIdServer\Controller\DiscoveryController',
-            //'controller-authorize' => 'PhpIdServer\Controller\AuthorizeController',
-            //'controller-token' => 'PhpIdServer\Controller\TokenController',
-            //'controller-userinfo' => 'PhpIdServer\Controller\UserinfoController',
-            //'controller-auth-dummy' => 'PhpIdServer\Authentication\Controller\DummyController'
-        ),
-        
-        'abstract_factories' => array(
-            'PhpIdServer\Authentication\Controller\ControllerAbstractFactory'
-        )
-    ),
-    
     'router' => array(
         'routes' => array(
             
@@ -143,20 +128,6 @@ return array(
         
         'template_map' => array(
             'error/index' => __DIR__ . '/../view/error/error.phtml'
-        )
-    ),
-    
-    'service_manager' => array(
-        'factories' => array(
-            //'AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
-            //'ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
-            'SessionManager' => 'PhpIdServer\Session\SessionManagerFactory',
-            'SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory',
-            'ClientRegistryStorage' => 'PhpIdServer\Client\Registry\StorageFactory',
-            'ClientRegistry' => 'PhpIdServer\Client\RegistryFactory'
-        ),
-        'invokables' => array(
-            'TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'
         )
     ),
     

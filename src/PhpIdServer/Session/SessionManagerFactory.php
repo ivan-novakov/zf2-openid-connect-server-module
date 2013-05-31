@@ -16,10 +16,10 @@ class SessionManagerFactory implements \Zend\ServiceManager\FactoryInterface
     {
         $sessionManager = new SessionManager();
         
-        $storage = $serviceLocator->get('SessionStorage');
-        $serializer = $serviceLocator->get('UserSerializer');
-        $idGenerator = $serviceLocator->get('SessionIdGenerator');
-        $hashGenerator = $serviceLocator->get('TokenGenerator');
+        $storage = $serviceLocator->get('PhpIdServer\SessionStorage');
+        $serializer = $serviceLocator->get('PhpIdServer\UserSerializer');
+        $idGenerator = $serviceLocator->get('PhpIdServer\SessionIdGenerator');
+        $hashGenerator = $serviceLocator->get('PhpIdServer\TokenGenerator');
         
         $sessionManager->setStorage($storage);
         $sessionManager->setSessionIdGenerator($idGenerator);

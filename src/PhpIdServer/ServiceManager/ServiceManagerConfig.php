@@ -21,12 +21,24 @@ class ServiceManagerConfig extends Config
 {
 
 
+    public function getInvokables()
+    {
+        return array(
+            'PhpIdServer\TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'
+        );
+    }
+
+
     public function getFactories()
     {
         return array(
             
             'PhpIdServer\AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
             'PhpIdServer\ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
+            'PhpIdServer\SessionManager' => 'PhpIdServer\Session\SessionManagerFactory',
+            'PhpIdServer\SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory',
+            'PhpIdServer\ClientRegistryStorage' => 'PhpIdServer\Client\Registry\StorageFactory',
+            'PhpIdServer\ClientRegistry' => 'PhpIdServer\Client\RegistryFactory',
             
             /*
              * Main logger object
@@ -56,8 +68,7 @@ class ServiceManagerConfig extends Config
                             }
                         }
                         
-                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) &&
-                             isset($writerConfig['formatter'])) {
+                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) && isset($writerConfig['formatter'])) {
                             $formatterConfig = $writerConfig['formatter'];
                             if (isset($formatterConfig['format'])) {
                                 $formatter = new \Zend\Log\Formatter\Simple($formatterConfig['format']);
@@ -79,7 +90,7 @@ class ServiceManagerConfig extends Config
             /*
              * User/Serializer
              */
-            'UserSerializer' => function (ServiceManager $sm)
+            'PhpIdServer\UserSerializer' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['user_serializer'])) {
@@ -105,7 +116,7 @@ class ServiceManagerConfig extends Config
             /*
              * User/DataConnector/DataConnectorFactory
              */
-            'UserDataConnectorFactory' => function (ServiceManager $sm)
+            'PhpIdServer\UserDataConnectorFactory' => function (ServiceManager $sm)
             {
                 return new DataConnectorFactory();
             }, 
@@ -114,7 +125,7 @@ class ServiceManagerConfig extends Config
              * The default user data connector.
              * User/DataConnector/Chain
              */
-            'UserDataConnector' => function (ServiceManager $sm)
+            'PhpIdServer\UserDataConnector' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['data_connectors'])) {
@@ -122,7 +133,7 @@ class ServiceManagerConfig extends Config
                 }
                 
                 $dataConnectorConfigs = $config['data_connectors'];
-                $factory = $sm->get('UserDataConnectorFactory');
+                $factory = $sm->get('PhpIdServer\UserDataConnectorFactory');
                 $chain = $factory->createDataConnector(array(
                     'class' => '\PhpIdServer\User\DataConnector\Chain'
                 ));
@@ -136,7 +147,7 @@ class ServiceManagerConfig extends Config
             /*
              * User/UserInfo/Mapper/MapperInterface
              */
-            'UserInfoMapper' => function (ServiceManager $sm)
+            'PhpIdServer\UserInfoMapper' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['user_info_mapper'])) {
@@ -159,7 +170,7 @@ class ServiceManagerConfig extends Config
             /*
              * Session/IdGenerator
              */
-            'SessionIdGenerator' => function (ServiceManager $sm)
+            'PhpIdServer\SessionIdGenerator' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['session_id_generator'])) {
@@ -196,13 +207,12 @@ class ServiceManagerConfig extends Config
                 $manager->setContext($sm->get('PhpIdServer\AuthorizeContext'));
                 
                 return $manager;
-            }, 
+            },
             
-            'ClientAuthenticationManager' => function (ServiceManager $sm)
+            'PhpIdServer\ClientAuthenticationManager' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
-                if (! isset($config['client_authentication_manager']) ||
-                     ! is_array($config['client_authentication_manager'])) {
+                if (! isset($config['client_authentication_manager']) || ! is_array($config['client_authentication_manager'])) {
                     throw new Exception\ConfigNotFoundException('client_authentication_manager');
                 }
                 
@@ -219,10 +229,10 @@ class ServiceManagerConfig extends Config
                 $dispatcher = new Dispatcher\Authorize();
                 
                 $dispatcher->setContext($sm->get('PhpIdServer\AuthorizeContext'));
-                $dispatcher->setAuthorizeResponse($sm->get('AuthorizeResponse'));
-                $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
-                $dispatcher->setSessionManager($sm->get('SessionManager'));
-                $dispatcher->setDataConnector($sm->get('UserDataConnector'));
+                $dispatcher->setAuthorizeResponse($sm->get('PhpIdServer\AuthorizeResponse'));
+                $dispatcher->setClientRegistry($sm->get('PhpIdServer\ClientRegistry'));
+                $dispatcher->setSessionManager($sm->get('PhpIdServer\SessionManager'));
+                $dispatcher->setDataConnector($sm->get('PhpIdServer\UserDataConnector'));
                 
                 return $dispatcher;
             }, 
@@ -230,7 +240,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Response/Authorize/
              */
-            'AuthorizeResponse' => function (ServiceManager $sm)
+            'PhpIdServer\AuthorizeResponse' => function (ServiceManager $sm)
             {
                 return new Response\Authorize\Simple($sm->get('Response'));
             },
@@ -242,11 +252,11 @@ class ServiceManagerConfig extends Config
             {
                 $dispatcher = new Dispatcher\Token();
                 
-                $dispatcher->setClientRegistry($sm->get('ClientRegistry'));
-                $dispatcher->setSessionManager($sm->get('SessionManager'));
-                $dispatcher->setTokenRequest($sm->get('TokenRequest'));
-                $dispatcher->setTokenResponse($sm->get('TokenResponse'));
-                $dispatcher->setClientAuthenticationManager($sm->get('ClientAuthenticationManager'));
+                $dispatcher->setClientRegistry($sm->get('PhpIdServer\ClientRegistry'));
+                $dispatcher->setSessionManager($sm->get('PhpIdServer\SessionManager'));
+                $dispatcher->setTokenRequest($sm->get('PhpIdServer\TokenRequest'));
+                $dispatcher->setTokenResponse($sm->get('PhpIdServer\TokenResponse'));
+                $dispatcher->setClientAuthenticationManager($sm->get('PhpIdServer\ClientAuthenticationManager'));
                 
                 return $dispatcher;
             }, 
@@ -254,7 +264,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpendIdConnect/Request/Token
              */
-            'TokenRequest' => function (ServiceManager $sm)
+            'PhpIdServer\TokenRequest' => function (ServiceManager $sm)
             {
                 return new Request\Token($sm->get('Request'));
             }, 
@@ -262,7 +272,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Response/Token
              */
-            'TokenResponse' => function (ServiceManager $sm)
+            'PhpIdServer\TokenResponse' => function (ServiceManager $sm)
             {
                 return new Response\Token($sm->get('Response'));
             }, 
@@ -274,10 +284,10 @@ class ServiceManagerConfig extends Config
             {
                 $dispatcher = new Dispatcher\UserInfo();
                 
-                $dispatcher->setSessionManager($sm->get('SessionManager'));
-                $dispatcher->setUserInfoRequest($sm->get('UserInfoRequest'));
-                $dispatcher->setUserInfoResponse($sm->get('UserInfoResponse'));
-                $dispatcher->setUserInfoMapper($sm->get('UserInfoMapper'));
+                $dispatcher->setSessionManager($sm->get('PhpIdServer\SessionManager'));
+                $dispatcher->setUserInfoRequest($sm->get('PhpIdServer\UserInfoRequest'));
+                $dispatcher->setUserInfoResponse($sm->get('PhpIdServer\UserInfoResponse'));
+                $dispatcher->setUserInfoMapper($sm->get('PhpIdServer\UserInfoMapper'));
                 
                 return $dispatcher;
             }, 
@@ -285,7 +295,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Request/UserInfo
              */
-            'UserInfoRequest' => function (ServiceManager $sm)
+            'PhpIdServer\UserInfoRequest' => function (ServiceManager $sm)
             {
                 return new Request\UserInfo($sm->get('Request'));
             }, 
@@ -293,7 +303,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Response/UserInfo
              */
-            'UserInfoResponse' => function (ServiceManager $sm)
+            'PhpIdServer\UserInfoResponse' => function (ServiceManager $sm)
             {
                 return new Response\UserInfo($sm->get('Response'));
             },
@@ -310,8 +320,7 @@ class ServiceManagerConfig extends Config
                     $filterInvokables = $config['filter_invokables'];
                     $factory->setDefaultFilterChain(new FilterChain());
                     
-                    $pluginManager = $factory->getDefaultFilterChain()
-                        ->getPluginManager();
+                    $pluginManager = $factory->getDefaultFilterChain()->getPluginManager();
                     foreach ($filterInvokables as $filterName => $filterClass) {
                         $pluginManager->setInvokableClass($filterName, $filterClass);
                     }
