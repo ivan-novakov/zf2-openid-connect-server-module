@@ -13,8 +13,9 @@ class TokenController extends AbstractTokenController
     {
         $this->_logInfo($_SERVER['REQUEST_URI']);
         
-        $serviceManager = $this->_getServiceManager();
-        $dispatcher = $serviceManager->get('TokenDispatcher');
+        //$serviceManager = $this->_getServiceManager();
+        //$dispatcher = $serviceManager->get('TokenDispatcher');
+        $dispatcher = $this->getDispatcher();
         
         return $this->_dispatch($dispatcher);
     }

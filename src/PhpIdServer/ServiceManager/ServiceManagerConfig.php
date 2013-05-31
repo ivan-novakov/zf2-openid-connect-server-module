@@ -238,7 +238,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Dispatcher/Token
              */
-            'TokenDispatcher' => function (ServiceManager $sm)
+            'PhpIdServer\TokenDispatcher' => function (ServiceManager $sm)
             {
                 $dispatcher = new Dispatcher\Token();
                 
@@ -270,7 +270,7 @@ class ServiceManagerConfig extends Config
             /*
              * OpenIdConnect/Dispatcher/UserInfo
              */
-            'UserInfoDispatcher' => function (ServiceManager $sm)
+            'PhpIdServer\UserInfoDispatcher' => function (ServiceManager $sm)
             {
                 $dispatcher = new Dispatcher\UserInfo();
                 

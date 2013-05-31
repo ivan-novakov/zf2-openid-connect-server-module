@@ -46,16 +46,22 @@ class ControllerManagerConfig extends Config
             
             'PhpIdServer\TokenController' => function (ControllerManager $controllerManager)
             {
-                $controller = new TokenController();
+                $sm = $controllerManager->getServiceLocator();
                 
+                $controller = new TokenController();
                 $controller->setLogger($sm->get('PhpIdServer\Logger'));
+                $controller->setDispatcher($sm->get('PhpIdServer\TokenDispatcher'));
                 
                 return $controller;
             },
             
             'PhpIdServer\UserinfoController' => function (ControllerManager $controllerManager)
             {
+                $sm = $controllerManager->getServiceLocator();
+                
                 $controller = new UserinfoController();
+                $controller->setLogger($sm->get('PhpIdServer\Logger'));
+                $controller->setDispatcher($sm->get('PhpIdServer\UserInfoDispatcher'));
                 
                 return $controller;
             }

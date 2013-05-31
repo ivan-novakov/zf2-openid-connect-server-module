@@ -67,20 +67,8 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
-    /**
-     * Returns the service manager object.
-     * 
-     * @return \Zend\ServiceManager\ServiceManager
-     */
-    /*
-    protected function _getServiceManager()
-    {
-        return $this->getServiceLocator();
-    }
-    */
     protected function saveContext(AuthorizeContext $context)
     {
-        // $this->getServiceLocator()->get('ContextStorage')->save($context);
         $this->getContextStorage()->save($context);
     }
 
@@ -118,7 +106,10 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     protected function _log($message, $priority = \Zend\Log\Logger::INFO)
     {
         // $this->_getServiceManager()->get('Logger')->log($priority, $this->_formatLogMessage($message));
-        $this->getLogger()->log($priority, $this->_formatLogMessage($message));
+        $logger = $this->getLogger();
+        if ($logger instanceof Logger) {
+            $logger->log($priority, $this->_formatLogMessage($message));
+        }
     }
 
 

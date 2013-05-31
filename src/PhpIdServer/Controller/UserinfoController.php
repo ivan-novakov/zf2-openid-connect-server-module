@@ -13,8 +13,9 @@ class UserinfoController extends AbstractTokenController
     {
         $this->_logInfo($_SERVER['REQUEST_URI']);
         
-        $serviceManager = $this->_getServiceManager();
-        $dispatcher = $serviceManager->get('UserInfoDispatcher');
+        //$serviceManager = $this->_getServiceManager();
+        //$dispatcher = $serviceManager->get('UserInfoDispatcher');
+        $dispatcher = $this->getDispatcher();
         
         return $this->_dispatch($dispatcher);
     }

@@ -3,6 +3,7 @@
 namespace PhpIdServer\Controller;
 
 use PhpIdServer\OpenIdConnect\Dispatcher;
+use PhpIdServer\OpenIdConnect\Dispatcher\DispatcherInterface;
 
 
 /**
@@ -10,9 +11,32 @@ use PhpIdServer\OpenIdConnect\Dispatcher;
  */
 abstract class AbstractTokenController extends BaseController
 {
+
+    /**
+     * @var DispatcherInterface
+     */
+    protected $dispatcher = null;
+
+
+    /**
+     * @return DispatcherInterface
+     */
+    public function getDispatcher()
+    {
+        return $this->dispatcher;
+    }
+
+
+    /**
+     * @param DispatcherInterface $dispatcher
+     */
+    public function setDispatcher(DispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
     
-    // FIXME - unify 
-    protected function _handleException (\Exception $e)
+    // FIXME - unify
+    protected function _handleException(\Exception $e)
     {
         _dump("$e");
         $this->_logError(sprintf("[%s] %s", get_class($e), $e->getMessage()));
@@ -20,7 +44,7 @@ abstract class AbstractTokenController extends BaseController
         $response = $this->getResponse();
         $response->setStatusCode(400);
         $response->setContent(\Zend\Json\Json::encode(array(
-            'error' => 'general error', 
+            'error' => 'general error',
             'error_description' => sprintf("[%s] %s", get_class($e), $e->getMessage())
         )));
         
@@ -34,7 +58,7 @@ abstract class AbstractTokenController extends BaseController
      * @param Dispatcher\DispatcherInterface $dispatcher
      * @return \Zend\Http\Response
      */
-    protected function _dispatch (Dispatcher\DispatcherInterface $dispatcher)
+    protected function _dispatch(Dispatcher\DispatcherInterface $dispatcher)
     {
         try {
             $this->_logInfo('Dispatching request...');

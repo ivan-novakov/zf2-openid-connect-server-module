@@ -100,12 +100,7 @@ class AuthorizeController extends BaseController
         $this->_logInfo($_SERVER['REQUEST_URI']);
         
         $response = null;
-        // $serviceManager = $this->_getServiceManager();
-        
-        // $context = $serviceManager->get('AuthorizeContext');
         $context = $this->getAuthorizeContext();
-        
-        // $dispatcher = $serviceManager->get('AuthorizeDispatcher');
         $dispatcher = $this->getAuthorizeDispatcher();
         
         /*
@@ -128,7 +123,6 @@ class AuthorizeController extends BaseController
                 return $this->_errorResponse($response, 'General error in preDispatch');
             }
             
-            // $manager = $serviceManager->get('AuthenticationManager');
             $manager = $this->getAuthenticationManager();
             
             $authenticationHandlerName = $manager->getAuthenticationHandler();
@@ -147,7 +141,6 @@ class AuthorizeController extends BaseController
         /*
          * Clear context (!)
          */
-        // $serviceManager->get('ContextStorage')->clear();
         $this->clearContext();
         
         /*
