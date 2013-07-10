@@ -2,23 +2,13 @@
 
 namespace PhpIdServer\Context;
 
-use PhpIdServer\OpenIdConnect;
 
-
-class AuthorizeContextFactory implements \Zend\ServiceManager\FactoryInterface
+class AuthorizeContextFactory
 {
 
 
-    public function createService (\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
+    public function createContext()
     {
-        $contextStorage = $serviceLocator->get('PhpIdServer\ContextStorage');
-        
-        $context = $contextStorage->load();
-        if (! $context) {
-            $context = new AuthorizeContext();
-            $context->setRequest(OpenIdConnect\Request\Authorize\RequestFactory::factory(new \Zend\Http\PhpEnvironment\Request()));
-        }
-        
-        return $context;
+        return new AuthorizeContext();
     }
 }

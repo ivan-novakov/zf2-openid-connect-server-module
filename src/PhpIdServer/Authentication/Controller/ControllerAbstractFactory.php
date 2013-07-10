@@ -66,8 +66,7 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
         
         $controller->setUserFactory($sm->get('PhpIdServer\UserFactory'));
         $controller->setUserInputFilterFactory($sm->get('PhpIdServer\InputFilterFactory'));
-        $controller->setAuthorizeContext($sm->get('PhpIdServer\AuthorizeContext'));
-        $controller->setContextStorage($sm->get('PhpIdServer\ContextStorage'));
+        $controller->setAuthorizeContextManager($sm->get('PhpIdServer\AuthorizeContextManager'));
         $controller->setLogger($sm->get('PhpIdServer\Logger'));
         
         return $controller;

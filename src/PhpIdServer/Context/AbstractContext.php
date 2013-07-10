@@ -11,7 +11,7 @@ class AbstractContext
      * 
      * @var \ArrayObject
      */
-    protected $_contextData = NULL;
+    protected $contextData = NULL;
 
 
     /**
@@ -52,10 +52,10 @@ class AbstractContext
      */
     public function getContextData ()
     {
-        if (! ($this->_contextData instanceof \ArrayObject)) {
-            $this->_contextData = new \ArrayObject(array());
+        if (! ($this->contextData instanceof \ArrayObject)) {
+            $this->contextData = new \ArrayObject(array());
         }
         
-        return $this->_contextData;
+        return $this->contextData;
     }
 }

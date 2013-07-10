@@ -11,9 +11,9 @@ class Session extends AbstractStorage
      *
      * @var \Zend\Session\Container
      */
-    protected $_sessionContainer = NULL;
+    protected $sessionContainer = NULL;
 
-    protected $_key = 'context';
+    protected $key = 'context';
 
 
     /**
@@ -21,9 +21,9 @@ class Session extends AbstractStorage
      *
      * @param \Zend\Session\Container $ontainer
      */
-    public function setSessionContainer (\Zend\Session\Container $container)
+    public function setSessionContainer(\Zend\Session\Container $container)
     {
-        $this->_sessionContainer = $container;
+        $this->sessionContainer = $container;
     }
 
 
@@ -32,46 +32,42 @@ class Session extends AbstractStorage
      * 
      * @return \Zend\Session\Container
      */
-    public function getSessionContainer ()
+    public function getSessionContainer()
     {
-        if (! ($this->_sessionContainer instanceof \Zend\Session\Container)) {
-            $this->_sessionContainer = new \Zend\Session\Container($this->_options->get('session_container_name', 'authorize'));
+        if (! ($this->sessionContainer instanceof \Zend\Session\Container)) {
+            $this->sessionContainer = new \Zend\Session\Container($this->_options->get('session_container_name', 'authorize'));
         }
         
-        return $this->_sessionContainer;
+        return $this->sessionContainer;
     }
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Context\Storage\StorageInterface::save()
      */
-    public function save ($context)
+    public function save($context)
     {
-        $this->getSessionContainer()
-            ->offsetSet($this->_key, $context);
+        $this->getSessionContainer()->offsetSet($this->key, $context);
     }
 
 
     /**
-     * (non-PHPdoc)
+     * {@inheritdoc}
      * @see \PhpIdServer\Context\Storage\StorageInterface::load()
      */
-    public function load ()
+    public function load()
     {
-        if (! $this->getSessionContainer()
-            ->offsetExists($this->_key)) {
+        if (! $this->getSessionContainer()->offsetExists($this->key)) {
             return NULL;
         }
         
-        return $this->getSessionContainer()
-            ->offsetGet($this->_key);
+        return $this->getSessionContainer()->offsetGet($this->key);
     }
 
 
-    public function clear ()
+    public function clear()
     {
-        $this->getSessionContainer()
-            ->offsetUnset($this->_key);
+        $this->getSessionContainer()->offsetUnset($this->key);
     }
 }

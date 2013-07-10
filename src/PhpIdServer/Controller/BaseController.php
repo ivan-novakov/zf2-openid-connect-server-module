@@ -2,8 +2,6 @@
 
 namespace PhpIdServer\Controller;
 
-use PhpIdServer\Context\AuthorizeContext;
-use PhpIdServer\Context\Storage\StorageInterface;
 use Zend\Log\Logger;
 
 
@@ -11,38 +9,11 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
 {
 
     /**
-     * @var StorageInterface
-     */
-    protected $contextStorage = null;
-
-    /**
      * @var Logger
      */
     protected $logger = null;
 
     protected $logIdent = 'abstract base';
-
-
-    /**
-     * Sets the context storage.
-     * 
-     * @param StorageInterface $contextStorage
-     */
-    public function setContextStorage(StorageInterface $contextStorage)
-    {
-        $this->contextStorage = $contextStorage;
-    }
-
-
-    /**
-     * Returns the context storage.
-     * 
-     * @return StorageInterface
-     */
-    public function getContextStorage()
-    {
-        return $this->contextStorage;
-    }
 
 
     /**
@@ -67,70 +38,57 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
-    protected function saveContext(AuthorizeContext $context)
+    protected function debug($message)
     {
-        $this->getContextStorage()->save($context);
+        $this->logDebug($message);
     }
 
 
-    protected function clearContext()
+    protected function logDebug($message)
     {
-        $this->getContextStorage()->clear();
+        $this->log($message, \Zend\Log\Logger::DEBUG);
     }
 
 
-    protected function _debug($message)
+    protected function logInfo($message)
     {
-        $this->_logDebug($message);
+        $this->log($message, \Zend\Log\Logger::INFO);
     }
 
 
-    protected function _logDebug($message)
+    protected function logError($message)
     {
-        $this->_log($message, \Zend\Log\Logger::DEBUG);
+        $this->log($message, \Zend\Log\Logger::ERR);
     }
 
 
-    protected function _logInfo($message)
+    protected function log($message, $priority = \Zend\Log\Logger::INFO)
     {
-        $this->_log($message, \Zend\Log\Logger::INFO);
-    }
-
-
-    protected function _logError($message)
-    {
-        $this->_log($message, \Zend\Log\Logger::ERR);
-    }
-
-
-    protected function _log($message, $priority = \Zend\Log\Logger::INFO)
-    {
-        // $this->_getServiceManager()->get('Logger')->log($priority, $this->_formatLogMessage($message));
         $logger = $this->getLogger();
         if ($logger instanceof Logger) {
-            $logger->log($priority, $this->_formatLogMessage($message));
+            $logger->log($priority, $this->formatLogMessage($message));
         }
     }
 
 
-    protected function _formatLogMessage($message)
+    protected function formatLogMessage($message)
     {
         return sprintf("CONTROLLER [%s] %s", $this->logIdent, $message);
     }
 
 
-    protected function _redirectToRoute($routeName, Array $params = array(), Array $options = array())
+    protected function redirectToRoute($routeName, Array $params = array(), Array $options = array())
     {
         $path = $this->url()->fromRoute($routeName, $params, $options);
         
-        $uri = new \Zend\Uri\Http($this->_getBaseUri());
+        $uri = new \Zend\Uri\Http($this->getBaseUri());
         $uri->setPath($path);
         
         return $this->redirect()->toUrl($uri->toString());
     }
 
 
-    protected function _getBaseUri()
+    protected function getBaseUri()
     {
         $uri = $this->getRequest()->getUri();
         $uri->setPath('');
@@ -147,10 +105,10 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
      * @param \Exception $e
      * @param string $label
      */
-    protected function _handleException(\Exception $e, $label = 'Exception')
+    protected function handleException(\Exception $e, $label = 'Exception')
     {
         _dump("$e");
-        return $this->_handleError(sprintf("%s: [%s] %s", $label, get_class($e), $e->getMessage()));
+        return $this->handleError(sprintf("%s: [%s] %s", $label, get_class($e), $e->getMessage()));
     }
 
 
@@ -160,10 +118,10 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
      * @param string $message
      * @return \Zend\Stdlib\ResponseInterface
      */
-    protected function _handleError($message)
+    protected function handleError($message)
     {
-        $this->_logError($message);
-        $this->_logInfo('returnning error response...');
+        $this->logError($message);
+        $this->logInfo('returnning error response...');
         $response = $this->getResponse();
         $response->setStatusCode(500);
         

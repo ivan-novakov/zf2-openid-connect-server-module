@@ -11,7 +11,7 @@ abstract class AbstractResponse implements ResponseInterface
      * 
      * @var \Zend\Http\Response
      */
-    protected $_httpResponse = NULL;
+    protected $httpResponse = NULL;
 
 
     /**
@@ -21,7 +21,7 @@ abstract class AbstractResponse implements ResponseInterface
      */
     public function __construct (\Zend\Http\Response $httpResponse)
     {
-        $this->_httpResponse = $httpResponse;
+        $this->httpResponse = $httpResponse;
     }
 
 
@@ -32,9 +32,9 @@ abstract class AbstractResponse implements ResponseInterface
      */
     public function getHttpResponse ()
     {
-        $this->_setNoCacheHeaders($this->_httpResponse);
+        $this->_setNoCacheHeaders($this->httpResponse);
         
-        return $this->_httpResponse;
+        return $this->httpResponse;
     }
 
 
@@ -45,7 +45,7 @@ abstract class AbstractResponse implements ResponseInterface
      */
     public function getRawHttpResponse ()
     {
-        return $this->_httpResponse;
+        return $this->httpResponse;
     }
 
 

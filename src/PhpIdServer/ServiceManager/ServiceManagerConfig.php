@@ -15,6 +15,9 @@ use PhpIdServer\OpenIdConnect\Request;
 use PhpIdServer\Client;
 use Zend\InputFilter\Factory;
 use Zend\Filter\FilterChain;
+use PhpIdServer\Util\ErrorHandler;
+use PhpIdServer\OpenIdConnect\Request\Authorize\Simple;
+use PhpIdServer\Context\AuthorizeContextManager;
 
 
 class ServiceManagerConfig extends Config
@@ -24,7 +27,9 @@ class ServiceManagerConfig extends Config
     public function getInvokables()
     {
         return array(
-            'PhpIdServer\TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple'
+            'PhpIdServer\TokenGenerator' => 'PhpIdServer\Session\Hash\Generator\Simple',
+            'PhpIdServer\AuthorizeRequestFactory' => 'PhpIdServer\OpenIdConnect\Request\Authorize\RequestFactory',
+            'PhpIdServer\AuthorizeContextFactory' => 'PhpIdServer\Context\AuthorizeContextFactory'
         );
     }
 
@@ -32,8 +37,6 @@ class ServiceManagerConfig extends Config
     public function getFactories()
     {
         return array(
-            
-            'PhpIdServer\AuthorizeContext' => 'PhpIdServer\Context\AuthorizeContextFactory',
             'PhpIdServer\ContextStorage' => 'PhpIdServer\Context\Storage\StorageFactory',
             'PhpIdServer\SessionManager' => 'PhpIdServer\Session\SessionManagerFactory',
             'PhpIdServer\SessionStorage' => 'PhpIdServer\Session\Storage\StorageFactory',
@@ -85,7 +88,12 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return $logger;
-            }, 
+            },
+            
+            'PhpIdServer\ErrorHandler' => function (ServiceManager $sm)
+            {
+                return new ErrorHandler($sm->get('PhpIdServer\Logger'));
+            },
             
             /*
              * User/Serializer
@@ -204,7 +212,6 @@ class ServiceManagerConfig extends Config
                 }
                 
                 $manager = new Authentication\Manager($config['authentication']);
-                $manager->setContext($sm->get('PhpIdServer\AuthorizeContext'));
                 
                 return $manager;
             },
@@ -221,6 +228,16 @@ class ServiceManagerConfig extends Config
                 return $manager;
             },
             
+            'PhpIdServer\AuthorizeContextManager' => function (ServiceManager $sm)
+            {
+                $contextStorage = $sm->get('PhpIdServer\ContextStorage');
+                $contextFactory = $sm->get('PhpIdServer\AuthorizeContextFactory');
+                $requestFactory = $sm->get('PhpIdServer\AuthorizeRequestFactory');
+                
+                $manager = new AuthorizeContextManager($contextStorage, $requestFactory, $contextFactory);
+                return $manager;
+            },
+            
             /*
              * OpenIdConnect/Dispatcher/Authorize
              */
@@ -228,14 +245,20 @@ class ServiceManagerConfig extends Config
             {
                 $dispatcher = new Dispatcher\Authorize();
                 
-                $dispatcher->setContext($sm->get('PhpIdServer\AuthorizeContext'));
                 $dispatcher->setAuthorizeResponse($sm->get('PhpIdServer\AuthorizeResponse'));
                 $dispatcher->setClientRegistry($sm->get('PhpIdServer\ClientRegistry'));
                 $dispatcher->setSessionManager($sm->get('PhpIdServer\SessionManager'));
                 $dispatcher->setDataConnector($sm->get('PhpIdServer\UserDataConnector'));
                 
                 return $dispatcher;
-            }, 
+            },
+            
+            'PhpIdServer\AuthorizeRequest' => function (ServiceManager $sm)
+            {
+                $httpRequest = $sm->get('Zend\HttpRequest');
+                $request = new Simple($httpRequest);
+                return $request;
+            },
             
             /*
              * OpenIdConnect/Response/Authorize/
@@ -327,6 +350,12 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return $factory;
+            },
+            
+            'Zend\HttpRequest' => function (ServiceManager $sm)
+            {
+                $request = new \Zend\Http\PhpEnvironment\Request();
+                return $request;
             }
         );
     }

@@ -7,7 +7,7 @@ class RequestFactory
 {
 
 
-    static public function factory (\Zend\Http\Request $httpRequest)
+    public function createRequest(\Zend\Http\Request $httpRequest)
     {
         return new Simple($httpRequest);
     }

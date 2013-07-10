@@ -21,35 +21,28 @@ class Authorize extends AbstractDispatcher
      * 
      * @var AuthorizeContext
      */
-    protected $_context = NULL;
+    protected $context = NULL;
 
     /**
      * The response object.
      * 
      * @var Response\Authorize\Simple
      */
-    protected $_response = NULL;
-
-    /**
-     * The redirect URI for the current client.
-     * 
-     * @var string
-     */
-    protected $_clientRedirectUri = NULL;
+    protected $response = NULL;
 
     /**
      * The amount of seconds after an invalid authentication, when it is possible to perform another authentication.
      * 
      * @var integer
      */
-    protected $_previousAuthenticationErrorTimeout = 10;
+    protected $previousAuthenticationErrorTimeout = 10;
 
     /**
      * Data connector.
      * 
      * @var DataConnectorInterface
      */
-    protected $_dataConnector = null;
+    protected $dataConnector = null;
 
 
     /**
@@ -57,9 +50,9 @@ class Authorize extends AbstractDispatcher
      * 
      * @param AuthorizeContext $context
      */
-    public function setContext (AuthorizeContext $context)
+    public function setContext(AuthorizeContext $context)
     {
-        $this->_context = $context;
+        $this->context = $context;
     }
 
 
@@ -68,12 +61,12 @@ class Authorize extends AbstractDispatcher
      * 
      * @return AuthorizeContext
      */
-    public function getContext ($throwException = false)
+    public function getContext($throwException = false)
     {
-        if ($throwException && ! ($this->_context instanceof AuthorizeContext)) {
+        if ($throwException && ! ($this->context instanceof AuthorizeContext)) {
             throw new GeneralException\MissingDependencyException('authorize context');
         }
-        return $this->_context;
+        return $this->context;
     }
 
 
@@ -82,9 +75,9 @@ class Authorize extends AbstractDispatcher
      * 
      * @param Response\Authorize\Simple $response
      */
-    public function setAuthorizeResponse (Response\Authorize\Simple $response)
+    public function setAuthorizeResponse(Response\Authorize\Simple $response)
     {
-        $this->_response = $response;
+        $this->response = $response;
     }
 
 
@@ -93,12 +86,12 @@ class Authorize extends AbstractDispatcher
      * 
      * @return Response\Authorize\Simple
      */
-    public function getAuthorizeResponse ($throwException = false)
+    public function getAuthorizeResponse($throwException = false)
     {
-        if ($throwException && ! ($this->_response instanceof Response\Authorize\Simple)) {
+        if ($throwException && ! ($this->response instanceof Response\Authorize\Simple)) {
             throw new GeneralException\MissingDependencyException('authorize response');
         }
-        return $this->_response;
+        return $this->response;
     }
 
 
@@ -107,9 +100,9 @@ class Authorize extends AbstractDispatcher
      * 
      * @param DataConnectorInterface $dataConnector
      */
-    public function setDataConnector (DataConnectorInterface $dataConnector)
+    public function setDataConnector(DataConnectorInterface $dataConnector)
     {
-        $this->_dataConnector = $dataConnector;
+        $this->dataConnector = $dataConnector;
     }
 
 
@@ -120,13 +113,13 @@ class Authorize extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return DataConnectorInterface
      */
-    public function getDataConnector ($throwException = false)
+    public function getDataConnector($throwException = false)
     {
-        if (null === $this->_dataConnector && $throwException) {
+        if (null === $this->dataConnector && $throwException) {
             throw new GeneralException\MissingDependencyException('data connector');
         }
         
-        return $this->_dataConnector;
+        return $this->dataConnector;
     }
 
 
@@ -134,24 +127,29 @@ class Authorize extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return mixed
      */
-    public function preDispatch ()
+    public function preDispatch()
     {
         $context = $this->getContext(true);
         
         $request = $context->getRequest();
         if (! $request) {
-            return $this->_clientErrorResponse(Error::ERROR_CLIENT_INVALID_REQUEST, 'no request data');
+            return $this->clientErrorResponse(Error::ERROR_CLIENT_INVALID_REQUEST, 'no request data');
         }
         
         $clientId = $request->getClientId();
         if (! $clientId) {
-            return $this->_clientErrorResponse(Error::ERROR_CLIENT_INVALID_REQUEST, 'no client ID');
+            return $this->clientErrorResponse(Error::ERROR_CLIENT_INVALID_REQUEST, 'no client ID');
+        }
+        
+        $redirectUri = $request->getRedirectUri();
+        if (! $redirectUri) {
+            return $this->clientErrorResponse(Error::ERROR_CLIENT_INVALID_REQUEST, 'no client redirect URI');
         }
         
         $registry = $this->getClientRegistry(true);
         $client = $registry->getClientById($clientId);
         if (! $client) {
-            return $this->_clientErrorResponse(Error::ERROR_CLIENT_INVALID_CLIENT, 'client not found');
+            return $this->clientErrorResponse(Error::ERROR_CLIENT_INVALID_CLIENT, 'client not found');
         }
         
         /*
@@ -159,17 +157,15 @@ class Authorize extends AbstractDispatcher
          */
         // [...]
         
-
-        $this->_clientRedirectUri = $client->getRedirectUri();
-        if (! $this->_clientRedirectUri) {
-            return $this->_clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no redirect uri found');
+        if (! $client->hasRedirectUri($redirectUri)) {
+            return $this->clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'redirect URI mismatch');
         }
         
         /*
          * Check if there has been an unsuccessful authentication attempt
          */
         $authenticationInfo = $context->getAuthenticationInfo();
-        if ($authenticationInfo && ! $authenticationInfo->isExpired($this->_previousAuthenticationErrorTimeout) && ($error = $authenticationInfo->getError())) {
+        if ($authenticationInfo && ! $authenticationInfo->isExpired($this->previousAuthenticationErrorTimeout) && ($error = $authenticationInfo->getError())) {
             $description = $authenticationInfo->getErrorDescription();
             
             return $this->errorResponse(Error::ERROR_SERVER_ERROR, sprintf("Authentication error: '%s' (%s)", $error, $description));
@@ -184,18 +180,13 @@ class Authorize extends AbstractDispatcher
      * 
      * @return Response\ResponseInterface
      */
-    public function dispatch ()
+    public function dispatch()
     {
         $context = $this->getContext(true);
         
         $client = $context->getClient();
         if (! ($client instanceof Client)) {
-            return $this->_clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no client data in context');
-        }
-        
-        $this->_clientRedirectUri = $client->getRedirectUri();
-        if (! $this->_clientRedirectUri) {
-            return $this->_clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no redirect uri found');
+            return $this->clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no client data in context');
         }
         
         $user = $context->getUser();
@@ -225,7 +216,7 @@ class Authorize extends AbstractDispatcher
         $authorizationCode = $sessionManager->createAuthorizationCode($session, $client);
         
         $response->setAuthorizationCode($authorizationCode->getCode());
-        $response->setRedirectLocation($client->getRedirectUri());
+        $response->setRedirectLocation($this->getRedirectUri());
         
         if ($state = $request->getState()) {
             $response->setState($state);
@@ -242,14 +233,18 @@ class Authorize extends AbstractDispatcher
      * @param string $description
      * @return Authorize\Error
      */
-    public function errorResponse ($message, $description = NULL)
+    public function errorResponse($message, $description = NULL)
     {
-        if (! $this->_clientRedirectUri) {
-            return $this->_clientErrorResponse($message, $description);
+        $redirectUri = $this->getContext(true)
+            ->getRequest()
+            ->getRedirectUri();
+        
+        if (! $redirectUri) {
+            return $this->clientErrorResponse($message, $description);
         }
         
-        $errorResponse = $this->_createErrorResponse();
-        $errorResponse->setRedirectLocation($this->_clientRedirectUri);
+        $errorResponse = $this->createErrorResponse();
+        $errorResponse->setRedirectLocation($redirectUri);
         $errorResponse->setError($message, $description);
         
         return $errorResponse;
@@ -262,7 +257,7 @@ class Authorize extends AbstractDispatcher
      * @param string $description
      * @return Authorize\Error
      */
-    public function serverErrorResponse ($description = NULL)
+    public function serverErrorResponse($description = NULL)
     {
         return $this->errorResponse(Error::ERROR_SERVER_ERROR, $description);
     }
@@ -275,9 +270,9 @@ class Authorize extends AbstractDispatcher
      * @param string $description
      * @return Authorize\Error
      */
-    protected function _clientErrorResponse ($message, $description = NULL)
+    protected function clientErrorResponse($message, $description = NULL)
     {
-        $errorResponse = $this->_createErrorResponse();
+        $errorResponse = $this->createErrorResponse();
         $errorResponse->setInvalidClientError($message, $description);
         
         return $errorResponse;
@@ -289,10 +284,18 @@ class Authorize extends AbstractDispatcher
      * 
      * @return Authorize\Error
      */
-    protected function _createErrorResponse ()
+    protected function createErrorResponse()
     {
         $response = $this->getAuthorizeResponse(true);
         
         return new Response\Authorize\Error($response->getRawHttpResponse());
+    }
+
+
+    protected function getRedirectUri()
+    {
+        return $this->getContext(true)
+            ->getRequest()
+            ->getRedirectUri();
     }
 }

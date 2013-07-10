@@ -9,6 +9,9 @@ use PhpIdServer\Util\Options;
 use PhpIdServer\Controller\BaseController;
 use Zend\InputFilter\Factory;
 use PhpIdServer\Context\AuthorizeContext;
+use PhpIdServer\Context\AuthorizeContextManager;
+use PhpIdServer\General\Exception as GeneralException;
+use PhpIdServer\Context\Exception\MissingContextException;
 
 
 abstract class AbstractController extends BaseController implements AuthenticationControllerInterface
@@ -16,29 +19,27 @@ abstract class AbstractController extends BaseController implements Authenticati
 
     /**
      * Options.
-     * 
      * @var Options
      */
     protected $options = null;
 
     /**
      * User factory.
-     * 
      * @var UserFactoryInterface
      */
     protected $userFactory = null;
 
     /**
      * User input filter factory.
-     * 
      * @var Factory
      */
     protected $userInputFilterFactory = null;
 
     /**
-     * @var AuthorizeContext
+     * Authorize context manager.
+     * @var AuthorizeContextManager
      */
-    protected $authorizeContext = null;
+    protected $authorizeContextManager;
 
 
     /**
@@ -77,6 +78,27 @@ abstract class AbstractController extends BaseController implements Authenticati
     public function getLabel()
     {
         return $this->getOption('label', 'unknown');
+    }
+
+
+    /**
+     * @return AuthorizeContextManager
+     */
+    public function getAuthorizeContextManager($throwException = false)
+    {
+        if (! $this->authorizeContextManager instanceof AuthorizeContextManager && $throwException) {
+            throw new GeneralException\MissingDependencyException('authorize context manager');
+        }
+        return $this->authorizeContextManager;
+    }
+
+
+    /**
+     * @param AuthorizeContextManager $authorizeContextManager
+     */
+    public function setAuthorizeContextManager(AuthorizeContextManager $authorizeContextManager)
+    {
+        $this->authorizeContextManager = $authorizeContextManager;
     }
 
 
@@ -124,28 +146,6 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
-    /**
-     * Sets the authorize context.
-     * 
-     * @param AuthorizeContext $authorizeContext
-     */
-    public function setAuthorizeContext(AuthorizeContext $authorizeContext)
-    {
-        $this->authorizeContext = $authorizeContext;
-    }
-
-
-    /**
-     * Returns the authorize context.
-     * 
-     * @return \PhpIdServer\Context\AuthorizeContext
-     */
-    public function getAuthorizeContext()
-    {
-        return $this->authorizeContext;
-    }
-
-
     public function indexAction()
     {
         return $this->getResponse();
@@ -158,10 +158,13 @@ abstract class AbstractController extends BaseController implements Authenticati
      */
     public function authenticateAction()
     {
-        $this->_logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));
+        $this->logInfo(sprintf("Authentication controller [%s]", $this->getLabel()));
         
-        // $context = $this->getServiceLocator()->get('AuthorizeContext');
-        $context = $this->getAuthorizeContext();
+        $contextManager = $this->getAuthorizeContextManager();
+        $context = $contextManager->loadContext();
+        if (! $context) {
+            throw new MissingContextException('Missing expected context');
+        }
         
         try {
             $user = $this->authenticate();
@@ -172,25 +175,24 @@ abstract class AbstractController extends BaseController implements Authenticati
             $context->setUser($user);
             $authenticationInfo = $this->_initSuccessAuthenticationInfo();
         } catch (Exception\InvalidUserDataException $e) {
-            $this->_logError(sprintf("Invalid user data exception: %s", $e->getMessage()));
+            $this->logError(sprintf("Invalid user data exception: %s", $e->getMessage()));
             $authenticationInfo = $this->_initFailureAuthenticationInfo('invalid_user_data', $e->getMessage());
         } catch (Exception\AuthenticationException $e) {
-            $this->_logError(sprintf("Authentication exception: %s (%s)", $e->getError(), $e->getDescription()));
+            $this->logError(sprintf("Authentication exception: %s (%s)", $e->getError(), $e->getDescription()));
             $authenticationInfo = $this->_initFailureAuthenticationInfo($e->getError(), $e->getDescription());
         } catch (\Exception $e) {
-            $this->_logError(sprintf("General exception during authentication: [%s] %s", get_class($e), $e->getMessage()));
+            $this->logError(sprintf("General exception during authentication: [%s] %s", get_class($e), $e->getMessage()));
             $authenticationInfo = $this->_initFailureAuthenticationInfo('general_error');
         }
         
         $context->setAuthenticationInfo($authenticationInfo);
-        // $this->_saveContext($context);
-        $this->getContextStorage()->save($context);
+        $contextManager->persistContext($context);
         
         $authorizeRoute = 'php-id-server/authorize-endpoint';
         
-        $this->_logInfo(sprintf("redirecting back to authorize endpoint '%s'", $authorizeRoute));
+        $this->logInfo(sprintf("redirecting back to authorize endpoint '%s'", $authorizeRoute));
         
-        return $this->_redirectToRoute($authorizeRoute);
+        return $this->redirectToRoute($authorizeRoute);
     }
 
 
@@ -219,7 +221,7 @@ abstract class AbstractController extends BaseController implements Authenticati
     }
 
 
-    protected function _formatLogMessage($message)
+    protected function formatLogMessage($message)
     {
         return sprintf("CONTROLLER AUTH [%s] %s", $this->getLabel(), $message);
     }

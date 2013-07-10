@@ -13,43 +13,57 @@ class AuthorizeContextTest extends \PHPUnit_Framework_TestCase
      * 
      * @var Context\AuthorizeContext
      */
-    protected $_context = NULL;
+    protected $context = NULL;
 
 
-    public function setUp ()
+    public function setUp()
     {
-        $this->_context = new Context\AuthorizeContext();
+        $this->context = new Context\AuthorizeContext();
     }
 
 
-    public function testIsUserAuthenticatedWithNoInfo ()
+    public function testInitialStatus()
     {
-        $this->assertFalse($this->_context->isUserAuthenticated());
+        $this->assertSame(Context\AuthorizeContext::STATUS_UNKNOWN, $this->context->getStatus());
     }
 
 
-    public function testIsUserAuthenticatedFalse ()
+    public function testSetStatus()
+    {
+        $status = 101;
+        $this->context->setStatus($status);
+        $this->assertSame($status, $this->context->getStatus()); 
+    }
+
+
+    public function testIsUserAuthenticatedWithNoInfo()
+    {
+        $this->assertFalse($this->context->isUserAuthenticated());
+    }
+
+
+    public function testIsUserAuthenticatedFalse()
     {
         $info = $this->getMock('PhpIdServer\Authentication\Info');
         $info->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue(false));
         
-        $this->_context->setAuthenticationInfo($info);
+        $this->context->setAuthenticationInfo($info);
         
-        $this->assertFalse($this->_context->isUserAuthenticated());
+        $this->assertFalse($this->context->isUserAuthenticated());
     }
 
 
-    public function testIsUserAuthenticatedTrue ()
+    public function testIsUserAuthenticatedTrue()
     {
         $info = $this->getMock('PhpIdServer\Authentication\Info');
         $info->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue(true));
         
-        $this->_context->setAuthenticationInfo($info);
+        $this->context->setAuthenticationInfo($info);
         
-        $this->assertTrue($this->_context->isUserAuthenticated());
+        $this->assertTrue($this->context->isUserAuthenticated());
     }
 }

@@ -5,7 +5,7 @@ define('TESTS_ROOT', dirname(__FILE__) . '/');
 define('TMP_DIR', TESTS_ROOT . 'tmp/');
 define('TESTS_CONFIG_FILE', TESTS_ROOT . '_files/tests.config.php');
 
-require __DIR__ . '/../../../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 require __DIR__ . '/../Module.php';
 
 $module = new Module();

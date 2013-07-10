@@ -77,7 +77,7 @@ class Token extends AbstractTokenResponse
         }
         
         if (! $tokenEntity->getAccessToken()) {
-            throw Exception\MissingFieldException('access token');
+            throw new Exception\MissingFieldException('access token');
         }
         
         return $this->_jsonEncode($tokenEntity->toArray());

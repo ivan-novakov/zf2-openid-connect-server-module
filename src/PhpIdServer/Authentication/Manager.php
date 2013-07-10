@@ -2,7 +2,6 @@
 
 namespace PhpIdServer\Authentication;
 
-use Zend\Mvc\Router\RouteStackInterface;
 use PhpIdServer\General\Exception as GeneralException;
 use PhpIdServer\Util\Options;
 use PhpIdServer\Context;
@@ -34,7 +33,7 @@ class Manager
      * 
      * @param array|\Traversable $options
      */
-    public function __construct ($options = array())
+    public function __construct($options = array())
     {
         $this->setOptions($options);
     }
@@ -45,7 +44,7 @@ class Manager
      * 
      * @param array|\Traversable $options
      */
-    public function setOptions ($options)
+    public function setOptions($options)
     {
         $this->_options = new Options($options);
     }
@@ -58,7 +57,7 @@ class Manager
      * @param mixed $defaultValue
      * @return mixed|null
      */
-    public function getOption ($name, $defaultValue = null)
+    public function getOption($name, $defaultValue = null)
     {
         return $this->_options->get($name, $defaultValue);
     }
@@ -69,7 +68,7 @@ class Manager
      * 
      * @param Context\AuthorizeContext $context
      */
-    public function setContext (Context\AuthorizeContext $context)
+    public function setContext(Context\AuthorizeContext $context)
     {
         $this->_context = $context;
     }
@@ -82,7 +81,7 @@ class Manager
      * @throws GeneralException\MissingDependencyException
      * @return Context\AuthorizeContext
      */
-    public function getContext ($throwException = false)
+    public function getContext($throwException = false)
     {
         if ($throwException && ! ($this->_context instanceof Context\AuthorizeContext)) {
             throw new GeneralException\MissingDependencyException('context', $this);
@@ -97,7 +96,7 @@ class Manager
      * 
      * @return string
      */
-    public function getAuthenticationRouteName ()
+    public function getAuthenticationRouteName()
     {
         return $this->getOption(self::OPT_BASE_ROUTE);
     }
@@ -109,10 +108,9 @@ class Manager
      * @throws \RuntimeException
      * @return string
      */
-    public function getAuthenticationHandler ()
+    public function getAuthenticationHandler()
     {
-        $client = $this->getContext(true)
-            ->getClient();
+        $client = $this->getContext(true)->getClient();
         
         if (! $client) {
             throw new \RuntimeException('Client object not found in context');

@@ -13,7 +13,7 @@ class AbstractAdapterFactory implements \Zend\ServiceManager\FactoryInterface
     const NS = __NAMESPACE__;
 
 
-    public function createService (\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
+    public function createService(\Zend\ServiceManager\ServiceLocatorInterface $serviceLocator)
     {
         $configField = static::CONFIG_FIELD;
         
@@ -29,7 +29,7 @@ class AbstractAdapterFactory implements \Zend\ServiceManager\FactoryInterface
             throw new ServiceManager\Exception\ConfigNotFoundException($configField . '/type');
         }
         
-        $className = sprintf("%s\%s", $this->_getNs(), $storageConfig['type']);
+        $className = sprintf("%s\\%s", $this->_getNs(), $storageConfig['type']);
         
         $options = array();
         if (isset($storageConfig['options']) && is_array($storageConfig['options'])) {
@@ -40,7 +40,7 @@ class AbstractAdapterFactory implements \Zend\ServiceManager\FactoryInterface
     }
 
 
-    protected function _getNs ()
+    protected function _getNs()
     {
         return static::NS;
     }

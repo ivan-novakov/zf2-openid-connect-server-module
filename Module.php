@@ -4,7 +4,6 @@ namespace PhpIdServer;
 
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\EventInterface;
-use Zend\Mvc\ModuleRouteListener;
 use Zend\ModuleManager\Feature\ServiceProviderInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
@@ -37,22 +36,33 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
 
     public function onBootstrap(EventInterface $e)
     {
+        $application = $e->getTarget();
         /* @var $e MvcEvent */
-        $eventManager = $e->getApplication()->getEventManager();
-        $moduleRouteListener = new ModuleRouteListener();
-        $moduleRouteListener->attach($eventManager);
+        $eventManager = $application->getEventManager();
         
-        // $eventManager->clearListeners(MvcEvent::EVENT_DISPATCH_ERROR);
-        $eventManager->attach(MvcEvent::EVENT_DISPATCH_ERROR, function (MvcEvent $e)
+        $services = $application->getServiceManager();
+        $eventManager->attach('dispatch.error', function ($event) use($services)
         {
-            error_log('ERROR IN DISPATCH: ' . $e->getError());
-        }, 100);
+            $exception = $event->getResult()->exception;
+            $error = $event->getError();
+            if (! $exception && ! $error) {
+                return;
+            }
+            
+            $service = $services->get('PhpIdServer\ErrorHandler');
+            if ($exception) {
+                $service->logException($exception);
+            }
+            
+            if ($error) {
+                $service->logError('Dispatch ERROR: ' . $error);
+            }
+        });
     }
 
 
     public function getServiceConfig()
     {
-        // return '\PhpIdServer\ServiceManager\ServiceManagerConfig';
         return new ServiceManager\ServiceManagerConfig();
     }
 
@@ -61,4 +71,10 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
     {
         return new ServiceManager\ControllerManagerConfig();
     }
+}
+
+
+function _dump($value)
+{
+    error_log(print_r($value, true));
 }

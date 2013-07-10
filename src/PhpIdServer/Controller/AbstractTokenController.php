@@ -36,10 +36,10 @@ abstract class AbstractTokenController extends BaseController
     }
     
     // FIXME - unify
-    protected function _handleException(\Exception $e)
+    protected function handleException(\Exception $e)
     {
         _dump("$e");
-        $this->_logError(sprintf("[%s] %s", get_class($e), $e->getMessage()));
+        $this->logError(sprintf("[%s] %s", get_class($e), $e->getMessage()));
         
         $response = $this->getResponse();
         $response->setStatusCode(400);
@@ -58,22 +58,22 @@ abstract class AbstractTokenController extends BaseController
      * @param Dispatcher\DispatcherInterface $dispatcher
      * @return \Zend\Http\Response
      */
-    protected function _dispatch(Dispatcher\DispatcherInterface $dispatcher)
+    protected function dispatchTokenRequest(Dispatcher\DispatcherInterface $dispatcher)
     {
         try {
-            $this->_logInfo('Dispatching request...');
+            $this->logInfo('Dispatching request...');
             $tokenResponse = $dispatcher->dispatch();
             
             if ($tokenResponse->isError()) {
-                $this->_logError(sprintf("Dispatch error: %s (%s)", $tokenResponse->getErrorMessage(), $tokenResponse->getErrorDescription()));
+                $this->logError(sprintf("Dispatch error: %s (%s)", $tokenResponse->getErrorMessage(), $tokenResponse->getErrorDescription()));
             } else {
-                $this->_logInfO('Dispatch OK, returning response...');
+                $this->logInfO('Dispatch OK, returning response...');
             }
             
             $response = $tokenResponse->getHttpResponse();
         } catch (\Exception $e) {
             // FIXME - use the $oicResponse instead of the raw http response
-            $response = $this->_handleException($e);
+            $response = $this->handleException($e);
         }
         
         return $response;

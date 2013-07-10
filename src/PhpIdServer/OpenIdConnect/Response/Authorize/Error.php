@@ -41,23 +41,23 @@ class Error extends AbstractAuthorizeResponse
 
     const ERROR_CLIENT_INVALID_CLIENT = 'client_invalid_client';
 
-    protected $_errorType = self::TYPE_INVALID_AUTHENTICATION;
+    protected $errorType = self::TYPE_INVALID_AUTHENTICATION;
 
-    protected $_errorMessage = '';
+    protected $errorMessage = '';
 
-    protected $_errorDescription = NULL;
+    protected $errorDescription = NULL;
 
 
-    public function setInvalidClientError ($message, $description = NULL)
+    public function setInvalidClientError($message, $description = NULL)
     {
-        $this->_errorType = self::TYPE_INVALID_CLIENT;
+        $this->errorType = self::TYPE_INVALID_CLIENT;
         $this->setError($message, $description);
     }
 
 
-    public function isInvalidClientError ()
+    public function isInvalidClientError()
     {
-        return ($this->_errorType == self::TYPE_INVALID_CLIENT);
+        return ($this->errorType == self::TYPE_INVALID_CLIENT);
     }
 
 
@@ -67,10 +67,10 @@ class Error extends AbstractAuthorizeResponse
      * @param string $message
      * @param string $description
      */
-    public function setError ($message, $description = NULL)
+    public function setError($message, $description = NULL)
     {
-        $this->_errorMessage = $message;
-        $this->_errorDescription = $description;
+        $this->errorMessage = $message;
+        $this->errorDescription = $description;
     }
 
 
@@ -79,9 +79,9 @@ class Error extends AbstractAuthorizeResponse
      * 
      * @return string
      */
-    public function getErrorMessage ()
+    public function getErrorMessage()
     {
-        return $this->_errorMessage;
+        return $this->errorMessage;
     }
 
 
@@ -90,13 +90,13 @@ class Error extends AbstractAuthorizeResponse
      * 
      * @return string|null
      */
-    public function getErrorDescription ()
+    public function getErrorDescription()
     {
-        return $this->_errorDescription;
+        return $this->errorDescription;
     }
 
 
-    public function getHttpResponse ()
+    public function getHttpResponse()
     {
         /*
          * If the error is not client related - return back a redirect with the error message.
@@ -108,20 +108,20 @@ class Error extends AbstractAuthorizeResponse
         /*
          * Otherwise show an error to the user.
          */
-        $this->_httpResponse->setContent(sprintf("Error: %s (%s)", $this->_errorMessage, $this->_errorDescription));
-        $this->_httpResponse->setStatusCode(400);
+        $this->httpResponse->setContent(sprintf("Error: %s (%s)", $this->errorMessage, $this->errorDescription));
+        $this->httpResponse->setStatusCode(400);
         
-        $this->_setNoCacheHeaders($this->_httpResponse);
+        $this->_setNoCacheHeaders($this->httpResponse);
         
-        return $this->_httpResponse;
+        return $this->httpResponse;
     }
 
 
-    protected function _constructRedirectUri ()
+    public function getRedirectUri()
     {
-        return sprintf('%s?%s', parent::_constructRedirectUri(), http_build_query(array(
-            'error' => $this->_errorMessage, 
-            'error_description' => $this->_errorDescription
-        )));
+        return $this->constructRedirectUri($this->redirectLocation, array(
+            'error' => $this->errorMessage,
+            'error_description' => $this->errorDescription
+        ));
     }
 }

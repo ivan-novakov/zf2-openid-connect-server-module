@@ -13,9 +13,8 @@ use PhpIdServer\Entity\Entity;
  * 
  * @method string getId()
  * @method string getType()
- * @method string getRedirectUri()
+ * @method string|array getRedirectUri()
  * @method string getUserAuthenticationHandler()
- * @method Authentication\Info getAuthenticationInfo()
  */
 class Client extends Entity
 {
@@ -35,10 +34,10 @@ class Client extends Entity
     const AUTH_FIELD_OPTIONS = 'options';
 
     protected $_fields = array(
-        self::FIELD_ID, 
-        self::FIELD_TYPE, 
-        self::FIELD_AUTHENTICATION, 
-        self::FIELD_REDIRECT_URI, 
+        self::FIELD_ID,
+        self::FIELD_TYPE,
+        self::FIELD_AUTHENTICATION,
+        self::FIELD_REDIRECT_URI,
         self::FIELD_USER_AUTHENTICATION_HANDLER
     );
 
@@ -87,5 +86,12 @@ class Client extends Entity
         }
         
         return $this->_authenticationInfo;
+    }
+    
+    
+    public function hasRedirectUri($redirectUri)
+    {
+        // FIXME - string comparison - consider security
+        return (in_array($redirectUri, $this->getRedirectUri()));
     }
 }

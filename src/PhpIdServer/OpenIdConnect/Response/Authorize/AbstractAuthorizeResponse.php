@@ -3,6 +3,7 @@
 namespace PhpIdServer\OpenIdConnect\Response\Authorize;
 
 use PhpIdServer\OpenIdConnect\Response\AbstractResponse;
+use Zend\Uri\Uri;
 
 
 class AbstractAuthorizeResponse extends AbstractResponse
@@ -13,24 +14,22 @@ class AbstractAuthorizeResponse extends AbstractResponse
      * 
      * @var array
      */
-    protected $_fields = array();
+    protected $fields = array();
 
     /**
      * The redirect URI.
      * 
      * @var string
      */
-    protected $_redirectLocation = NULL;
+    protected $redirectLocation = NULL;
 
 
-    public function getHttpResponse ()
+    public function getHttpResponse()
     {
-        $this->_httpResponse->getHeaders()
-            ->addHeaders(array(
-            'Location' => $this->_constructRedirectUri()
+        $this->httpResponse->getHeaders()->addHeaders(array(
+            'Location' => $this->getRedirectUri()
         ));
-        
-        $this->_httpResponse->setStatusCode(302);
+        $this->httpResponse->setStatusCode(302);
         
         return parent::getHttpResponse();
     }
@@ -41,32 +40,45 @@ class AbstractAuthorizeResponse extends AbstractResponse
      * 
      * @param string $location
      */
-    public function setRedirectLocation ($location)
+    public function setRedirectLocation($location)
     {
-        $this->_redirectLocation = $location;
+        $this->redirectLocation = $location;
     }
 
 
-    protected function _constructRedirectUri ()
+    public function getRedirectUri()
     {
-        return $this->_redirectLocation;
+        return $this->constructRedirectUri($this->redirectLocation);
     }
 
 
-    protected function _addField ($fieldName, $fieldValue)
+    protected function constructRedirectUri($uri = null, array $query = array())
     {
-        $this->_fields[$fieldName] = $fieldValue;
+        $uri = new Uri($uri);
+        
+        if (! empty($query)) {
+            $query = $uri->getQueryAsArray() + $query;
+            $uri->setQuery($query);
+        }
+        
+        return $uri;
     }
 
 
-    protected function _getFields ()
+    protected function addField($fieldName, $fieldValue)
     {
-        return $this->_fields;
+        $this->fields[$fieldName] = $fieldValue;
     }
 
 
-    protected function _isField ($fieldName)
+    protected function getFields()
     {
-        return (isset($this->_fields[$fieldName]));
+        return $this->fields;
+    }
+
+
+    protected function isField($fieldName)
+    {
+        return (isset($this->fields[$fieldName]));
     }
 }

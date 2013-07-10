@@ -44,8 +44,7 @@ class ControllerManagerConfig extends Config
                 
                 $controller = new AuthorizeController();
                 $controller->setLogger($sm->get('PhpIdServer\Logger'));
-                $controller->setContextStorage($sm->get('PhpIdServer\ContextStorage'));
-                $controller->setAuthorizeContext($sm->get('PhpIdServer\AuthorizeContext'));
+                $controller->setAuthorizeContextManager($sm->get('PhpIdServer\AuthorizeContextManager'));
                 $controller->setAuthorizeDispatcher($sm->get('PhpIdServer\AuthorizeDispatcher'));
                 $controller->setAuthenticationManager($sm->get('PhpIdServer\AuthenticationManager'));
                 
