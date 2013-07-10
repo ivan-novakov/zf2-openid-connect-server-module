@@ -2,8 +2,8 @@
     backupGlobals="false" backupStaticAttributes="false">
 
     <testsuites>
-        <testsuite name="phpID Server Test Suite">
-            <directory>./PhpIdServerTest/</directory>
+        <testsuite name="OpenID Connect Server Test Suite">
+            <directory>./InoOicServerTest/</directory>
         </testsuite>
     </testsuites>
 

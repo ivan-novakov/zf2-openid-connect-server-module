@@ -1,0 +1,77 @@
+<?php
+
+namespace InoOicServer\ServiceManager;
+
+use Zend\ServiceManager\Config;
+use InoOicServer\Controller\IndexController;
+use Zend\Mvc\Controller\ControllerManager;
+use InoOicServer\Controller\DiscoveryController;
+use InoOicServer\Controller\AuthorizeController;
+use InoOicServer\Controller\TokenController;
+use InoOicServer\Controller\UserinfoController;
+
+
+class ControllerManagerConfig extends Config
+{
+
+
+    public function getAbstractFactories()
+    {
+        return array(
+            'InoOicServer\Authentication\Controller\ControllerAbstractFactory'
+        );
+    }
+
+
+    public function getFactories()
+    {
+        return array(
+            'InoOicServer\IndexController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new IndexController();
+                return $controller;
+            },
+            
+            'InoOicServer\DiscoveryController' => function (ControllerManager $controllerManager)
+            {
+                $controller = new DiscoveryController();
+                return $controller;
+            },
+            
+            'InoOicServer\AuthorizeController' => function (ControllerManager $controllerManager)
+            {
+                $sm = $controllerManager->getServiceLocator();
+                
+                $controller = new AuthorizeController();
+                $controller->setLogger($sm->get('InoOicServer\Logger'));
+                $controller->setAuthorizeContextManager($sm->get('InoOicServer\AuthorizeContextManager'));
+                $controller->setAuthorizeDispatcher($sm->get('InoOicServer\AuthorizeDispatcher'));
+                $controller->setAuthenticationManager($sm->get('InoOicServer\AuthenticationManager'));
+                
+                return $controller;
+            },
+            
+            'InoOicServer\TokenController' => function (ControllerManager $controllerManager)
+            {
+                $sm = $controllerManager->getServiceLocator();
+                
+                $controller = new TokenController();
+                $controller->setLogger($sm->get('InoOicServer\Logger'));
+                $controller->setDispatcher($sm->get('InoOicServer\TokenDispatcher'));
+                
+                return $controller;
+            },
+            
+            'InoOicServer\UserinfoController' => function (ControllerManager $controllerManager)
+            {
+                $sm = $controllerManager->getServiceLocator();
+                
+                $controller = new UserinfoController();
+                $controller->setLogger($sm->get('InoOicServer\Logger'));
+                $controller->setDispatcher($sm->get('InoOicServer\UserInfoDispatcher'));
+                
+                return $controller;
+            }
+        );
+    }
+}

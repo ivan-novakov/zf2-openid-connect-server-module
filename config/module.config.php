@@ -1,6 +1,6 @@
 <?php
 use Zend\Log\Logger;
-use PhpIdServer\User\User;
+use InoOicServer\User\User;
 
 return array(
     
@@ -13,7 +13,7 @@ return array(
                 'options' => array(
                     'route' => '/',
                     'defaults' => array(
-                        'controller' => 'PhpIdServer\IndexController',
+                        'controller' => 'InoOicServer\IndexController',
                         'action' => 'index'
                     )
                 )
@@ -38,7 +38,7 @@ return array(
                         'options' => array(
                             'route' => '/openid-configuration',
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\DiscoveryController',
+                                'controller' => 'InoOicServer\DiscoveryController',
                                 'action' => 'index'
                             )
                         )
@@ -54,7 +54,7 @@ return array(
                     
                     'route' => '/oic',
                     'defaults' => array(
-                        'controller' => 'PhpIdServer\IndexController',
+                        'controller' => 'InoOicServer\IndexController',
                         'action' => 'index'
                     )
                 ),
@@ -67,7 +67,7 @@ return array(
                         'options' => array(
                             'route' => '/authorize',
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\AuthorizeController',
+                                'controller' => 'InoOicServer\AuthorizeController',
                                 'action' => 'index'
                             )
                         )
@@ -79,7 +79,7 @@ return array(
                         'options' => array(
                             'route' => '/token',
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\TokenController',
+                                'controller' => 'InoOicServer\TokenController',
                                 'action' => 'index'
                             )
                         )
@@ -91,7 +91,7 @@ return array(
                         'options' => array(
                             'route' => '/userinfo',
                             'defaults' => array(
-                                'controller' => 'PhpIdServer\UserinfoController',
+                                'controller' => 'InoOicServer\UserinfoController',
                                 'action' => 'index'
                             )
                         )
@@ -164,7 +164,7 @@ return array(
     'authentication_handlers' => array(
         
         'dummy' => array(
-            'class' => 'PhpIdServer\Authentication\Controller\DummyController',
+            'class' => 'InoOicServer\Authentication\Controller\DummyController',
             'options' => array(
                 'label' => 'dummy',
                 'identity' => array(
@@ -179,14 +179,14 @@ return array(
         ),
         
         'basic-auth' => array(
-            'class' => 'PhpIdServer\Authentication\Controller\BasicAuthController',
+            'class' => 'InoOicServer\Authentication\Controller\BasicAuthController',
             'options' => array(
                 'file' => 'data/auth/users.php'
             )
         ),
         
         'shibboleth' => array(
-            'class' => 'PhpIdServer\Authentication\Controller\ShibbolethController',
+            'class' => 'InoOicServer\Authentication\Controller\ShibbolethController',
             'options' => array(
                 'system_attributes_map' => array(
                     'Shib-Session-ID' => 'session_id'
@@ -235,7 +235,7 @@ return array(
     ),
     
     'session_id_generator' => array(
-        'class' => '\PhpIdServer\Session\IdGenerator\Simple',
+        'class' => '\InoOicServer\Session\IdGenerator\Simple',
         'options' => array(
             'secret_salt' => 'tajna sul'
         )
@@ -249,40 +249,40 @@ return array(
     ),
     
     'user_factory' => array(
-        'user_class' => '\PhpIdServer\User\User'
+        'user_class' => '\InoOicServer\User\User'
     ),
     
     'data_connectors' => array(
         'test' => array(
-            'class' => '\PhpIdServer\User\DataConnector\Dummy',
+            'class' => '\InoOicServer\User\DataConnector\Dummy',
             'options' => array()
         )
     ),
     
     'user_info_mapper' => array(
-        'class' => '\PhpIdServer\User\UserInfo\Mapper\ToArray'
+        'class' => '\InoOicServer\User\UserInfo\Mapper\ToArray'
     ),
     
     'client_authentication_manager' => array(
         'methods' => array(
             'dummy' => array(
-                'class' => '\PhpIdServer\Client\Authentication\Method\Dummy',
+                'class' => '\InoOicServer\Client\Authentication\Method\Dummy',
                 'options' => array(
                     'success' => true
                 )
             ),
             'secret' => array(
-                'class' => '\PhpIdServer\Client\Authentication\Method\SharedSecret',
+                'class' => '\InoOicServer\Client\Authentication\Method\SharedSecret',
                 'options' => array()
             ),
             'pki' => array(
-                'class' => '\PhpIdServer\Client\Authentication\Method\Pki',
+                'class' => '\InoOicServer\Client\Authentication\Method\Pki',
                 'options' => array()
             )
         )
     ),
     
     'filter_invokables' => array(
-        'shibboleth_serialized_value' => 'PhpIdServer\Util\Filter\ShibbolethSerializedValue'
+        'shibboleth_serialized_value' => 'InoOicServer\Util\Filter\ShibbolethSerializedValue'
     )
 );

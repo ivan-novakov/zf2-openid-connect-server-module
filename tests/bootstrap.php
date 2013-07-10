@@ -1,5 +1,5 @@
 <?php
-use PhpIdServer\Module;
+use InoOicServer\Module;
 
 define('TESTS_ROOT', dirname(__FILE__) . '/');
 define('TMP_DIR', TESTS_ROOT . 'tmp/');
@@ -13,7 +13,7 @@ $module = new Module();
 \Zend\Loader\AutoloaderFactory::factory(array(
     'Zend\Loader\StandardAutoloader' => array(
         'namespaces' => array(
-            'PhpIdServerTest' => TESTS_ROOT . 'PhpIdServerTest/', 
+            'InoOicServerTest' => TESTS_ROOT . 'InoOicServerTest/', 
             'MyUnit' => TESTS_ROOT . 'MyUnit'
         )
     )

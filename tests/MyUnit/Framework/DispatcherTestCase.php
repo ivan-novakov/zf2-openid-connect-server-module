@@ -9,7 +9,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     public function testDispatchMissingRequestDependencyException()
     {
-        $this->setExpectedException('\PhpIdServer\General\Exception\MissingDependencyException');
+        $this->setExpectedException('InoOicServer\General\Exception\MissingDependencyException');
         
         $this->_dispatcher->dispatch();
     }
@@ -17,7 +17,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getSessionManagerStub($noAuthorizationCode = false, $expired = false, $returnSession = false)
     {
-        $sm = $this->getMockBuilder('\PhpIdServer\Session\SessionManager')
+        $sm = $this->getMockBuilder('InoOicServer\Session\SessionManager')
             ->getMock();
         
         if (! $noAuthorizationCode) {
@@ -40,7 +40,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getAuthorizationCodeStub($expired = false)
     {
-        $authorizationCode = $this->getMock('\PhpIdServer\Session\Token\AuthorizationCode');
+        $authorizationCode = $this->getMock('InoOicServer\Session\Token\AuthorizationCode');
         $authorizationCode->expects($this->any())
             ->method('isExpired')
             ->will($this->returnValue($expired));
@@ -51,7 +51,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getAccessTokenStub($expired = false)
     {
-        $accessToken = $this->getMock('\PhpIdServer\Session\Token\AccessToken');
+        $accessToken = $this->getMock('InoOicServer\Session\Token\AccessToken');
         $accessToken->expects($this->any())
             ->method('isExpired')
             ->will($this->returnValue($expired));
@@ -62,7 +62,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getClientStub()
     {
-        $client = $this->getMock('\PhpIdServer\Client\Client');
+        $client = $this->getMock('InoOicServer\Client\Client');
         $client->expects($this->any())
             ->method('getAuthenticationInfo')
             ->will($this->returnValue($this->_getAuthenticationInfoStub()));
@@ -73,7 +73,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getAuthenticationInfoStub($method = 'dummy')
     {
-        $authenticationInfo = $this->getMockBuilder('PhpIdServer\Client\Authentication\Info')
+        $authenticationInfo = $this->getMockBuilder('InoOicServer\Client\Authentication\Info')
             ->disableOriginalConstructor()
             ->getMock();
         $authenticationInfo->expects($this->any())
@@ -86,7 +86,7 @@ class DispatcherTestCase extends \PHPUnit_Framework_TestCase
 
     protected function _getSessionStub()
     {
-        $session = $this->getMock('\PhpIdServer\Session\Session');
+        $session = $this->getMock('InoOicServer\Session\Session');
         
         return $session;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace PhpIdServer;
+namespace InoOicServer;
 
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\EventInterface;
@@ -49,7 +49,7 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
                 return;
             }
             
-            $service = $services->get('PhpIdServer\ErrorHandler');
+            $service = $services->get('InoOicServer\ErrorHandler');
             if ($exception) {
                 $service->logException($exception);
             }

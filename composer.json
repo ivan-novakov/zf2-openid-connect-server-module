@@ -1,10 +1,10 @@
 {
-    "name" : "ivan-novakov/phpid-server",
+    "name" : "ivan-novakov/zf2-openid-connect-server-module",
     "description" : "OpenID Connect server implementation in PHP as a Zend Framework 2 module",
-    "homepage" : "https://github.com/ivan-novakov/phpid-server",
+    "homepage" : "https://github.com/ivan-novakov/zf2-openid-connect-server-module",
     "license" : "BSD-3-Clause",
     "keywords" : [
-        "openid connect", "authentication"
+        "openid connect", "authentication", "oauth2", "zf2"
     ],
     "authors" : [
         {
@@ -20,7 +20,7 @@
 
     "autoload" : {
         "psr-0" : {
-            "PhpIdServer\\" : "src/"
+            "InoOicServer\\" : "src/"
         },
         "classmap" : [
             "Module.php"
