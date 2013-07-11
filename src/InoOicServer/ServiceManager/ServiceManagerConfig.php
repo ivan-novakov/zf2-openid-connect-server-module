@@ -2,6 +2,7 @@
 
 namespace InoOicServer\ServiceManager;
 
+use InoOicServer\Session\SessionManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
 use InoOicServer\General\Exception as GeneralException;
@@ -38,7 +39,7 @@ class ServiceManagerConfig extends Config
     {
         return array(
             'InoOicServer\ContextStorage' => 'InoOicServer\Context\Storage\StorageFactory',
-            'InoOicServer\SessionManager' => 'InoOicServer\Session\SessionManagerFactory',
+            // 'InoOicServer\SessionManager' => 'InoOicServer\Session\SessionManagerFactory',
             'InoOicServer\SessionStorage' => 'InoOicServer\Session\Storage\StorageFactory',
             'InoOicServer\ClientRegistryStorage' => 'InoOicServer\Client\Registry\StorageFactory',
             'InoOicServer\ClientRegistry' => 'InoOicServer\Client\RegistryFactory',
@@ -71,7 +72,8 @@ class ServiceManagerConfig extends Config
                             }
                         }
                         
-                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) && isset($writerConfig['formatter'])) {
+                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) &&
+                             isset($writerConfig['formatter'])) {
                             $formatterConfig = $writerConfig['formatter'];
                             if (isset($formatterConfig['format'])) {
                                 $formatter = new \Zend\Log\Formatter\Simple($formatterConfig['format']);
@@ -142,9 +144,10 @@ class ServiceManagerConfig extends Config
                 
                 $dataConnectorConfigs = $config['data_connectors'];
                 $factory = $sm->get('InoOicServer\UserDataConnectorFactory');
-                $chain = $factory->createDataConnector(array(
-                    'class' => '\InoOicServer\User\DataConnector\Chain'
-                ));
+                $chain = $factory->createDataConnector(
+                    array(
+                        'class' => '\InoOicServer\User\DataConnector\Chain'
+                    ));
                 foreach ($dataConnectorConfigs as $dataConnectorConfig) {
                     $chain->addDataConnector($factory->createDataConnector($dataConnectorConfig));
                 }
@@ -173,6 +176,18 @@ class ServiceManagerConfig extends Config
                 }
                 
                 return new $className();
+            },
+            
+            'InoOicServer\SessionManager' => function (ServiceManager $sm)
+            {
+                $sessionManager = new SessionManager();
+                
+                $sessionManager->setStorage($sm->get('InoOicServer\SessionStorage'));
+                $sessionManager->setSessionIdGenerator($sm->get('InoOicServer\SessionIdGenerator'));
+                $sessionManager->setTokenGenerator($sm->get('InoOicServer\TokenGenerator'));
+                $sessionManager->setUserSerializer($sm->get('InoOicServer\UserSerializer'));
+                
+                return $sessionManager;
             },
             
             /*
@@ -219,7 +234,8 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ClientAuthenticationManager' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
-                if (! isset($config['client_authentication_manager']) || ! is_array($config['client_authentication_manager'])) {
+                if (! isset($config['client_authentication_manager']) ||
+                     ! is_array($config['client_authentication_manager'])) {
                     throw new Exception\ConfigNotFoundException('client_authentication_manager');
                 }
                 

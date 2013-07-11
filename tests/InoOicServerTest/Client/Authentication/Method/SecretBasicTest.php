@@ -38,6 +38,7 @@ class SecretBasicTest extends \PHPUnit_Framework_Testcase
     public function testAuthenticateWithUnsupportedAuth()
     {
         $info = $this->createAuthenticationInfoMock();
+        
         $httpRequest = $this->createHttpRequestMock('foo bar');
         
         $result = $this->method->authenticate($info, $httpRequest);
@@ -108,7 +109,7 @@ class SecretBasicTest extends \PHPUnit_Framework_Testcase
         $info = $this->getMockBuilder('InoOicServer\Client\Authentication\Info')
             ->disableOriginalConstructor()
             ->getMock();
-
+        
         if ($clientId && $clientSecret) {
             $info->expects($this->once())
                 ->method('getClientId')
