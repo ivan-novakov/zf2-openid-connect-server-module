@@ -214,6 +214,18 @@ return array(
                     'REMOTE_USER' => array(
                         'name' => 'remote_user',
                         'required' => true
+                    ),
+                    'cn' => array(
+                        'required' => true
+                    ),
+                    'mail' => array(
+                        'required' => false
+                    ),
+                    'givenName' => array(
+                        'required' => false
+                    ),
+                    'sn' => array(
+                        'required' => false
                     )
                 )
             )
