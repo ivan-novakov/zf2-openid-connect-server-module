@@ -23,7 +23,7 @@ class Dummy extends AbstractMethod
      */
     public function authenticate(Client\Authentication\Info $info, \Zend\Http\Request $httpRequest)
     {
-        if ($this->_options->get(self::OPT_SUCCESS, false)) {
+        if ($this->options->get(self::OPT_SUCCESS, false)) {
             return $this->createSuccessResult();
         }
         

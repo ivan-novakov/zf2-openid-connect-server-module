@@ -19,18 +19,37 @@ abstract class AbstractMethod implements MethodInterface
      * Options.
      * @var Options
      */
-    protected $_options = null;
+    protected $options = null;
 
 
+    /**
+     * Constructor.
+     * 
+     * @param array|\Traversable $options
+     */
     public function __construct($options = array())
     {
         $this->setOptions($options);
     }
 
 
+    /**
+     * @param array|\Traversable $options
+     */
     public function setOptions($options)
     {
-        $this->_options = new Options($options);
+        $this->options = new Options($options);
+    }
+
+
+    /**
+     * Returns the options.
+     * 
+     * @return Options
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
 
@@ -41,7 +60,7 @@ abstract class AbstractMethod implements MethodInterface
      */
     public function createSuccessResult()
     {
-        return new Authentication\Result(true);
+        return new Authentication\Result(get_class($this), true);
     }
 
 
@@ -53,6 +72,6 @@ abstract class AbstractMethod implements MethodInterface
      */
     public function createFailureResult($reason)
     {
-        return new Authentication\Result(false, sprintf("[%s] %s", get_class($this), $reason));
+        return new Authentication\Result(get_class($this), false, $reason);
     }
 }

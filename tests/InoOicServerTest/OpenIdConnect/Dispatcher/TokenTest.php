@@ -231,8 +231,7 @@ class TokenTest extends DispatcherTestCase
 
     protected function _getSessionManagerStub($noAuthorizationCode = false, $expired = false, $returnSession = false)
     {
-        $sm = $this->getMockBuilder('\InoOicServer\Session\SessionManager')
-            ->getMock();
+        $sm = $this->getMockBuilder('\InoOicServer\Session\SessionManager')->getMock();
         
         $sm->expects($this->any())
             ->method('createAccessToken')
@@ -252,7 +251,9 @@ class TokenTest extends DispatcherTestCase
 
     protected function _getClientAuthenticationManagerStub($authSuccess = false, $failureReason = 'auth failure reason')
     {
-        $result = $this->getMock('InoOicServer\Client\Authentication\Result');
+        $result = $this->getMockBuilder('InoOicServer\Client\Authentication\Result')
+            ->disableOriginalConstructor()
+            ->getMock();
         $result->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue($authSuccess));

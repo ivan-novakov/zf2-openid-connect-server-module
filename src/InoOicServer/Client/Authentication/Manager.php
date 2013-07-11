@@ -95,7 +95,7 @@ class Manager
     {
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
         if ('dummy' == $clientAuthenticationInfo->getMethod()) {
-            return new Result(true);
+            return new Result('Dummy', true);
         }
         
         $method = $this->getAuthenticationMethodFactory()->createMethod($clientAuthenticationInfo->getMethod());

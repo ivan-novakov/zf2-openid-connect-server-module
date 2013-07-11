@@ -19,8 +19,9 @@ class Result extends \Zend\Stdlib\Message
      * @param boolean $authenticated
      * @param string $reason
      */
-    public function __construct ($authenticated = null, $reason = 'undefined')
+    public function __construct($methodClass, $authenticated = null, $reason = 'undefined')
     {
+        $this->setMetadata('class', $methodClass);
         $this->setResult($authenticated, $reason);
     }
 
@@ -31,19 +32,20 @@ class Result extends \Zend\Stdlib\Message
      * @param boolean $authenticated
      * @param string $reason
      */
-    public function setResult ($authenticated, $reason = 'undefined')
+    public function setResult($authenticated, $reason = 'undefined')
     {
-        $this->setMetadata(array(
-            'authenticated' => (boolean) $authenticated, 
-            'reason' => $reason
-        ));
+        $this->setMetadata(
+            array(
+                'authenticated' => (boolean) $authenticated,
+                'reason' => $reason
+            ));
     }
 
 
     /**
      * Sets the result as authenticated.
      */
-    public function setAuthenticated ()
+    public function setAuthenticated()
     {
         $this->setResult(true);
     }
@@ -54,7 +56,7 @@ class Result extends \Zend\Stdlib\Message
      * 
      * @param string $reason
      */
-    public function setNotAuthenticated ($reason)
+    public function setNotAuthenticated($reason)
     {
         $this->setResult(false, $reason);
     }
@@ -63,7 +65,7 @@ class Result extends \Zend\Stdlib\Message
     /**
      * Returns true, if the result is set as authenticated.
      */
-    public function isAuthenticated ()
+    public function isAuthenticated()
     {
         return (boolean) $this->getMetadata('authenticated');
     }
@@ -74,8 +76,14 @@ class Result extends \Zend\Stdlib\Message
      * 
      * @return string
      */
-    public function getNotAuthenticatedReason ()
+    public function getNotAuthenticatedReason()
     {
         return (string) $this->getMetadata('reason');
+    }
+
+
+    public function getMethodClass()
+    {
+        return (string) $this->getMetadata('class');
     }
 }
