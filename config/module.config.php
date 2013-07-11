@@ -68,7 +68,19 @@ return array(
                             'route' => '/authorize',
                             'defaults' => array(
                                 'controller' => 'InoOicServer\AuthorizeController',
-                                'action' => 'index'
+                                'action' => 'authorize'
+                            )
+                        )
+                    ),
+                    
+                    'authorize-response-endpoint' => array(
+                        'type' => 'Literal',
+                        'may_terminate' => true,
+                        'options' => array(
+                            'route' => '/authorize-response',
+                            'defaults' => array(
+                                'controller' => 'InoOicServer\AuthorizeController',
+                                'action' => 'response'
                             )
                         )
                     ),

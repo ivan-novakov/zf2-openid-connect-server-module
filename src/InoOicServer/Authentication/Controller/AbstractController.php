@@ -188,7 +188,7 @@ abstract class AbstractController extends BaseController implements Authenticati
         $context->setAuthenticationInfo($authenticationInfo);
         $contextManager->persistContext($context);
         
-        $authorizeRoute = 'php-id-server/authorize-endpoint';
+        $authorizeRoute = 'php-id-server/authorize-response-endpoint';
         
         $this->logInfo(sprintf("redirecting back to authorize endpoint '%s'", $authorizeRoute));
         

@@ -136,9 +136,10 @@ class AuthorizeController extends BaseController
             $authenticationHandlerName = $manager->getAuthenticationHandler();
             $this->logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
             
-            return $this->redirectToRoute($manager->getAuthenticationRouteName(), array(
-                'controller' => $authenticationHandlerName
-            ));
+            return $this->redirectToRoute($manager->getAuthenticationRouteName(), 
+                array(
+                    'controller' => $authenticationHandlerName
+                ));
         }
         
         /*
@@ -155,6 +156,78 @@ class AuthorizeController extends BaseController
         /*
          * Dispatching response
          */
+        try {
+            $this->logInfo('dispatching response...');
+            
+            $response = $dispatcher->dispatch();
+            if ($response instanceof Response\Authorize\Error) {
+                return $this->errorResponse($response, 'Error in dispatch');
+            }
+        } catch (\Exception $e) {
+            $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
+            return $this->errorResponse($response, 'General error in dispatch');
+        }
+        
+        return $this->validResponse($response);
+    }
+
+
+    public function authorizeAction()
+    {
+        $this->logInfo($_SERVER['REQUEST_URI']);
+        
+        $response = null;
+        
+        $contextManager = $this->getAuthorizeContextManager();
+        $context = $contextManager->initContext();
+        
+        $dispatcher = $this->getAuthorizeDispatcher();
+        $dispatcher->setContext($context);
+        
+        $this->logInfo('user not authenticated - running preDispatch()');
+        
+        try {
+            $response = $dispatcher->preDispatch();
+            if ($response instanceof Response\Authorize\Error) {
+                return $this->errorResponse($response, 'Error in preDispatch()');
+            }
+            
+            $this->logInfo('preDispatch OK');
+        } catch (\Exception $e) {
+            $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
+            return $this->errorResponse($response, 'General error in preDispatch');
+        }
+        
+        // ???
+        $contextManager->persistContext($context);
+        
+        $manager = $this->getAuthenticationManager();
+        $manager->setContext($context);
+        
+        $authenticationHandlerName = $manager->getAuthenticationHandler();
+        $this->logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
+        
+        return $this->redirectToRoute($manager->getAuthenticationRouteName(), 
+            array(
+                'controller' => $authenticationHandlerName
+            ));
+    }
+
+
+    public function responseAction()
+    {
+        $this->logInfo($_SERVER['REQUEST_URI']);
+        
+        $response = null;
+        
+        $contextManager = $this->getAuthorizeContextManager();
+        $context = $contextManager->initContext();
+        
+        $dispatcher = $this->getAuthorizeDispatcher();
+        $dispatcher->setContext($context);
+        
+        $contextManager->unpersistContext();
+        
         try {
             $this->logInfo('dispatching response...');
             
