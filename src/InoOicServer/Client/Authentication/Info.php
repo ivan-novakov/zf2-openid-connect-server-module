@@ -13,18 +13,23 @@ class Info
 {
 
     /**
+     * @var string
+     */
+    protected $clientId;
+
+    /**
      * Authentication type.
      * 
      * @var string
      */
-    protected $_method = NULL;
+    protected $method = NULL;
 
     /**
      * Authentication options.
      * 
      * @var array
      */
-    protected $_options = array();
+    protected $options = array();
 
 
     /**
@@ -33,10 +38,29 @@ class Info
      * @param string $method
      * @param array $options
      */
-    public function __construct($method, Array $options = array())
+    public function __construct($clientId, $method, Array $options = array())
     {
+        $this->setClientId($clientId);
         $this->setMethod($method);
         $this->setOptions($options);
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getClientId()
+    {
+        return $this->clientId;
+    }
+
+
+    /**
+     * @param string $clientId
+     */
+    public function setClientId($clientId)
+    {
+        $this->clientId = $clientId;
     }
 
 
@@ -47,7 +71,7 @@ class Info
      */
     public function setMethod($method)
     {
-        $this->_method = $method;
+        $this->method = $method;
     }
 
 
@@ -58,7 +82,7 @@ class Info
      */
     public function getMethod()
     {
-        return $this->_method;
+        return $this->method;
     }
 
 
@@ -69,7 +93,7 @@ class Info
      */
     public function setOptions(Array $options)
     {
-        $this->_options = $options;
+        $this->options = $options;
     }
 
 
@@ -80,7 +104,7 @@ class Info
      */
     public function getOptions()
     {
-        return $this->_options;
+        return $this->options;
     }
 
 
@@ -92,8 +116,8 @@ class Info
      */
     public function getOption($name)
     {
-        if (isset($this->_options[$name])) {
-            return $this->_options[$name];
+        if (isset($this->options[$name])) {
+            return $this->options[$name];
         }
         
         return null;

@@ -15,6 +15,7 @@ use InoOicServer\Entity\Entity;
  * @method string getType()
  * @method string|array getRedirectUri()
  * @method string getUserAuthenticationHandler()
+ * @method \InoOicServer\Client\Authentication\Info getAuthenticationInfo()
  */
 class Client extends Entity
 {
@@ -74,7 +75,8 @@ class Client extends Entity
         if (! ($this->_authenticationInfo instanceof Authentication\Info)) {
             $authentication = $this->getValue(self::FIELD_AUTHENTICATION);
             if (! $authentication || ! isset($authentication[self::AUTH_FIELD_METHOD])) {
-                throw new Exception\IncompleteAuthenticationInfoException(sprintf("Missing configuration field: '%s'", self::AUTH_FIELD_METHOD));
+                throw new Exception\IncompleteAuthenticationInfoException(
+                    sprintf("Missing configuration field: '%s'", self::AUTH_FIELD_METHOD));
             }
             
             $options = array();
@@ -82,13 +84,14 @@ class Client extends Entity
                 $options = $authentication[self::AUTH_FIELD_OPTIONS];
             }
             
-            $this->_authenticationInfo = new Authentication\Info($authentication[self::AUTH_FIELD_METHOD], $options);
+            $this->_authenticationInfo = new Authentication\Info($this->getId(), 
+                $authentication[self::AUTH_FIELD_METHOD], $options);
         }
         
         return $this->_authenticationInfo;
     }
-    
-    
+
+
     public function hasRedirectUri($redirectUri)
     {
         // FIXME - string comparison - consider security
