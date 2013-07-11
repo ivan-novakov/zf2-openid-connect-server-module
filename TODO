@@ -1,6 +1,8 @@
-- use new ZF2 abstract factories
+- session manager: put expiration times in config
 
-- handle multivalue Shibboleth attributes
+- implement user attribute filtering/validating:
+  - handle multivalue Shibboleth attributes
+  - check for invalid values
 
 - client validator
   - validate match between client ID and redirect URI
