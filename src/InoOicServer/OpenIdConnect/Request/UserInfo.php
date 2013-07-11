@@ -17,25 +17,14 @@ class UserInfo extends AbstractRequest
      * 
      * @var string
      */
-    protected $_authorizationType = NULL;
+    protected $authorizationType = NULL;
 
     /**
      * The authorization value part of the Authorization header.
      * 
      * @var string
      */
-    protected $_authorizationValue = NULL;
-
-
-    /**
-     * Returns the schema value.
-     * 
-     * @return string|NULL
-     */
-    public function getSchema()
-    {
-        return $this->_getGetParam(self::FIELD_SCHEMA);
-    }
+    protected $authorizationValue = NULL;
 
 
     /**
@@ -45,11 +34,11 @@ class UserInfo extends AbstractRequest
      */
     public function getAuthorizationType()
     {
-        if (NULL === $this->_authorizationType) {
-            $this->_parseAuthorizationHeader();
+        if (NULL === $this->authorizationType) {
+            $this->parseAuthorizationHeader();
         }
         
-        return $this->_authorizationType;
+        return $this->authorizationType;
     }
 
 
@@ -60,11 +49,11 @@ class UserInfo extends AbstractRequest
      */
     public function getAuthorizationValue()
     {
-        if (NULL === $this->_authorizationValue) {
-            $this->_parseAuthorizationHeader();
+        if (NULL === $this->authorizationValue) {
+            $this->parseAuthorizationHeader();
         }
         
-        return $this->_authorizationValue;
+        return $this->authorizationValue;
     }
 
 
@@ -89,7 +78,7 @@ class UserInfo extends AbstractRequest
      * 
      * @throws Exception\InvalidAuthorizationException
      */
-    protected function _parseAuthorizationHeader()
+    protected function parseAuthorizationHeader()
     {
         $authorization = trim($this->getAuthorization());
         if ($authorization) {
@@ -99,8 +88,8 @@ class UserInfo extends AbstractRequest
                     sprintf("Unexpected number or authorization parts: %d", count($parts)));
             }
             
-            $this->_authorizationType = strtolower(trim($parts[0]));
-            $this->_authorizationValue = trim($parts[1]);
+            $this->authorizationType = strtolower(trim($parts[0]));
+            $this->authorizationValue = trim($parts[1]);
         }
     }
 
@@ -109,14 +98,9 @@ class UserInfo extends AbstractRequest
      * (non-PHPdoc)
      * @see \InoOicServer\OpenIdConnect\Request\AbstractRequest::_validate()
      */
-    protected function _validate()
+    protected function validate()
     {
         $reasons = array();
-        
-        $schema = $this->getSchema();
-        if ('openid' != $schema) {
-            $reasons[] = sprintf("invalid schema '%s'", $schema);
-        }
         
         $authorizationType = $this->getAuthorizationType();
         if ('bearer' != $authorizationType) {

@@ -73,7 +73,7 @@ abstract class AbstractRequest implements RequestInterface
     public function getInvalidReasons()
     {
         if (! is_array($this->invalidReasons)) {
-            $this->invalidReasons = $this->_validate();
+            $this->invalidReasons = $this->validate();
         }
         
         return $this->invalidReasons;
@@ -85,7 +85,7 @@ abstract class AbstractRequest implements RequestInterface
      * 
      * @return array
      */
-    protected function _validate()
+    protected function validate()
     {
         return array();
     }

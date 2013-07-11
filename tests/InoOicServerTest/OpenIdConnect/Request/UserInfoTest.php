@@ -13,40 +13,30 @@ class UserInfoTest extends \PHPUnit_Framework_TestCase
      * 
      * @var Request\UserInfo
      */
-    protected $_request = NULL;
+    protected $request = NULL;
 
 
-    public function setUp ()
+    public function setUp()
     {
         $httpRequest = new \Zend\Http\Request('https://dummy/userinfo');
-        $httpRequest->getQuery()
-            ->fromArray(array(
-            'schema' => 'openid'
-        ));
         
-        $httpRequest->getHeaders()
-            ->addHeaders(array(
-            'Authorization' => 'Bearer access_token_123'
-        ));
+        $httpRequest->getHeaders()->addHeaders(
+            array(
+                'Authorization' => 'Bearer access_token_123'
+            ));
         
-        $this->_request = new Request\UserInfo($httpRequest);
+        $this->request = new Request\UserInfo($httpRequest);
     }
 
 
-    public function testGetSchema ()
+    public function testGetAuthorizationType()
     {
-        $this->assertEquals('openid', $this->_request->getSchema());
+        $this->assertEquals('bearer', $this->request->getAuthorizationType());
     }
 
 
-    public function testGetAuthorizationType ()
+    public function testGetAuthorizationValue()
     {
-        $this->assertEquals('bearer', $this->_request->getAuthorizationType());
-    }
-
-
-    public function testGetAuthorizationValue ()
-    {
-        $this->assertEquals('access_token_123', $this->_request->getAuthorizationValue());
+        $this->assertEquals('access_token_123', $this->request->getAuthorizationValue());
     }
 }
