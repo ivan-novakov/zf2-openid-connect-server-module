@@ -24,6 +24,8 @@ use InoOicServer\Context\AuthorizeContextManager;
 class ServiceManagerConfig extends Config
 {
 
+    const CONFIG_SESSION_MANAGER = 'oic_session_manager';
+
 
     public function getInvokables()
     {
@@ -37,6 +39,7 @@ class ServiceManagerConfig extends Config
 
     public function getFactories()
     {
+        $smc = $this;
         return array(
             'InoOicServer\ContextStorage' => 'InoOicServer\Context\Storage\StorageFactory',
             // 'InoOicServer\SessionManager' => 'InoOicServer\Session\SessionManagerFactory',
@@ -178,9 +181,15 @@ class ServiceManagerConfig extends Config
                 return new $className();
             },
             
-            'InoOicServer\SessionManager' => function (ServiceManager $sm)
+            'InoOicServer\SessionManager' => function (ServiceManager $sm) use($smc)
             {
-                $sessionManager = new SessionManager();
+                $config = $sm->get('Config');
+                if (! isset($config[$smc::CONFIG_SESSION_MANAGER]) || ! is_array(
+                    $config[$smc::CONFIG_SESSION_MANAGER])) {
+                    throw new Exception\ConfigNotFoundException($smc::CONFIG_SESSION_MANAGER);
+                }
+                
+                $sessionManager = new SessionManager($config[$smc::CONFIG_SESSION_MANAGER]);
                 
                 $sessionManager->setStorage($sm->get('InoOicServer\SessionStorage'));
                 $sessionManager->setSessionIdGenerator($sm->get('InoOicServer\SessionIdGenerator'));

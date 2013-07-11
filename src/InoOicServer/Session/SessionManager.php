@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Session;
 
+use Zend\Stdlib\Parameters;
 use InoOicServer\Session\Token\AccessToken;
 use InoOicServer\General\Exception as GeneralException;
 use InoOicServer\Session\Token\AuthorizationCode;
@@ -9,38 +10,191 @@ use InoOicServer\User\UserInterface;
 use InoOicServer\User\Serializer;
 use InoOicServer\Client\Client;
 use InoOicServer\Authentication;
+use InoOicServer\Util;
 
 
 class SessionManager
 {
 
     /**
+     * @var Parameters
+     */
+    protected $options;
+
+    /**
      * The session storage.
      * 
      * @var Storage\StorageInterface
      */
-    protected $_storage = NULL;
+    protected $storage;
 
     /**
      * The user serializer object.
      * 
      * @var Serializer\SerializerInterface
      */
-    protected $_userSerializer = NULL;
+    protected $userSerializer;
 
     /**
      * The session ID generator object.
      * 
      * @var IdGenerator\IdGeneratorInterface
      */
-    protected $_sessionIdGenerator = NULL;
+    protected $sessionIdGenerator;
 
     /**
      * Token generator oibject.
      * 
      * @var Hash\Generator\GeneratorInterface
      */
-    protected $_tokenGenerator = NULL;
+    protected $tokenGenerator;
+
+    /**
+     * @var Util\DateTime
+     */
+    protected $dateTimeUtil;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param array $options
+     */
+    public function __construct(array $options = array())
+    {
+        $this->setOptions($options);
+    }
+
+
+    /**
+     * Sets the options.
+     * 
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = new Parameters($options);
+    }
+
+
+    /**
+     * Returns the options.
+     * 
+     * @return Parameters
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+
+    /**
+     * Sets the session storage object.
+     *
+     * @param Storage\StorageInterface $storage
+     */
+    public function setStorage(Storage\StorageInterface $storage)
+    {
+        $this->storage = $storage;
+    }
+
+
+    /**
+     * Returns the session storage object.
+     *
+     * @return Storage\StorageInterface
+     */
+    public function getStorage()
+    {
+        return $this->storage;
+    }
+
+
+    /**
+     * Sets the session ID generator object.
+     *
+     * @param IdGenerator\IdGeneratorInterface $idGenerator
+     */
+    public function setSessionIdGenerator(IdGenerator\IdGeneratorInterface $idGenerator)
+    {
+        $this->sessionIdGenerator = $idGenerator;
+    }
+
+
+    /**
+     * Returns the session ID generator object.
+     *
+     * @return IdGenerator\IdGeneratorInterface
+     */
+    public function getSessionIdGenerator()
+    {
+        return $this->sessionIdGenerator;
+    }
+
+
+    /**
+     * Sets the token generator object.
+     *
+     * @param Hash\Generator\GeneratorInterface
+     */
+    public function setTokenGenerator(Hash\Generator\GeneratorInterface $generator)
+    {
+        $this->tokenGenerator = $generator;
+    }
+
+
+    /**
+     * Return the token generator object.
+     *
+     * @return Hash\Generator\GeneratorInterface
+     */
+    public function getTokenGenerator()
+    {
+        return $this->tokenGenerator;
+    }
+
+
+    /**
+     * Sets the user serializer object.
+     *
+     * @param Serializer\SerializerInterface $serializer
+     */
+    public function setUserSerializer(Serializer\SerializerInterface $serializer)
+    {
+        $this->userSerializer = $serializer;
+    }
+
+
+    /**
+     * Returns the user serializer object.
+     *
+     * @return Serializer\SerializerInterface
+     */
+    public function getUserSerializer()
+    {
+        return $this->userSerializer;
+    }
+
+
+    /**
+     * @return Util\DateTime
+     */
+    public function getDateTimeUtil()
+    {
+        if (! $this->dateTimeUtil instanceof Util\DateTime) {
+            $this->dateTimeUtil = new Util\DateTime();
+        }
+        return $this->dateTimeUtil;
+    }
+
+
+    /**
+     * @param Util\DateTime $dateTimeUtil
+     */
+    public function setDateTimeUtil($dateTimeUtil)
+    {
+        $this->dateTimeUtil = $dateTimeUtil;
+    }
 
 
     /**
@@ -50,7 +204,7 @@ class SessionManager
      * @throws GeneralException\MissingDependencyException
      * @return UserInterface
      */
-    public function getUserFromSession (Session $session)
+    public function getUserFromSession(Session $session)
     {
         $serializer = $this->getUserSerializer();
         if (! $serializer) {
@@ -69,7 +223,7 @@ class SessionManager
      * @throws Exception\MissingComponentException
      * @return Session
      */
-    public function createSession (UserInterface $user, Authentication\Info $authenticationInfo)
+    public function createSession(UserInterface $user, Authentication\Info $authenticationInfo)
     {
         $sessionIdGenerator = $this->getSessionIdGenerator();
         if (! $sessionIdGenerator) {
@@ -81,7 +235,7 @@ class SessionManager
             throw new GeneralException\MissingDependencyException('user serializer');
         }
         
-        $storage = $this->_getStorageWithCheck();
+        $storage = $this->getStorageWithCheck();
         
         $sessionId = $sessionIdGenerator->generateId(array(
             $user->getId()
@@ -90,16 +244,20 @@ class SessionManager
         $serializedUserData = $serializer->serialize($user);
         
         $now = new \DateTime('now');
-        $session = new Session(array(
-            Session::FIELD_ID => $sessionId, 
-            Session::FIELD_USER_ID => $user->getId(), 
-            Session::FIELD_CREATE_TIME => $now, 
-            Session::FIELD_MODIFY_TIME => $now, 
-            Session::FIELD_AUTHENTICATION_TIME => $authenticationInfo->getTime(), 
-            Session::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
-            Session::FIELD_AUTHENTICATION_METHOD => $authenticationInfo->getMethod(), 
-            Session::FIELD_USER_DATA => $serializedUserData
-        ));
+        // $expire = clone $now;
+        // $expire = $expire->add(new \DateInterval('PT3600S'));
+        $expire = $this->getDateTimeUtil()->createExpireDateTime($now, 'PT3600S');
+        $session = new Session(
+            array(
+                Session::FIELD_ID => $sessionId,
+                Session::FIELD_USER_ID => $user->getId(),
+                Session::FIELD_CREATE_TIME => $now,
+                Session::FIELD_MODIFY_TIME => $now,
+                Session::FIELD_AUTHENTICATION_TIME => $authenticationInfo->getTime(),
+                Session::FIELD_EXPIRATION_TIME => $expire,
+                Session::FIELD_AUTHENTICATION_METHOD => $authenticationInfo->getMethod(),
+                Session::FIELD_USER_DATA => $serializedUserData
+            ));
         
         $storage->saveSession($session);
         
@@ -107,7 +265,7 @@ class SessionManager
     }
 
 
-    public function updateSession (Session $session)
+    public function updateSession(Session $session)
     {}
 
 
@@ -117,10 +275,9 @@ class SessionManager
      * @param AuthorizationCode $authorizationCode
      * @return Session
      */
-    public function getSessionForAuthorizationCode (AuthorizationCode $authorizationCode)
+    public function getSessionForAuthorizationCode(AuthorizationCode $authorizationCode)
     {
-        return $this->_getStorageWithCheck()
-            ->loadSession($authorizationCode->getSessionId());
+        return $this->getStorageWithCheck()->loadSession($authorizationCode->getSessionId());
     }
 
 
@@ -130,10 +287,9 @@ class SessionManager
      * @param AccessToken $accessToken
      * @return Session
      */
-    public function getSessionByAccessToken (AccessToken $accessToken)
+    public function getSessionByAccessToken(AccessToken $accessToken)
     {
-        return $this->_getStorageWithCheck()
-            ->loadSession($accessToken->getSessionId());
+        return $this->getStorageWithCheck()->loadSession($accessToken->getSessionId());
     }
 
 
@@ -145,26 +301,27 @@ class SessionManager
      * @throws Exception\MissingComponentException
      * @return AuthorizationCode
      */
-    public function createAuthorizationCode (Session $session, Client $client)
+    public function createAuthorizationCode(Session $session, Client $client)
     {
         $tokenGenerator = $this->getTokenGenerator();
         if (! $tokenGenerator) {
             throw new GeneralException\MissingDependencyException('token generator');
         }
         
-        $storage = $this->_getStorageWithCheck();
+        $storage = $this->getStorageWithCheck();
         
         $code = $tokenGenerator->generateAuthorizationCode($session, $client);
         
-        $authorizationCode = new AuthorizationCode(array(
-            AuthorizationCode::FIELD_CODE => $code, 
-            AuthorizationCode::FIELD_SESSION_ID => $session->getId(), 
-            AuthorizationCode::FIELD_ISSUE_TIME => new \DateTime('now'), 
-            // FIXME - set 5 min from config
-            AuthorizationCode::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
-            AuthorizationCode::FIELD_CLIENT_ID => $client->getId(), 
-            AuthorizationCode::FIELD_SCOPE => 'openid'
-        ));
+        $authorizationCode = new AuthorizationCode(
+            array(
+                AuthorizationCode::FIELD_CODE => $code,
+                AuthorizationCode::FIELD_SESSION_ID => $session->getId(),
+                AuthorizationCode::FIELD_ISSUE_TIME => new \DateTime('now'),
+                // FIXME - set 5 min from config
+                AuthorizationCode::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'),
+                AuthorizationCode::FIELD_CLIENT_ID => $client->getId(),
+                AuthorizationCode::FIELD_SCOPE => 'openid'
+            ));
         
         $storage->saveAuthorizationCode($authorizationCode);
         
@@ -179,42 +336,41 @@ class SessionManager
      * @throws GeneralException\MissingDependencyException
      * @return AuthorizationCode|NULL
      */
-    public function getAuthorizationCode ($code)
+    public function getAuthorizationCode($code)
     {
-        return $this->_getStorageWithCheck()
-            ->loadAuthorizationCode($code);
+        return $this->getStorageWithCheck()->loadAuthorizationCode($code);
     }
 
 
     /**
      * Deactivates the authentication code - it will not be possible to acquire the corresponding session anymore.
      * 
-     * @param unknown_type $code
+     * @param AuthorizationCode $code
      */
-    public function deactivateAuthorizationCode (AuthorizationCode $authorizationCode)
+    public function deactivateAuthorizationCode(AuthorizationCode $authorizationCode)
     {
-        $this->_getStorageWithCheck()
-            ->deleteAuthorizationCode($authorizationCode);
+        $this->getStorageWithCheck()->deleteAuthorizationCode($authorizationCode);
     }
 
 
-    public function createAccessToken (Session $session, Client $client)
+    public function createAccessToken(Session $session, Client $client)
     {
-        $storage = $this->_getStorageWithCheck();
-        $generator = $this->_getTokenGeneratorWithCheck();
+        $storage = $this->getStorageWithCheck();
+        $generator = $this->getTokenGeneratorWithCheck();
         
         $token = $generator->generateAccessToken($session, $client);
         
-        $accessToken = new AccessToken(array(
-            AccessToken::FIELD_TOKEN => $token, 
-            AccessToken::FIELD_SESSION_ID => $session->getId(), 
-            AccessToken::FIELD_CLIENT_ID => $client->getId(), 
-            AccessToken::FIELD_ISSUE_TIME => new \DateTime('now'), 
-            // FIXME set from config
-            AccessToken::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'), 
-            AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER, 
-            AccessToken::FIELD_SCOPE => 'openid'
-        ));
+        $accessToken = new AccessToken(
+            array(
+                AccessToken::FIELD_TOKEN => $token,
+                AccessToken::FIELD_SESSION_ID => $session->getId(),
+                AccessToken::FIELD_CLIENT_ID => $client->getId(),
+                AccessToken::FIELD_ISSUE_TIME => new \DateTime('now'),
+                // FIXME set from config
+                AccessToken::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'),
+                AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER,
+                AccessToken::FIELD_SCOPE => 'openid'
+            ));
         
         $storage->saveAccessToken($accessToken);
         
@@ -228,107 +384,18 @@ class SessionManager
      * @param string $token
      * @return AccessToken
      */
-    public function getAccessToken ($token)
+    public function getAccessToken($token)
     {
-        return $this->_getStorageWithCheck()
-            ->loadAccessToken($token);
+        return $this->getStorageWithCheck()->loadAccessToken($token);
     }
 
 
-    public function createRefreshToken ()
+    public function createRefreshToken()
     {}
 
 
-    public function getRefreshToken ($token)
+    public function getRefreshToken($token)
     {}
-
-
-    /**
-     * Sets the session storage object.
-     * 
-     * @param Storage\StorageInterface $storage
-     */
-    public function setStorage (Storage\StorageInterface $storage)
-    {
-        $this->_storage = $storage;
-    }
-
-
-    /**
-     * Returns the session storage object.
-     * 
-     * @return Storage\StorageInterface
-     */
-    public function getStorage ()
-    {
-        return $this->_storage;
-    }
-
-
-    /**
-     * Sets the session ID generator object.
-     * 
-     * @param IdGenerator\IdGeneratorInterface $idGenerator
-     */
-    public function setSessionIdGenerator (IdGenerator\IdGeneratorInterface $idGenerator)
-    {
-        $this->_sessionIdGenerator = $idGenerator;
-    }
-
-
-    /**
-     * Returns the session ID generator object.
-     * 
-     * @return IdGenerator\IdGeneratorInterface
-     */
-    public function getSessionIdGenerator ()
-    {
-        return $this->_sessionIdGenerator;
-    }
-
-
-    /**
-     * Sets the token generator object.
-     * 
-     * @param Hash\Generator\GeneratorInterface
-     */
-    public function setTokenGenerator (Hash\Generator\GeneratorInterface $generator)
-    {
-        $this->_tokenGenerator = $generator;
-    }
-
-
-    /**
-     * Return the token generator object.
-     * 
-     * @return Hash\Generator\GeneratorInterface
-     */
-    public function getTokenGenerator ()
-    {
-        return $this->_tokenGenerator;
-    }
-
-
-    /**
-     * Sets the user serializer object.
-     * 
-     * @param Serializer\SerializerInterface $serializer
-     */
-    public function setUserSerializer (Serializer\SerializerInterface $serializer)
-    {
-        $this->_userSerializer = $serializer;
-    }
-
-
-    /**
-     * Returns the user serializer object.
-     * 
-     * @return Serializer\SerializerInterface
-     */
-    public function getUserSerializer ()
-    {
-        return $this->_userSerializer;
-    }
 
 
     /**
@@ -337,7 +404,7 @@ class SessionManager
      * @throws Exception\MissingComponentException
      * @return Storage\StorageInterface
      */
-    protected function _getStorageWithCheck ()
+    protected function getStorageWithCheck()
     {
         $storage = $this->getStorage();
         if (! $storage) {
@@ -354,7 +421,7 @@ class SessionManager
      * @throws GeneralException\MissingDependencyException
      * @return Hash\Generator\GeneratorInterface
      */
-    protected function _getTokenGeneratorWithCheck ()
+    protected function getTokenGeneratorWithCheck()
     {
         $generator = $this->getTokenGenerator();
         if (! $generator) {

@@ -258,6 +258,13 @@ return array(
         )
     ),
     
+    'oic_session_manager' => array(
+        'session_expiration' => 3600,
+        'authorization_code_expiration' => 600,
+        'access_token_expiration' => 3600,
+        'refresh_token_expiration' => 36000
+    ),
+    
     'session_id_generator' => array(
         'class' => '\InoOicServer\Session\IdGenerator\Simple',
         'options' => array(

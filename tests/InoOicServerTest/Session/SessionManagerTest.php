@@ -20,25 +20,50 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
      * 
      * @var SessionManager
      */
-    protected $_manager = NULL;
+    protected $manager = NULL;
 
 
-    public function setUp ()
+    public function setUp()
     {
-        $this->_manager = new SessionManager();
-        $this->_manager->setStorage(new Storage\Dummy());
+        $this->manager = new SessionManager();
+        // FIXME - replace with mock
+        $this->manager->setStorage(new Storage\Dummy());
     }
 
 
-    public function testCreateSession ()
+    public function testConstructor()
     {
-        $user = $this->_getUser();
-        $info = $this->_getAuthenticationInfo();
+        $options = array(
+            'foo' => 'bar'
+        );
         
-        $this->_manager->setSessionIdGenerator($this->_getSessionIdGeneratorStub());
-        $this->_manager->setUserSerializer($this->_getUserSerializerStub());
+        $manager = new SessionManager($options);
+        $this->assertSame($options, $manager->getOptions()
+            ->toArray());
+    }
+
+
+    public function testSetOptions()
+    {
+        $options = array(
+            'foo' => 'bar'
+        );
         
-        $session = $this->_manager->createSession($user, $info);
+        $this->manager->setOptions($options);
+        $this->assertSame($options, $this->manager->getOptions()
+            ->toArray());
+    }
+
+
+    public function testCreateSession()
+    {
+        $user = $this->createUser();
+        $info = $this->createAuthenticationInfo();
+        
+        $this->manager->setSessionIdGenerator($this->createSessionIdGeneratorStub());
+        $this->manager->setUserSerializer($this->createUserSerializerStub());
+        
+        $session = $this->manager->createSession($user, $info);
         
         $this->assertInstanceOf('\InoOicServer\Session\Session', $session);
         $this->assertEquals(md5('test'), $session->getId());
@@ -46,43 +71,43 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testCreateAuthorizationCode ()
+    public function testCreateAuthorizationCode()
     {
-        $session = $this->_getSessionStub();
-        $client = $this->_getClientStub();
+        $session = $this->createSessionStub();
+        $client = $this->createClientStub();
         
-        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        $this->manager->setTokenGenerator($this->createTokenGeneratorStub());
         
-        $authorizationCode = $this->_manager->createAuthorizationCode($session, $client);
+        $authorizationCode = $this->manager->createAuthorizationCode($session, $client);
         
         $this->assertInstanceOf('\InoOicServer\Session\Token\AuthorizationCode', $authorizationCode);
         $this->assertEquals('generated_token', $authorizationCode->getCode());
     }
 
 
-    public function testGetAuthorizationCode ()
+    public function testGetAuthorizationCode()
     {
-        $session = $this->_getSessionStub();
-        $client = $this->_getClientStub();
+        $session = $this->createSessionStub();
+        $client = $this->createClientStub();
         
-        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        $this->manager->setTokenGenerator($this->createTokenGeneratorStub());
         
-        $authorizationCode = $this->_manager->createAuthorizationCode($session, $client);
+        $authorizationCode = $this->manager->createAuthorizationCode($session, $client);
         
-        $loadedCode = $this->_manager->getAuthorizationCode($authorizationCode->getCode());
+        $loadedCode = $this->manager->getAuthorizationCode($authorizationCode->getCode());
         
         $this->assertEquals($loadedCode->toArray(), $authorizationCode->toArray());
     }
 
 
-    public function testCreateAccessToken ()
+    public function testCreateAccessToken()
     {
-        $session = $this->_getSessionStub();
-        $client = $this->_getClientStub();
+        $session = $this->createSessionStub();
+        $client = $this->createClientStub();
         
-        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        $this->manager->setTokenGenerator($this->createTokenGeneratorStub());
         
-        $accessToken = $this->_manager->createAccessToken($session, $client);
+        $accessToken = $this->manager->createAccessToken($session, $client);
         
         $this->assertInstanceOf('\InoOicServer\Session\Token\AccessToken', $accessToken);
         $this->assertEquals('generated_access_token', $accessToken->getToken());
@@ -90,16 +115,16 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testGetAccessToken ()
+    public function testGetAccessToken()
     {
-        $session = $this->_getSessionStub();
-        $client = $this->_getClientStub();
+        $session = $this->createSessionStub();
+        $client = $this->createClientStub();
         
-        $this->_manager->setTokenGenerator($this->_getTokenGeneratorStub());
+        $this->manager->setTokenGenerator($this->createTokenGeneratorStub());
         
-        $accessToken = $this->_manager->createAccessToken($session, $client);
+        $accessToken = $this->manager->createAccessToken($session, $client);
         
-        $loadedAccessToken = $this->_manager->getAccessToken($accessToken->getToken());
+        $loadedAccessToken = $this->manager->getAccessToken($accessToken->getToken());
         
         $this->assertEquals($loadedAccessToken->toArray(), $accessToken->toArray());
     }
@@ -107,7 +132,7 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     /*
      * Helper methods
      */
-    protected function _getSessionStub ()
+    protected function createSessionStub()
     {
         $session = $this->getMock('\InoOicServer\Session\Session');
         $session->expects($this->any())
@@ -118,7 +143,7 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getClientStub ()
+    protected function createClientStub()
     {
         $client = $this->getMock('\InoOicServer\Client\Client');
         $client->expects($this->any())
@@ -129,7 +154,7 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getSessionIdGeneratorStub ()
+    protected function createSessionIdGeneratorStub()
     {
         $idGenerator = $this->getMock('\InoOicServer\Session\IdGenerator\Simple');
         $idGenerator->expects($this->any())
@@ -140,7 +165,7 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getUserSerializerStub ()
+    protected function createUserSerializerStub()
     {
         $serializer = $this->getMock('\InoOicServer\User\Serializer\Serializer');
         $serializer->expects($this->any())
@@ -149,13 +174,13 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
         
         $serializer->expects($this->any())
             ->method('unserialize')
-            ->will($this->returnValue($this->_getUser()));
+            ->will($this->returnValue($this->createUser()));
         
         return $serializer;
     }
 
 
-    protected function _getTokenGeneratorStub ()
+    protected function createTokenGeneratorStub()
     {
         $generator = $this->getMock('\InoOicServer\Session\Hash\Generator\Simple');
         $generator->expects($this->any())
@@ -170,7 +195,7 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getUser ()
+    protected function createUser()
     {
         return new User(array(
             User::FIELD_ID => 'testuser'
@@ -178,11 +203,12 @@ class SessionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function _getAuthenticationInfo ()
+    protected function createAuthenticationInfo()
     {
-        return new Info(array(
-            Info::FIELD_METHOD => 'dummy', 
-            Info::FIELD_TIME => new \DateTime('now')
-        ));
+        return new Info(
+            array(
+                Info::FIELD_METHOD => 'dummy',
+                Info::FIELD_TIME => new \DateTime('now')
+            ));
     }
 }
