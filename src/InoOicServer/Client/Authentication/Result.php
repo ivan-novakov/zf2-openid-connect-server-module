@@ -5,9 +5,6 @@ namespace InoOicServer\Client\Authentication;
 
 /**
  * The class contains the result of a client authentication.
- *
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 class Result extends \Zend\Stdlib\Message
 {

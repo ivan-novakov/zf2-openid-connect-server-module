@@ -5,9 +5,6 @@ namespace InoOicServer\Client\Authentication;
 
 /**
  * Simple class that contains information about the authentication type and parameters of the client.
- *
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 class Info
 {

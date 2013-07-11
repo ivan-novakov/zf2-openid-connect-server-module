@@ -8,9 +8,6 @@ use InoOicServer\Client;
 
 /**
  * Token request object.
- *
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 class Token extends AbstractRequest
 {

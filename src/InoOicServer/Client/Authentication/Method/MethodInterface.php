@@ -8,9 +8,6 @@ use Zend\Http;
 
 /**
  * Interface for client authentication methods.
- * 
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 interface MethodInterface
 {

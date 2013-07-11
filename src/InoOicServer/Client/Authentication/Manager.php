@@ -11,9 +11,6 @@ use InoOicServer\Util\Options;
 /**
  * The authentication manager authenticates the client using the client request data and the client info from the
  * local registry.
- *
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 class Manager
 {

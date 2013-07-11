@@ -108,7 +108,7 @@ class SecretBasicTest extends \PHPUnit_Framework_Testcase
         $info = $this->getMockBuilder('InoOicServer\Client\Authentication\Info')
             ->disableOriginalConstructor()
             ->getMock();
-        // return $info;
+
         if ($clientId && $clientSecret) {
             $info->expects($this->once())
                 ->method('getClientId')

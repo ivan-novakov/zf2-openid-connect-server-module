@@ -7,9 +7,6 @@ use InoOicServer\Entity\Entity;
 
 /**
  * Entity representing the client application.
- *
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  * 
  * @method string getId()
  * @method string getType()

@@ -8,9 +8,6 @@ use InoOicServer\Util\Options;
 
 /**
  * Abstract client authentication method class.
- * 
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 abstract class AbstractMethod implements MethodInterface
 {

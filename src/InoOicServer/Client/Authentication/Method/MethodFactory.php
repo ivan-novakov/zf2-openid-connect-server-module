@@ -7,9 +7,6 @@ use InoOicServer\General\Exception as GeneralException;
 
 /**
  * Factory class for creating client authentication method objects.
- * 
- * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
- * @license http://debug.cz/license/freebsd
  */
 class MethodFactory
 {
@@ -69,7 +66,7 @@ class MethodFactory
         if (! class_exists($methodClass)) {
             throw new GeneralException\ClassNotFoundException($methodClass);
         }
- 
+        
         $options = array();
         if (isset($methodInfo['options']) && is_array($methodInfo['options'])) {
             $options = $methodInfo['options'];
