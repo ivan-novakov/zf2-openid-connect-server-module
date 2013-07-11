@@ -19,13 +19,13 @@ class Manager
      * 
      * @var Options
      */
-    protected $_options = NULL;
+    protected $options = NULL;
 
     /**
      * Context object
      * @var Context\AuthorizeContext
      */
-    protected $_context = NULL;
+    protected $context = NULL;
 
 
     /**
@@ -46,7 +46,7 @@ class Manager
      */
     public function setOptions($options)
     {
-        $this->_options = new Options($options);
+        $this->options = new Options($options);
     }
 
 
@@ -59,7 +59,18 @@ class Manager
      */
     public function getOption($name, $defaultValue = null)
     {
-        return $this->_options->get($name, $defaultValue);
+        return $this->options->get($name, $defaultValue);
+    }
+
+
+    /**
+     * Returns all options.
+     * 
+     * @return Options
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
 
@@ -70,7 +81,7 @@ class Manager
      */
     public function setContext(Context\AuthorizeContext $context)
     {
-        $this->_context = $context;
+        $this->context = $context;
     }
 
 
@@ -83,11 +94,11 @@ class Manager
      */
     public function getContext($throwException = false)
     {
-        if ($throwException && ! ($this->_context instanceof Context\AuthorizeContext)) {
+        if ($throwException && ! ($this->context instanceof Context\AuthorizeContext)) {
             throw new GeneralException\MissingDependencyException('context', $this);
         }
         
-        return $this->_context;
+        return $this->context;
     }
 
 
