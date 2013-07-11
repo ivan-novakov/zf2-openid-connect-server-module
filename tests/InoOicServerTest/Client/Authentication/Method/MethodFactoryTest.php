@@ -10,60 +10,48 @@ class MethodFactoryTest extends \PHPUnit_Framework_TestCase
 
     const CLASS_DUMMY = 'InoOicServer\Client\Authentication\Method\Dummy';
 
-    protected $factory = null;
+    /**
+     * @var MethodFactory
+     */
+    protected $factory;
 
 
     public function setUp()
     {
-        $this->factory = new MethodFactory(
-            array(
-                'dummy' => array(
-                    'class' => self::CLASS_DUMMY,
-                    'options' => array(
-                        'foo' => 'bar'
-                    )
-                ),
-                'dummy_with_no_class' => array(),
-                'dummy_with_nonexistent_class' => array(
-                    'class' => 'NonExistent\Dummy'
-                )
-            ));
+        $this->factory = new MethodFactory();
     }
 
 
-    public function testGetMethodInfo()
+    public function testCreateMethodWithMissingClass()
     {
-        $methodInfo = $this->factory->getMethodInfo('dummy');
-        $this->assertInternalType('array', $methodInfo);
-        $this->assertSame('InoOicServer\Client\Authentication\Method\Dummy', $methodInfo['class']);
-    }
-
-
-    public function testCreateMethodWithInvalidMethod()
-    {
-        $this->setExpectedException(
-            'InoOicServer\Client\Authentication\Method\Exception\InvalidAuthenticationMethodException');
-        $method = $this->factory->createMethod('invalid');
-    }
-
-
-    public function testCreateMethodWithNoMethodClass()
-    {
-        $this->setExpectedException('InoOicServer\General\Exception\MissingParameterException');
-        $method = $this->factory->createMethod('dummy_with_no_class');
+        $this->setExpectedException('InoOicServer\General\Exception\MissingParameterException', 
+            "Missing value for parameter 'class'");
+        
+        $this->factory->createAuthenticationMethod(array());
     }
 
 
     public function testCreateMethodWithNonExistentClass()
     {
-        $this->setExpectedException('InoOicServer\General\Exception\ClassNotFoundException');
-        $method = $this->factory->createMethod('dummy_with_nonexistent_class');
+        $this->setExpectedException('InoOicServer\General\Exception\ClassNotFoundException', 
+            "Class not found: NonExistentClass");
+        
+        $this->factory->createAuthenticationMethod(array(
+            'class' => 'NonExistentClass'
+        ));
     }
 
 
-    public function testCreateMethodWithDummyClass()
+    public function testCreateMethod()
     {
-        $method = $this->factory->createMethod('dummy');
-        $this->assertInstanceOf(self::CLASS_DUMMY, $method);
+        $methodConfig = array(
+            'class' => self::CLASS_DUMMY,
+            'options' => array(
+                'foo' => 'bar'
+            )
+        );
+        
+        $method = $this->factory->createAuthenticationMethod($methodConfig);
+        $this->assertInstanceOf('InoOicServer\Client\Authentication\Method\MethodINterface', $method);
     }
 }
