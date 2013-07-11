@@ -12,7 +12,7 @@ use InoOicServer\Client;
  * @copyright (c) 2013 Ivan Novakov (http://novakov.cz/)
  * @license http://debug.cz/license/freebsd
  */
-class Token extends AbstractRequest implements ClientRequestInterface
+class Token extends AbstractRequest
 {
 
     const FIELD_CODE = 'code';
@@ -22,38 +22,6 @@ class Token extends AbstractRequest implements ClientRequestInterface
     const FIELD_REDIRECT_URI = 'redirect_uri';
 
     const FIELD_CLIENT_ID = 'client_id';
-
-    /**
-     * "Authorization" header parser.
-     * 
-     * @var AuthorizationHeaderParser
-     */
-    protected $_authorizationHeaderParser = null;
-
-
-    /**
-     * Sets the "Authorization" header parser.
-     * 
-     * @param AuthorizationHeaderParser $authorizationHeaderParser
-     */
-    public function setAuthorizationHeaderParser(AuthorizationHeaderParser $authorizationHeaderParser)
-    {
-        $this->_authorizationHeaderParser = $authorizationHeaderParser;
-    }
-
-
-    /**
-     * Returns the "Authorization" header parser.
-     * @return AuthorizationHeaderParser
-     */
-    public function getAuthorizationHeaderParser()
-    {
-        if (! ($this->_authorizationHeaderParser instanceof AuthorizationHeaderParser)) {
-            $this->_authorizationHeaderParser = new AuthorizationHeaderParser();
-        }
-        
-        return $this->_authorizationHeaderParser;
-    }
 
 
     /**
@@ -97,31 +65,6 @@ class Token extends AbstractRequest implements ClientRequestInterface
     public function getClientId()
     {
         return $this->_getPostParam(self::FIELD_CLIENT_ID);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     * @see \InoOicServer\OpenIdConnect\Request\ClientRequestInterface::getAuthenticationData()
-     */
-    public function getAuthenticationData()
-    {
-        $authorizationHeader = $this->_getHeader('Authorization');
-        if (! $authorizationHeader) {
-            throw new Exception\InvalidClientAuthenticationException('Missing "Authorization" header');
-        }
-        
-        $rawValue = $authorizationHeader->getFieldValue();
-        
-        $parser = $this->getAuthorizationHeaderParser();
-        $data = $parser->parse($rawValue);
-        
-        if ($parser->isError()) {
-            throw new Exception\InvalidClientAuthenticationException(
-                sprintf("Error parsing the Authorization header: %s", implode(', ', $parser->getErrors())));
-        }
-        
-        return $data;
     }
 
 

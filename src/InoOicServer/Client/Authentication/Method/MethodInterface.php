@@ -3,6 +3,7 @@
 namespace InoOicServer\Client\Authentication\Method;
 
 use InoOicServer\Client;
+use Zend\Http;
 
 
 /**
@@ -20,7 +21,8 @@ interface MethodInterface
      * authentication;
      * 
      * @param Client\Authentication\Info $info
-     * @return Client\Authentication\Data $data
+     * @param Http\Request $httpRequest
+     * @return Client\Authentication\Result
      */
-    public function authenticate(Client\Authentication\Info $info, Client\Authentication\Data $data);
+    public function authenticate(Client\Authentication\Info $info, Http\Request $httpRequest);
 }

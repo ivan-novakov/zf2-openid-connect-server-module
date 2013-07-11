@@ -2,7 +2,7 @@
 
 namespace InoOicServer\Client\Authentication;
 
-use InoOicServer\OpenIdConnect\Request\ClientRequestInterface;
+use InoOicServer\OpenIdConnect\Request\RequestInterface;
 use InoOicServer\Client\Authentication\Method\MethodFactory;
 use InoOicServer\Client\Client;
 use InoOicServer\Util\Options;
@@ -87,25 +87,19 @@ class Manager
      * Authenticates the client - uses the client's configured authentication method and authenticates
      * the request.
      * 
-     * @param ClientRequestInterface $request
+     * @param RequestInterface $request
      * @param Client $client
      * @return Result
      */
-    public function authenticate(ClientRequestInterface $request, Client $client)
+    public function authenticate(RequestInterface $request, Client $client)
     {
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
         if ('dummy' == $clientAuthenticationInfo->getMethod()) {
             return new Result(true);
         }
         
-        $clientAuthenticationData = $request->getAuthenticationData();        
-        if ($clientAuthenticationInfo->getMethod() != $clientAuthenticationData->getMethod()) {
-            return new Result(false, 'invalid authentication method');
-        }
+        $method = $this->getAuthenticationMethodFactory()->createMethod($clientAuthenticationInfo->getMethod());
         
-        $method = $this->getAuthenticationMethodFactory()
-            ->createMethod($clientAuthenticationInfo->getMethod());
-        
-        return $method->authenticate($clientAuthenticationInfo, $clientAuthenticationData);
+        return $method->authenticate($clientAuthenticationInfo, $request->getHttpRequest());
     }
 }

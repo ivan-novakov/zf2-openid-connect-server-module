@@ -14,14 +14,13 @@ class TokenTest extends \PHPUnit_Framework_TestCase
      * 
      * @var Request\Token
      */
-    protected $_request = NULL;
+    protected $request = NULL;
 
 
     public function setUp()
     {
         $httpRequest = new \Zend\Http\Request();
-        $httpRequest->getPost()
-            ->fromArray(
+        $httpRequest->getPost()->fromArray(
             array(
                 Request\Token::FIELD_CODE => 'authorization_code_123',
                 Request\Token::FIELD_CLIENT_ID => 'testclient',
@@ -29,94 +28,31 @@ class TokenTest extends \PHPUnit_Framework_TestCase
                 Request\Token::FIELD_REDIRECT_URI => 'http://dummy'
             ));
         
-        $this->_request = new Request\Token($httpRequest);
+        $this->request = new Request\Token($httpRequest);
     }
 
 
     public function testGetClientId()
     {
-        $this->assertEquals('testclient', $this->_request->getClientId());
+        $this->assertEquals('testclient', $this->request->getClientId());
     }
 
 
     public function testGetCode()
     {
-        $this->assertEquals('authorization_code_123', $this->_request->getCode());
+        $this->assertEquals('authorization_code_123', $this->request->getCode());
     }
 
 
     public function testGetGrantType()
     {
-        $this->assertEquals('authorization_code', $this->_request->getGrantType());
+        $this->assertEquals('authorization_code', $this->request->getGrantType());
     }
 
 
     public function testGetRedirectUri()
     {
-        $this->assertEquals('http://dummy', $this->_request->getRedirectUri());
-    }
-
-
-    public function testGetAuthenticationDataWithNoHeader()
-    {
-        $this->setExpectedException('InoOicServer\OpenIdConnect\Request\Exception\InvalidClientAuthenticationException');
-        $data = $this->_request->getAuthenticationData();
-    }
-
-
-    public function testGetAuthenticationDataError()
-    {
-        $rawValue = 'header raw value';
-        
-        $this->_setAuthorizationHeader($this->_request, $rawValue);
-        
-        $data = $this->getMockBuilder('InoOicServer\Client\Authentication\Data')
-            ->disableOriginalConstructor()
-            ->getMock();
-        
-        $parser = $this->getMock('InoOicServer\Http\AuthorizationHeaderParser');
-        $parser->expects($this->once())
-            ->method('parse')
-            ->with($rawValue)
-            ->will($this->returnValue($data));
-        $parser->expects($this->once())
-            ->method('isError')
-            ->will($this->returnValue(true));
-        $parser->expects($this->once())
-            ->method('getErrors')
-            ->will($this->returnValue(array(
-            'error'
-        )));
-        
-        $this->_request->setAuthorizationHeaderParser($parser);
-        
-        $this->setExpectedException('InoOicServer\OpenIdConnect\Request\Exception\InvalidClientAuthenticationException');
-        $parsedData = $this->_request->getAuthenticationData();
-    }
-
-
-    public function testGetAuthenticationDataOk()
-    {
-        $rawValue = 'header raw value';
-        
-        $this->_setAuthorizationHeader($this->_request, $rawValue);
-        
-        $data = $this->getMockBuilder('InoOicServer\Client\Authentication\Data')
-            ->disableOriginalConstructor()
-            ->getMock();
-        
-        $parser = $this->getMock('InoOicServer\Http\AuthorizationHeaderParser');
-        $parser->expects($this->once())
-            ->method('parse')
-            ->with($rawValue)
-            ->will($this->returnValue($data));
-        $parser->expects($this->once())
-            ->method('isError')
-            ->will($this->returnValue(false));
-        $this->_request->setAuthorizationHeaderParser($parser);
-        
-        $parsedData = $this->_request->getAuthenticationData();
-        $this->assertSame($data, $parsedData);
+        $this->assertEquals('http://dummy', $this->request->getRedirectUri());
     }
 
 

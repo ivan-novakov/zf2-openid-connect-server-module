@@ -3,7 +3,7 @@
 namespace InoOicServer\OpenIdConnect\Request;
 
 
-abstract class AbstractRequest
+abstract class AbstractRequest implements RequestInterface
 {
 
     /**
@@ -11,14 +11,14 @@ abstract class AbstractRequest
      *
      * @var \Zend\Http\Request
      */
-    protected $_httpRequest = NULL;
+    protected $httpRequest = NULL;
 
     /**
      * List of reasons, why the request is invalid.
      * 
      * @var array
      */
-    protected $_invalidReasons = NULL;
+    protected $invalidReasons = NULL;
 
 
     /**
@@ -28,7 +28,7 @@ abstract class AbstractRequest
      */
     public function __construct(\Zend\Http\Request $httpRequest)
     {
-        $this->_httpRequest = $httpRequest;
+        $this->httpRequest = $httpRequest;
     }
 
 
@@ -39,7 +39,7 @@ abstract class AbstractRequest
      */
     public function getHttpRequest()
     {
-        return $this->_httpRequest;
+        return $this->httpRequest;
     }
 
 
@@ -50,7 +50,7 @@ abstract class AbstractRequest
      */
     public function isPostRequest()
     {
-        return (\Zend\Http\Request::METHOD_POST == $this->_httpRequest->getMethod());
+        return (\Zend\Http\Request::METHOD_POST == $this->httpRequest->getMethod());
     }
 
 
@@ -72,11 +72,11 @@ abstract class AbstractRequest
      */
     public function getInvalidReasons()
     {
-        if (! is_array($this->_invalidReasons)) {
-            $this->_invalidReasons = $this->_validate();
+        if (! is_array($this->invalidReasons)) {
+            $this->invalidReasons = $this->_validate();
         }
         
-        return $this->_invalidReasons;
+        return $this->invalidReasons;
     }
 
 
@@ -115,7 +115,7 @@ abstract class AbstractRequest
      */
     protected function _getPostParam($name)
     {
-        return $this->_httpRequest->getPost($name);
+        return $this->httpRequest->getPost($name);
     }
 
 
@@ -127,7 +127,7 @@ abstract class AbstractRequest
      */
     protected function _getGetParam($name)
     {
-        return $this->_httpRequest->getQuery($name);
+        return $this->httpRequest->getQuery($name);
     }
 
 
@@ -139,6 +139,6 @@ abstract class AbstractRequest
      */
     protected function _getHeader($name)
     {
-        return $this->_httpRequest->getHeader($name);
+        return $this->httpRequest->getHeader($name);
     }
 }

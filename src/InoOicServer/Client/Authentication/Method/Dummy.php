@@ -21,7 +21,7 @@ class Dummy extends AbstractMethod
      * {@inheritdoc}
      * @see \InoOicServer\Client\Authentication\Method\MethodInterface::authenticate()
      */
-    public function authenticate(Client\Authentication\Info $info, Client\Authentication\Data $data)
+    public function authenticate(Client\Authentication\Info $info, \Zend\Http\Request $httpRequest)
     {
         if ($this->_options->get(self::OPT_SUCCESS, false)) {
             return $this->createSuccessResult();

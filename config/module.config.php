@@ -283,13 +283,11 @@ return array(
                     'success' => true
                 )
             ),
-            'secret' => array(
-                'class' => '\InoOicServer\Client\Authentication\Method\SharedSecret',
-                'options' => array()
+            'client_secret_basic' => array(
+                'class' => '\InoOicServer\Client\Authentication\Method\SecretBasic'
             ),
-            'pki' => array(
-                'class' => '\InoOicServer\Client\Authentication\Method\Pki',
-                'options' => array()
+            'client_secret_post' => array(
+                'class' => '\InoOicServer\Client\Authentication\Method\SecretPost'
             )
         )
     ),

@@ -75,7 +75,7 @@ class UserInfo extends AbstractRequest
      */
     public function getAuthorization()
     {
-        $header = $this->_httpRequest->getHeader('Authorization');
+        $header = $this->httpRequest->getHeader('Authorization');
         if ($header instanceof \Zend\Http\Header\Authorization) {
             return $header->getFieldValue();
         }
