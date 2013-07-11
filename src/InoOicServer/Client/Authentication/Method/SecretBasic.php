@@ -6,6 +6,11 @@ use InoOicServer\Client;
 use Zend\Http;
 
 
+/**
+ * Server implementation of the "client_secret_basic" client authentication method.
+ *
+ * @see http://openid.net/specs/openid-connect-messages-1_0-20.html#client_authentication
+ */
 class SecretBasic extends AbstractMethod
 {
 
