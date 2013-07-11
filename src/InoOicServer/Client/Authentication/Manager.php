@@ -3,6 +3,7 @@
 namespace InoOicServer\Client\Authentication;
 
 use InoOicServer\OpenIdConnect\Request\RequestInterface;
+use InoOicServer\Client\Authentication\Method\MethodFactoryInterface;
 use InoOicServer\Client\Authentication\Method\MethodFactory;
 use InoOicServer\Client\Client;
 use InoOicServer\Util\Options;
@@ -21,14 +22,14 @@ class Manager
      * Options.
      * @var Options
      */
-    protected $_options = null;
+    protected $options;
 
     /**
      * The authentication method factory.
      * 
-     * @var MethodFactory
+     * @var MethodFactoryInterface
      */
-    protected $_methodFactory = null;
+    protected $methodFactory;
 
 
     /**
@@ -49,34 +50,44 @@ class Manager
      */
     public function setOptions($options = array())
     {
-        $this->_options = new Options($options);
+        $this->options = new Options($options);
+    }
+
+
+    /**
+     * Returns the options.
+     * 
+     * @return Options
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
 
     /**
      * Sets the authentication method factory.
      * 
-     * @param MethodFactory $methodFactory
+     * @param MethodFactoryInterface $methodFactory
      */
-    public function setAuthenticationMethodFactory(MethodFactory $methodFactory)
+    public function setAuthenticationMethodFactory(MethodFactoryInterface $methodFactory)
     {
-        $this->_methodFactory = $methodFactory;
+        $this->methodFactory = $methodFactory;
     }
 
 
     /**
      * Returns the authentication method factory.
      * 
-     * @return MethodFactory
+     * @return MethodFactoryInterface
      */
     public function getAuthenticationMethodFactory()
     {
-        if (! ($this->_methodFactory instanceof MethodFactory)) {
-            $methods = $this->_options->get(self::OPT_METHODS, array());
-            $this->_methodFactory = new MethodFactory($methods);
+        if (! ($this->methodFactory instanceof MethodFactoryInterface)) {
+            $this->methodFactory = new MethodFactory();
         }
         
-        return $this->_methodFactory;
+        return $this->methodFactory;
     }
 
 
@@ -91,7 +102,21 @@ class Manager
     public function authenticate(RequestInterface $request, Client $client)
     {
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
-        $method = $this->getAuthenticationMethodFactory()->createMethod($clientAuthenticationInfo->getMethod());
+        $authenticationMethod = $clientAuthenticationInfo->getMethod();
+        $authenticationMethodConfig = $this->getMethodConfig($authenticationMethod);
+        $method = $this->getAuthenticationMethodFactory()->createAuthenticationMethod($authenticationMethodConfig);
+        // $method = $this->getAuthenticationMethodFactory()->createMethod($clientAuthenticationInfo->getMethod());
         return $method->authenticate($clientAuthenticationInfo, $request->getHttpRequest());
+    }
+
+
+    protected function getMethodConfig($methodName)
+    {
+        $methods = $this->options->get(self::OPT_METHODS, array());
+        if (! isset($methods[$methodName]) || ! is_array($methods[$methodName])) {
+            throw new Method\Exception\InvalidAuthenticationMethodException($methodName);
+        }
+        
+        return $methods[$methodName];
     }
 }

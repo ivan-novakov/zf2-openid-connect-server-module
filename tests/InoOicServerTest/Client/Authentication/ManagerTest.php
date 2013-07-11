@@ -20,50 +20,99 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testAuthenticateWithDummy()
+    public function testConstructor()
     {
-        $authenticationMethod = 'dummy';
+        $options = array(
+            'foo' => 'bar'
+        );
+        $manager = new Manager($options);
+        $this->assertSame($options, (array) $manager->getOptions());
+    }
+
+
+    public function testSetOptions()
+    {
+        $options = array(
+            'foo' => 'bar'
+        );
+        $this->manager->setOptions($options);
+        $this->assertSame($options, (array) $this->manager->getOptions());
+    }
+
+
+    public function testGetAuthenticationMethodFactoryWithImplicitValue()
+    {
+        $factory = $this->manager->getAuthenticationMethodFactory();
+        $this->assertInstanceOf('InoOicServer\Client\Authentication\Method\MethodFactoryInterface', $factory);
+    }
+
+
+    public function testAuthenticateWithInvalidMethod()
+    {
+        $authenticationMethod = 'invalid_auth_method';
         
-        $info = $this->getMockBuilder('InoOicServer\Client\Authentication\Info')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $info->expects($this->any())
-            ->method('getMethod')
-            ->will($this->returnValue($authenticationMethod));
+        $this->setExpectedException(
+            'InoOicServer\Client\Authentication\Method\Exception\InvalidAuthenticationMethodException', 
+            "Invalid client authentication method '$authenticationMethod'");
         
-        $request = $this->createRequestMock();
         $client = $this->createClientMock($authenticationMethod);
+        $request = $this->createRequestMock();
         
-        $result = $this->manager->authenticate($request, $client);
-        $this->assertTrue($result->isAuthenticated());
+        $this->manager->authenticate($request, $client);
     }
 
 
     public function testAuthenticate()
     {
         $authenticationMethod = 'dummy';
+        $methodConfig = array(
+            'class' => 'Dummy'
+        );
+        $options = array(
+            'methods' => array(
+                $authenticationMethod => $methodConfig
+            )
+        );
         
-        $client = $this->createClientMock($authenticationMethod);
+        $httpRequest = $this->getMock('Zend\Http\Request');
+        
+        $result = $this->getMockBuilder('InoOicServer\Client\Authentication\Result');
+        
+        $clientAuthenticationInfo = $this->createInfoMock($authenticationMethod);
+        
+        $client = $this->createClientMock($authenticationMethod, $clientAuthenticationInfo);
         $request = $this->createRequestMock();
+        $request->expects($this->once())
+            ->method('getHttpRequest')
+            ->will($this->returnValue($httpRequest));
         
         $method = $this->getMock('InoOicServer\Client\Authentication\Method\MethodInterface');
+        $method->expects($this->once())
+            ->method('authenticate')
+            ->with($clientAuthenticationInfo, $httpRequest)
+            ->will($this->returnValue($result));
         
-        $methodFactory = $this->getMockBuilder('InoOicServer\Client\Authentication\Method\MethodFactory')
+        $methodFactory = $this->getMockBuilder('InoOicServer\Client\Authentication\Method\MethodFactoryInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $methodFactory->expects($this->any())
-            ->method('createMethod')
+            ->method('createAuthenticationMethod')
+            ->with($methodConfig)
             ->will($this->returnValue($method));
         
+        $this->manager->setOptions($options);
         $this->manager->setAuthenticationMethodFactory($methodFactory);
-        $this->manager->authenticate($request, $client);
+        
+        $this->assertSame($result, $this->manager->authenticate($request, $client));
     }
     
     /*
      * --------------------------
      */
-
-
+    
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function createRequestMock()
     {
         $request = $this->getMock('InoOicServer\OpenIdConnect\Request\RequestInterface');
@@ -71,9 +120,11 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function createClientMock($authenticationMethod)
+    protected function createClientMock($authenticationMethod, $info = null)
     {
-        $info = $this->createInfoMock($authenticationMethod);
+        if (! $info) {
+            $info = $this->createInfoMock($authenticationMethod);
+        }
         
         $client = $this->getMock('InoOicServer\Client\Client');
         $client->expects($this->once())
