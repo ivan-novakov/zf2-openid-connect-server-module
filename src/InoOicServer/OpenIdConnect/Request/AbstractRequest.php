@@ -8,17 +8,15 @@ abstract class AbstractRequest implements RequestInterface
 
     /**
      * The HTTP request object.
-     *
      * @var \Zend\Http\Request
      */
-    protected $httpRequest = NULL;
+    protected $httpRequest;
 
     /**
      * List of reasons, why the request is invalid.
-     * 
      * @var array
      */
-    protected $invalidReasons = NULL;
+    protected $invalidReasons;
 
 
     /**

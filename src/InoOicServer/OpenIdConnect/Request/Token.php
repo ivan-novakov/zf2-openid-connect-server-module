@@ -65,7 +65,11 @@ class Token extends AbstractRequest
     }
 
 
-    protected function _validate()
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\OpenIdConnect\Request\AbstractRequest::validate()
+     */
+    protected function validate()
     {
         $reasons = array();
         
