@@ -91,12 +91,7 @@ class Manager
     public function authenticate(RequestInterface $request, Client $client)
     {
         $clientAuthenticationInfo = $client->getAuthenticationInfo();
-        if ('dummy' == $clientAuthenticationInfo->getMethod()) {
-            return new Result('Dummy', true);
-        }
-        
         $method = $this->getAuthenticationMethodFactory()->createMethod($clientAuthenticationInfo->getMethod());
-        
         return $method->authenticate($clientAuthenticationInfo, $request->getHttpRequest());
     }
 }
