@@ -259,10 +259,10 @@ return array(
     ),
     
     'oic_session_manager' => array(
-        'session_expiration' => 3600,
-        'authorization_code_expiration' => 600,
-        'access_token_expiration' => 3600,
-        'refresh_token_expiration' => 36000
+        'session_expire_interval' => 'PT1H',
+        'authorization_code_expire_interval' => 'PT5M',
+        'access_token_expire_interval' => 'PT12H',
+        'refresh_token_expire_interval' => 'PT24H'
     ),
     
     'session_id_generator' => array(

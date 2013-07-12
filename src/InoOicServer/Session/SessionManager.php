@@ -16,6 +16,14 @@ use InoOicServer\Util;
 class SessionManager
 {
 
+    const OPT_SESSION_EXPIRE_INTERVAL = 'session_expire_interval';
+
+    const OPT_AUTHORIZATION_CODE_EXPIRE_INTERVAL = 'authorization_code_expire_interval';
+
+    const OPT_ACCESS_TOKEN_EXPIRE_INTERVAL = 'access_token_expire_interval';
+
+    const OPT_REFRESH_TOKEN_EXPIRE_INTERVAL = 'refresh_token_expire_interval';
+
     /**
      * @var Parameters
      */
@@ -50,7 +58,7 @@ class SessionManager
     protected $tokenGenerator;
 
     /**
-     * @var Util\DateTime
+     * @var Util\DateTimeUtil
      */
     protected $dateTimeUtil;
 
@@ -177,21 +185,21 @@ class SessionManager
 
 
     /**
-     * @return Util\DateTime
+     * @return Util\DateTimeUtil
      */
     public function getDateTimeUtil()
     {
-        if (! $this->dateTimeUtil instanceof Util\DateTime) {
-            $this->dateTimeUtil = new Util\DateTime();
+        if (! $this->dateTimeUtil instanceof Util\DateTimeUtil) {
+            $this->dateTimeUtil = new Util\DateTimeUtil();
         }
         return $this->dateTimeUtil;
     }
 
 
     /**
-     * @param Util\DateTime $dateTimeUtil
+     * @param Util\DateTimeUtil $dateTimeUtil
      */
-    public function setDateTimeUtil($dateTimeUtil)
+    public function setDateTimeUtil(DateTimeUtil $dateTimeUtil)
     {
         $this->dateTimeUtil = $dateTimeUtil;
     }
@@ -243,10 +251,10 @@ class SessionManager
         
         $serializedUserData = $serializer->serialize($user);
         
-        $now = new \DateTime('now');
-        // $expire = clone $now;
-        // $expire = $expire->add(new \DateInterval('PT3600S'));
-        $expire = $this->getDateTimeUtil()->createExpireDateTime($now, 'PT3600S');
+        $dateTimeUtil = $this->getDateTimeUtil();
+        $now = $dateTimeUtil->createDateTime();
+        $expire = $dateTimeUtil->createExpireDateTime($now, $this->getSessionExpireInterval());
+        
         $session = new Session(
             array(
                 Session::FIELD_ID => $sessionId,
@@ -312,13 +320,15 @@ class SessionManager
         
         $code = $tokenGenerator->generateAuthorizationCode($session, $client);
         
+        $now = $this->getDateTimeUtil()->createDateTime();
+        $expire = $this->getDateTimeUtil()->createExpireDateTime($now, $this->getAuthorizationCodeExpireInterval());
+        
         $authorizationCode = new AuthorizationCode(
             array(
                 AuthorizationCode::FIELD_CODE => $code,
                 AuthorizationCode::FIELD_SESSION_ID => $session->getId(),
-                AuthorizationCode::FIELD_ISSUE_TIME => new \DateTime('now'),
-                // FIXME - set 5 min from config
-                AuthorizationCode::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'),
+                AuthorizationCode::FIELD_ISSUE_TIME => $now,
+                AuthorizationCode::FIELD_EXPIRATION_TIME => $expire,
                 AuthorizationCode::FIELD_CLIENT_ID => $client->getId(),
                 AuthorizationCode::FIELD_SCOPE => 'openid'
             ));
@@ -360,14 +370,16 @@ class SessionManager
         
         $token = $generator->generateAccessToken($session, $client);
         
+        $now = $this->getDateTimeUtil()->createDateTime();
+        $expire = $this->getDateTimeUtil()->createExpireDateTime($now, $this->getAccessTokenExpireInterval());
+        
         $accessToken = new AccessToken(
             array(
                 AccessToken::FIELD_TOKEN => $token,
                 AccessToken::FIELD_SESSION_ID => $session->getId(),
                 AccessToken::FIELD_CLIENT_ID => $client->getId(),
-                AccessToken::FIELD_ISSUE_TIME => new \DateTime('now'),
-                // FIXME set from config
-                AccessToken::FIELD_EXPIRATION_TIME => new \DateTime('tomorrow'),
+                AccessToken::FIELD_ISSUE_TIME => $now,
+                AccessToken::FIELD_EXPIRATION_TIME => $expire,
                 AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER,
                 AccessToken::FIELD_SCOPE => 'openid'
             ));
@@ -396,6 +408,50 @@ class SessionManager
 
     public function getRefreshToken($token)
     {}
+
+
+    /**
+     * Returns the session expire interval.
+     * 
+     * @return string
+     */
+    public function getSessionExpireInterval()
+    {
+        return $this->options->get(self::OPT_SESSION_EXPIRE_INTERVAL, 'PT1H');
+    }
+
+
+    /**
+     * Returns the authorization code expire interval.
+     * 
+     * @return string
+     */
+    public function getAuthorizationCodeExpireInterval()
+    {
+        return $this->options->get(self::OPT_AUTHORIZATION_CODE_EXPIRE_INTERVAL, 'PT5M');
+    }
+
+
+    /**
+     * Returns the access token expire interval.
+     * 
+     * @return string
+     */
+    public function getAccessTokenExpireInterval()
+    {
+        return $this->options->get(self::OPT_ACCESS_TOKEN_EXPIRE_INTERVAL, 'PT12H');
+    }
+
+
+    /**
+     * Returns the refresh token expire interval.
+     * 
+     * @return string
+     */
+    public function getRefreshTokenExpireInterval()
+    {
+        return $this->options->get(self::OPT_REFRESH_TOKEN_EXPIRE_INTERVAL, 'PT24H');
+    }
 
 
     /**

@@ -15,6 +15,7 @@ class DateTimeUtil
      * For more information about date/time string formats, see http://php.net/manual/en/datetime.formats.php.
      * 
      * @see http://php.net/manual/en/datetime.formats.php
+     * 
      * @param string $dateTimeString
      * @return \DateTime
      */
@@ -30,6 +31,8 @@ class DateTimeUtil
     /**
      * Creates the corresponding expiration DateTime object based on the provided DateTime object and
      * the interval.
+     * 
+     * @see http://php.net/manual/en/dateinterval.construct.php
      * 
      * @param \DateTime $dateTimeFrom
      * @param string|\DateInterval $interfal
