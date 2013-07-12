@@ -21,9 +21,9 @@ return array(
             'adapter' => array(
                 'driver' => 'Pdo_Mysql',
                 'host' => 'localhost',
-                'database' => 'oic_server_test',
-                'username' => 'oic_admin',
-                'password' => 'OicadmiN'
+                'database' => 'oic_server',
+                'username' => 'admin',
+                'password' => 'passwd'
             )
         )
     ),
@@ -55,7 +55,7 @@ return array(
     'authentication_handlers' => array(
         
         'basic-auth' => array(
-            'class' => 'PhpIdServer\Authentication\Controller\BasicAuthController',
+            'class' => 'InoOicServer\Authentication\Controller\BasicAuthController',
             'options' => array(
                 'file' => 'data/auth/users.php'
             )
