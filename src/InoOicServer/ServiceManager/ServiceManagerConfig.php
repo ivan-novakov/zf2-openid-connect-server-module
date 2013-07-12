@@ -2,6 +2,7 @@
 
 namespace InoOicServer\ServiceManager;
 
+use InoOicServer\Server\ServerInfo;
 use InoOicServer\Session\SessionManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
@@ -26,6 +27,8 @@ class ServiceManagerConfig extends Config
 
     const CONFIG_SESSION_MANAGER = 'oic_session_manager';
 
+    const CONFIG_SERVER_INFO = 'oic_server_info';
+
 
     public function getInvokables()
     {
@@ -47,6 +50,17 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ClientRegistryStorage' => 'InoOicServer\Client\Registry\StorageFactory',
             'InoOicServer\ClientRegistry' => 'InoOicServer\Client\RegistryFactory',
             
+            'InoOicServer\ServerInfo' => function (ServiceManager $sm) use($smc)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config[$smc::CONFIG_SERVER_INFO]) || ! is_array($config[$smc::CONFIG_SERVER_INFO])) {
+                    throw new Exception\ConfigNotFoundException($smc::CONFIG_SERVER_INFO);
+                }
+                
+                $serverInfo = new ServerInfo($config[$smc::CONFIG_SERVER_INFO]);
+                return $serverInfo;
+            },
+        
             /*
              * Main logger object
              */
@@ -184,8 +198,7 @@ class ServiceManagerConfig extends Config
             'InoOicServer\SessionManager' => function (ServiceManager $sm) use($smc)
             {
                 $config = $sm->get('Config');
-                if (! isset($config[$smc::CONFIG_SESSION_MANAGER]) || ! is_array(
-                    $config[$smc::CONFIG_SESSION_MANAGER])) {
+                if (! isset($config[$smc::CONFIG_SESSION_MANAGER]) || ! is_array($config[$smc::CONFIG_SESSION_MANAGER])) {
                     throw new Exception\ConfigNotFoundException($smc::CONFIG_SESSION_MANAGER);
                 }
                 

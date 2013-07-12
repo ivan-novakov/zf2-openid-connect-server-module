@@ -34,7 +34,10 @@ class ControllerManagerConfig extends Config
             
             'InoOicServer\DiscoveryController' => function (ControllerManager $controllerManager)
             {
+                $sm = $controllerManager->getServiceLocator();
+                
                 $controller = new DiscoveryController();
+                $controller->setServerInfo($sm->get('InoOicServer\ServerInfo'));
                 return $controller;
             },
             

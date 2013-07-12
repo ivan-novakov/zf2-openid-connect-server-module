@@ -160,6 +160,11 @@ return array(
             )
         )
     ),
+
+    'oic_server_info' => array(
+        'server_version' => '0.6.0-pre2',
+        'base_uri' => 'https://shongo-auth-dev.cesnet.cz/devel/authn',
+    ),
     
     'client_registry_storage' => array(
         'type' => 'SingleJsonFileStorage',
