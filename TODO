@@ -1,4 +1,6 @@
-- session manager: put expiration times in config
+- return state param even if there is an error 
+
+- persist login session - cache the information that the user has been authenticated for some time
 
 - implement user attribute filtering/validating:
   - handle multivalue Shibboleth attributes
