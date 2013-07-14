@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Controller;
 
+use InoOicServer\Server\Version;
 use InoOicServer\Server\ServerInfo;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\Json\Json;
@@ -44,13 +45,13 @@ class DiscoveryController extends AbstractActionController
         ));
         
         $issuer = $this->getServerInfo()->getBaseUri();
-        $version = $this->getServerInfo()->getServerVersion();
+        
         /*
          * http://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
          */
         $configuration = Json::encode(
             array(
-                'version' => $version,
+                'version' => Version::VERSION,
                 'issuer' => $issuer,
                 'authorization_endpoint' => $issuer . '/oic/authorize',
                 'token_endpoint' => $issuer . '/oic/token',
