@@ -78,7 +78,7 @@ class DiscoveryController extends AbstractActionController
                 ),
                 'request_parameter_supported' => false,
                 'request_uri_parameter_supported' => false,
-                'service_documentation' => 'https://homeproj.cesnet.cz/projects/shongo/wiki/TestAuthServer'
+                'service_documentation' => $this->getServerInfo()->getServiceDocumentation()
             ));
         
         $response->setContent($configuration);
