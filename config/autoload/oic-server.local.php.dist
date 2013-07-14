@@ -2,6 +2,10 @@
 
 return array(
 
+    'oic_server_info' => array(
+        'base_uri' => 'https://oic.server.org/authn',
+    ),
+
 	'oic_session_manager' => array(
         'session_expire_interval' => 'PT1H',
         'authorization_code_expire_interval' => 'PT5M',

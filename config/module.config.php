@@ -1,6 +1,4 @@
 <?php
-use Zend\Log\Logger;
-use InoOicServer\User\User;
 
 return array(
     
@@ -151,7 +149,7 @@ return array(
                     'stream' => '/data/var/log/phpid-server.log'
                 ),
                 'filters' => array(
-                    'priority' => Logger::DEBUG
+                    'priority' => 7
                 ),
                 'formatter' => array(
                     'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
@@ -160,10 +158,11 @@ return array(
             )
         )
     ),
-
+    
     'oic_server_info' => array(
         'server_version' => '0.6.0-pre2',
-        'base_uri' => 'https://shongo-auth-dev.cesnet.cz/devel/authn',
+        'base_uri' => 'https://oic.server.org/authn',
+        'service_documentation' => 'https://github.com/ivan-novakov/zf2-openid-connect-server-module'
     ),
     
     'client_registry_storage' => array(
@@ -185,12 +184,12 @@ return array(
             'options' => array(
                 'label' => 'dummy',
                 'identity' => array(
-                    User::FIELD_ID => 'vomacka@example.cz',
-                    User::FIELD_NAME => 'Franta Vomacka',
-                    User::FIELD_GIVEN_NAME => 'Franta',
-                    User::FIELD_FAMILY_NAME => 'Vomacka',
-                    User::FIELD_NICKNAME => 'killer_vom',
-                    User::FIELD_EMAIL => 'franta.vomacka@example.cz'
+                    'id' => 'vomacka@example.cz',
+                    'name' => 'Franta Vomacka',
+                    'given_name' => 'Franta',
+                    'family_name' => 'Vomacka',
+                    'nickname' => 'killer_vom',
+                    'email' => 'franta.vomacka@example.cz'
                 )
             )
         ),
@@ -209,11 +208,11 @@ return array(
                     'Shib-Session-ID' => 'session_id'
                 ),
                 'user_attributes_map' => array(
-                    'REMOTE_USER' => User::FIELD_ID,
-                    'cn' => User::FIELD_NAME,
-                    'givenName' => User::FIELD_GIVEN_NAME,
-                    'sn' => User::FIELD_FAMILY_NAME,
-                    'mail' => User::FIELD_EMAIL
+                    'REMOTE_USER' => 'id',
+                    'cn' => 'name',
+                    'givenName' => 'given_name',
+                    'sn' => 'field_name',
+                    'mail' => 'email'
                 ),
                 'attribute_filter' => array(
                     'REMOTE_USER' => array(
