@@ -21,21 +21,21 @@ class UserInfo extends AbstractDispatcher
      * 
      * @var Request\UserInfo
      */
-    protected $_request = null;
+    protected $request;
 
     /**
      * The user info response.
      * 
      * @var Response\UserInfo
      */
-    protected $_response = null;
+    protected $response;
 
     /**
      * The userinfo mapper.
      * 
      * @var User\UserInfo\Mapper\MapperInterface
      */
-    protected $_userInfoMapper = null;
+    protected $userInfoMapper;
 
 
     /**
@@ -45,7 +45,7 @@ class UserInfo extends AbstractDispatcher
      */
     public function setUserInfoRequest (Request\UserInfo $request)
     {
-        $this->_request = $request;
+        $this->request = $request;
     }
 
 
@@ -56,7 +56,7 @@ class UserInfo extends AbstractDispatcher
      */
     public function getUserInfoRequest ()
     {
-        return $this->_request;
+        return $this->request;
     }
 
 
@@ -67,7 +67,7 @@ class UserInfo extends AbstractDispatcher
      */
     public function setUserInfoResponse (Response\UserInfo $response)
     {
-        $this->_response = $response;
+        $this->response = $response;
     }
 
 
@@ -78,7 +78,7 @@ class UserInfo extends AbstractDispatcher
      */
     public function getUserInfoResponse ()
     {
-        return $this->_response;
+        return $this->response;
     }
 
 
@@ -89,7 +89,7 @@ class UserInfo extends AbstractDispatcher
      */
     public function setUserInfoMapper (User\UserInfo\Mapper\MapperInterface $mapper)
     {
-        $this->_userInfoMapper = $mapper;
+        $this->userInfoMapper = $mapper;
     }
 
 
@@ -100,11 +100,11 @@ class UserInfo extends AbstractDispatcher
      */
     public function getUserInfoMapper ()
     {
-        if (null === $this->_userInfoMapper) {
-            $this->_userInfoMapper = new User\UserInfo\Mapper\ToArray();
+        if (null === $this->userInfoMapper) {
+            $this->userInfoMapper = new User\UserInfo\Mapper\ToArray();
         }
         
-        return $this->_userInfoMapper;
+        return $this->userInfoMapper;
     }
 
 
@@ -125,7 +125,7 @@ class UserInfo extends AbstractDispatcher
          * Validate request.
          */
         if (! $request->isValid()) {
-            return $this->_errorResponse(Response\UserInfo::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
+            return $this->errorResponse(Response\UserInfo::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
         /*
@@ -135,16 +135,16 @@ class UserInfo extends AbstractDispatcher
         
         $accessToken = $sessionManager->getAccessToken($request->getAuthorizationValue());
         if (! $accessToken) {
-            return $this->_errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NOT_FOUND, 'No such access token');
+            return $this->errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NOT_FOUND, 'No such access token');
         }
         
         if ($accessToken->isExpired()) {
-            return $this->_errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_EXPIRED, 'Expired access token');
+            return $this->errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_EXPIRED, 'Expired access token');
         }
         
         $session = $sessionManager->getSessionByAccessToken($accessToken);
         if (! $session) {
-            return $this->_errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NO_SESSION, 'No session associated with the access token');
+            return $this->errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NO_SESSION, 'No session associated with the access token');
         }
         
         /*
@@ -152,13 +152,13 @@ class UserInfo extends AbstractDispatcher
         */
         $user = $sessionManager->getUserFromSession($session);
         if (! $user) {
-            return $this->_errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NO_USER_DATA, 'Could not extract user data');
+            return $this->errorResponse(Response\UserInfo::ERROR_INVALID_TOKEN_NO_USER_DATA, 'Could not extract user data');
         }
         
         // FIXME - validate user data
         
 
-        return $this->_validResponse($user);
+        return $this->validResponse($user);
     }
 
 
@@ -169,7 +169,7 @@ class UserInfo extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\UserInfo
      */
-    protected function _validResponse (UserInterface $user)
+    protected function validResponse (UserInterface $user)
     {
         $userInfoResponse = $this->getUserInfoResponse();
         if (! $userInfoResponse) {
@@ -190,7 +190,7 @@ class UserInfo extends AbstractDispatcher
      * @throws GeneralException\MissingDependencyException
      * @return Response\Token
      */
-    protected function _errorResponse ($message, $description = NULL)
+    protected function errorResponse ($message, $description = NULL)
     {
         $userInfoResponse = $this->getUserInfoResponse();
         if (! $userInfoResponse) {

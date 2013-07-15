@@ -17,10 +17,10 @@ class Simple extends AbstractIdGenerator
 
 
     /**
-     * (non-PHPdoc)
+     * {@inhertidoc}
      * @see \InoOicServer\Session\IdGenerator\IdGeneratorInterface::generateId()
      */
-    public function generateId (Array $inputValues = array())
+    public function generateId(Array $inputValues = array())
     {
         $secretSalt = $this->_options->get('secret_salt');
         if (! $secretSalt) {

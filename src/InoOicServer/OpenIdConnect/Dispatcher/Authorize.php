@@ -164,6 +164,7 @@ class Authorize extends AbstractDispatcher
         /*
          * Check if there has been an unsuccessful authentication attempt
          */
+        // OBSOLETE
         $authenticationInfo = $context->getAuthenticationInfo();
         if ($authenticationInfo && ! $authenticationInfo->isExpired($this->previousAuthenticationErrorTimeout) && ($error = $authenticationInfo->getError())) {
             $description = $authenticationInfo->getErrorDescription();
