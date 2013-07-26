@@ -210,7 +210,7 @@ return array(
                     'REMOTE_USER' => 'id',
                     'cn' => 'name',
                     'givenName' => 'given_name',
-                    'sn' => 'field_name',
+                    'sn' => 'family_name',
                     'mail' => 'email'
                 ),
                 'attribute_filter' => array(
