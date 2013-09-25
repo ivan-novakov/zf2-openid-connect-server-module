@@ -35,7 +35,9 @@ class ServiceManagerConfig extends Config
         return array(
             'InoOicServer\TokenGenerator' => 'InoOicServer\Session\Hash\Generator\Simple',
             'InoOicServer\AuthorizeRequestFactory' => 'InoOicServer\OpenIdConnect\Request\Authorize\RequestFactory',
-            'InoOicServer\AuthorizeContextFactory' => 'InoOicServer\Context\AuthorizeContextFactory'
+            'InoOicServer\AuthorizeContextFactory' => 'InoOicServer\Context\AuthorizeContextFactory',
+            'InoOicServer\UserDataConnectorFactory' => 'InoOicServer\User\DataConnector\DataConnectorFactory',
+            'InoOicServer\UserValidatorFactory' => 'InoOicServer\User\Validator\ValidatorFactory'
         );
     }
 
@@ -89,8 +91,7 @@ class ServiceManagerConfig extends Config
                             }
                         }
                         
-                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) &&
-                             isset($writerConfig['formatter'])) {
+                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) && isset($writerConfig['formatter'])) {
                             $formatterConfig = $writerConfig['formatter'];
                             if (isset($formatterConfig['format'])) {
                                 $formatter = new \Zend\Log\Formatter\Simple($formatterConfig['format']);
@@ -141,14 +142,6 @@ class ServiceManagerConfig extends Config
             }, 
             
             /*
-             * User/DataConnector/DataConnectorFactory
-             */
-            'InoOicServer\UserDataConnectorFactory' => function (ServiceManager $sm)
-            {
-                return new DataConnectorFactory();
-            }, 
-            
-            /*
              * The default user data connector.
              * User/DataConnector/Chain
              */
@@ -161,16 +154,41 @@ class ServiceManagerConfig extends Config
                 
                 $dataConnectorConfigs = $config['data_connectors'];
                 $factory = $sm->get('InoOicServer\UserDataConnectorFactory');
-                $chain = $factory->createDataConnector(
-                    array(
-                        'class' => '\InoOicServer\User\DataConnector\Chain'
-                    ));
+                $chain = $factory->createDataConnector(array(
+                    'class' => '\InoOicServer\User\DataConnector\Chain'
+                ));
                 foreach ($dataConnectorConfigs as $dataConnectorConfig) {
                     $chain->addDataConnector($factory->createDataConnector($dataConnectorConfig));
                 }
                 
                 return $chain;
-            }, 
+            },
+            
+            /*
+             * The default user validator
+             * User/Validator/ChainValidator
+             */
+            'InoOicServer\UserValidator' => function (ServiceManager $sm)
+            {
+                $config = $sm->get('Config');
+                $validatorsConfig = array();
+                
+                if (isset($config['user_validators']) && is_array($config['user_validators'])) {
+                    $validatorsConfig = $config['user_validators'];
+                }
+                
+                /* @var $factory \InoOicServer\User\Validator\ValidatorFactory */
+                $factory = $sm->get('InoOicServer\UserValidatorFactory');
+                
+                $validator = $factory->createValidator(array(
+                    'class' => '\InoOicServer\User\Validator\ChainValidator'
+                ));
+                foreach ($validatorsConfig as $validatorConfig) {
+                    $validator->addValidator($factory->createValidator($validatorConfig));
+                }
+                
+                return $validator;
+            },
             
             /*
              * User/UserInfo/Mapper/MapperInterface
@@ -256,8 +274,7 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ClientAuthenticationManager' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
-                if (! isset($config['client_authentication_manager']) ||
-                     ! is_array($config['client_authentication_manager'])) {
+                if (! isset($config['client_authentication_manager']) || ! is_array($config['client_authentication_manager'])) {
                     throw new Exception\ConfigNotFoundException('client_authentication_manager');
                 }
                 
@@ -287,6 +304,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher->setClientRegistry($sm->get('InoOicServer\ClientRegistry'));
                 $dispatcher->setSessionManager($sm->get('InoOicServer\SessionManager'));
                 $dispatcher->setDataConnector($sm->get('InoOicServer\UserDataConnector'));
+                $dispatcher->setUserValidator($sm->get('InoOicServer\UserValidator'));
                 
                 return $dispatcher;
             },

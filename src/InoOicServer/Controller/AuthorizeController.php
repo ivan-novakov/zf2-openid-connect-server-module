@@ -2,11 +2,13 @@
 
 namespace InoOicServer\Controller;
 
+use Zend\Http;
 use InoOicServer\OpenIdConnect\Response;
 use InoOicServer\OpenIdConnect\Dispatcher;
 use InoOicServer\Authentication;
 use InoOicServer\Context\AuthorizeContextManager;
 use InoOicServer\General\Exception\MissingDependencyException;
+use InoOicServer\User\Validator\Exception\InvalidUserException;
 
 
 class AuthorizeController extends BaseController
@@ -104,7 +106,7 @@ class AuthorizeController extends BaseController
         
         $contextManager = $this->getAuthorizeContextManager();
         $context = $contextManager->initContext();
-
+        
         $dispatcher = $this->getAuthorizeDispatcher();
         $dispatcher->setContext($context);
         
@@ -130,10 +132,9 @@ class AuthorizeController extends BaseController
         $authenticationHandlerName = $manager->getAuthenticationHandler();
         $this->logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
         
-        return $this->redirectToRoute($manager->getAuthenticationRouteName(), 
-            array(
-                'controller' => $authenticationHandlerName
-            ));
+        return $this->redirectToRoute($manager->getAuthenticationRouteName(), array(
+            'controller' => $authenticationHandlerName
+        ));
     }
 
 
@@ -145,20 +146,24 @@ class AuthorizeController extends BaseController
         
         $contextManager = $this->getAuthorizeContextManager();
         $context = $contextManager->initContext();
+        $contextManager->unpersistContext();
         
         $dispatcher = $this->getAuthorizeDispatcher();
         $dispatcher->setContext($context);
-        
-        $contextManager->unpersistContext();
         
         try {
             $this->logInfo('dispatching response...');
             
             $response = $dispatcher->dispatch();
+            
             if ($response instanceof Response\Authorize\Error) {
                 return $this->errorResponse($response, 'Error in dispatch');
             }
         } catch (\Exception $e) {
+            if ($e instanceof InvalidUserException && $redirectUri = $e->getRedirectUri()) {
+                $this->logError(sprintf("Invalid user: [%s] %s - redirecting to '%s'", get_class($e), $e->getMessage(), $redirectUri));
+                return $this->redirect()->toUrl($redirectUri);
+            }
             $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
             return $this->errorResponse($response, 'General error in dispatch');
         }

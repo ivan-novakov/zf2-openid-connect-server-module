@@ -3,6 +3,7 @@
 namespace InoOicServer\OpenIdConnect\Dispatcher;
 
 use InoOicServer\User\DataConnector\DataConnectorInterface;
+use InoOicServer\User\Validator\ValidatorInterface;
 use InoOicServer\Client\Client;
 use InoOicServer\Authentication;
 use InoOicServer\User\UserInterface;
@@ -21,14 +22,14 @@ class Authorize extends AbstractDispatcher
      * 
      * @var AuthorizeContext
      */
-    protected $context = NULL;
+    protected $context;
 
     /**
      * The response object.
      * 
      * @var Response\Authorize\Simple
      */
-    protected $response = NULL;
+    protected $response;
 
     /**
      * The amount of seconds after an invalid authentication, when it is possible to perform another authentication.
@@ -42,7 +43,14 @@ class Authorize extends AbstractDispatcher
      * 
      * @var DataConnectorInterface
      */
-    protected $dataConnector = null;
+    protected $dataConnector;
+
+    /**
+     * User validator.
+     * 
+     * @var ValidatorInterface
+     */
+    protected $userValidator;
 
 
     /**
@@ -120,6 +128,24 @@ class Authorize extends AbstractDispatcher
         }
         
         return $this->dataConnector;
+    }
+
+
+    /**
+     * @return ValidatorInterface
+     */
+    public function getUserValidator()
+    {
+        return $this->userValidator;
+    }
+
+
+    /**
+     * @param ValidatorInterface $userValidator
+     */
+    public function setUserValidator(ValidatorInterface $userValidator)
+    {
+        $this->userValidator = $userValidator;
     }
 
 
@@ -208,6 +234,11 @@ class Authorize extends AbstractDispatcher
         $dataConnector = $this->getDataConnector();
         if ($dataConnector instanceof DataConnectorInterface) {
             $dataConnector->populateUser($user);
+        }
+        
+        $userValidator = $this->getUserValidator();
+        if ($userValidator instanceof ValidatorInterface) {
+            $userValidator->validate($user);
         }
         
         $response = $this->getAuthorizeResponse(true);

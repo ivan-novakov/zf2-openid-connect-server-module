@@ -77,6 +77,14 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
+    /**
+     * Redirects to the specified route.
+     * 
+     * @param string $routeName
+     * @param array $params
+     * @param array $options
+     * @return \Zend\Http\Response
+     */
     protected function redirectToRoute($routeName, Array $params = array(), Array $options = array())
     {
         $path = $this->url()->fromRoute($routeName, $params, $options);
@@ -88,6 +96,11 @@ abstract class BaseController extends \Zend\Mvc\Controller\AbstractActionControl
     }
 
 
+    /**
+     * Returns the base URI.
+     * 
+     * @return \Zend\Uri\Http
+     */
     protected function getBaseUri()
     {
         $uri = $this->getRequest()->getUri();

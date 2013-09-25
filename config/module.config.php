@@ -1,5 +1,4 @@
 <?php
-
 return array(
     
     'router' => array(
@@ -290,6 +289,16 @@ return array(
         'test' => array(
             'class' => '\InoOicServer\User\DataConnector\Dummy',
             'options' => array()
+        )
+    ),
+    
+    'user_validators' => array(
+        'dummy' => array(
+            'class' => '\InoOicServer\User\Validator\Dummy',
+            'options' => array(
+                'valid' => false,
+                'redirect_uri' => 'http://www.cesnet.cz/'
+            )
         )
     ),
     
