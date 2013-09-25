@@ -297,7 +297,7 @@ return array(
             'class' => '\InoOicServer\User\Validator\Dummy',
             'options' => array(
                 'valid' => false,
-                'redirect_uri' => 'http://www.cesnet.cz/'
+                'redirect_uri' => 'http://registration.example.org/'
             )
         )
     ),
