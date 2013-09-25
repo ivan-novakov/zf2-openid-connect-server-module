@@ -3,6 +3,7 @@
 namespace InoOicServer\Controller;
 
 use Zend\Http;
+use Zend\Session;
 use InoOicServer\OpenIdConnect\Response;
 use InoOicServer\OpenIdConnect\Dispatcher;
 use InoOicServer\Authentication;
@@ -23,14 +24,38 @@ class AuthorizeController extends BaseController
     /**
      * @var Dispatcher\Authorize
      */
-    protected $authorizeDispatcher = null;
+    protected $authorizeDispatcher;
 
     /**
      * @var Authentication\Manager
      */
-    protected $authenticationManager = null;
+    protected $authenticationManager;
+
+    /**
+     * Session container.
+     * @var Session\Container
+     */
+    protected $sessionContainer;
 
     protected $logIdent = 'authorize';
+
+
+    /**
+     * @return Session\Container
+     */
+    public function getSessionContainer()
+    {
+        return $this->sessionContainer;
+    }
+
+
+    /**
+     * @param Session\Container $sessionContainer
+     */
+    public function setSessionContainer(Session\Container $sessionContainer)
+    {
+        $this->sessionContainer = $sessionContainer;
+    }
 
 
     /**
@@ -102,6 +127,8 @@ class AuthorizeController extends BaseController
     {
         $this->logInfo($_SERVER['REQUEST_URI']);
         
+        $this->getSessionContainer()->offsetSet('http_request', $this->getRequest());
+        
         $response = null;
         
         $contextManager = $this->getAuthorizeContextManager();
@@ -132,9 +159,10 @@ class AuthorizeController extends BaseController
         $authenticationHandlerName = $manager->getAuthenticationHandler();
         $this->logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
         
-        return $this->redirectToRoute($manager->getAuthenticationRouteName(), array(
-            'controller' => $authenticationHandlerName
-        ));
+        return $this->redirectToRoute($manager->getAuthenticationRouteName(), 
+            array(
+                'controller' => $authenticationHandlerName
+            ));
     }
 
 
@@ -161,7 +189,10 @@ class AuthorizeController extends BaseController
             }
         } catch (\Exception $e) {
             if ($e instanceof InvalidUserException && $redirectUri = $e->getRedirectUri()) {
-                $this->logError(sprintf("Invalid user: [%s] %s - redirecting to '%s'", get_class($e), $e->getMessage(), $redirectUri));
+                $this->logError(
+                    sprintf("Invalid user: [%s] %s - redirecting to '%s'", get_class($e), $e->getMessage(), 
+                        $redirectUri));
+                
                 return $this->redirect()->toUrl($redirectUri);
             }
             $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));

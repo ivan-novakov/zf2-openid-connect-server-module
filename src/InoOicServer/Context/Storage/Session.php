@@ -35,7 +35,8 @@ class Session extends AbstractStorage
     public function getSessionContainer()
     {
         if (! ($this->sessionContainer instanceof \Zend\Session\Container)) {
-            $this->sessionContainer = new \Zend\Session\Container($this->_options->get('session_container_name', 'authorize'));
+            $this->sessionContainer = new \Zend\Session\Container(
+                $this->_options->get('session_container_name', 'authorize'));
         }
         
         return $this->sessionContainer;

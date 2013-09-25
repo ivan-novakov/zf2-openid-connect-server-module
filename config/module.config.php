@@ -158,6 +158,10 @@ return array(
         )
     ),
     
+    'session_container' => array(
+        'namespace' => 'oic_server'
+    ),
+    
     'oic_server_info' => array(
         'base_uri' => 'https://oic.server.org/authn',
         'service_documentation' => 'https://github.com/ivan-novakov/zf2-openid-connect-server-module'

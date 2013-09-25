@@ -50,6 +50,7 @@ class ControllerManagerConfig extends Config
                 $controller->setAuthorizeContextManager($sm->get('InoOicServer\AuthorizeContextManager'));
                 $controller->setAuthorizeDispatcher($sm->get('InoOicServer\AuthorizeDispatcher'));
                 $controller->setAuthenticationManager($sm->get('InoOicServer\AuthenticationManager'));
+                $controller->setSessionContainer($sm->get('InoOicServer\SessionContainer'));
                 
                 return $controller;
             },

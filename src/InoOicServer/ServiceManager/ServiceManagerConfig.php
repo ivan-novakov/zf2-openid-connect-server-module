@@ -47,7 +47,6 @@ class ServiceManagerConfig extends Config
         $smc = $this;
         return array(
             'InoOicServer\ContextStorage' => 'InoOicServer\Context\Storage\StorageFactory',
-            // 'InoOicServer\SessionManager' => 'InoOicServer\Session\SessionManagerFactory',
             'InoOicServer\SessionStorage' => 'InoOicServer\Session\Storage\StorageFactory',
             'InoOicServer\ClientRegistryStorage' => 'InoOicServer\Client\Registry\StorageFactory',
             'InoOicServer\ClientRegistry' => 'InoOicServer\Client\RegistryFactory',
@@ -91,7 +90,8 @@ class ServiceManagerConfig extends Config
                             }
                         }
                         
-                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) && isset($writerConfig['formatter'])) {
+                        if (isset($writerConfig['formatter']) && is_array($writerConfig['formatter']) &&
+                             isset($writerConfig['formatter'])) {
                             $formatterConfig = $writerConfig['formatter'];
                             if (isset($formatterConfig['format'])) {
                                 $formatter = new \Zend\Log\Formatter\Simple($formatterConfig['format']);
@@ -115,6 +115,20 @@ class ServiceManagerConfig extends Config
                 return new ErrorHandler($sm->get('InoOicServer\Logger'));
             },
             
+            'InoOicServer\SessionManager' => function (ServiceManager $sm)
+            {
+                $sessionManager = new \Zend\Session\SessionManager();
+                return $sessionManager;
+            },
+            
+            'InoOicServer\SessionContainer' => function (ServiceManager $sm)
+            {
+                // $config = $sm->get('Config');
+                $sessionManager = $sm->get('InoOicServer\SessionManager');
+                $container = new \Zend\Session\Container('InoOicServer', $sessionManager);
+                return $container;
+            },
+       
             /*
              * User/Serializer
              */
@@ -154,9 +168,10 @@ class ServiceManagerConfig extends Config
                 
                 $dataConnectorConfigs = $config['data_connectors'];
                 $factory = $sm->get('InoOicServer\UserDataConnectorFactory');
-                $chain = $factory->createDataConnector(array(
-                    'class' => '\InoOicServer\User\DataConnector\Chain'
-                ));
+                $chain = $factory->createDataConnector(
+                    array(
+                        'class' => '\InoOicServer\User\DataConnector\Chain'
+                    ));
                 foreach ($dataConnectorConfigs as $dataConnectorConfig) {
                     $chain->addDataConnector($factory->createDataConnector($dataConnectorConfig));
                 }
@@ -180,11 +195,14 @@ class ServiceManagerConfig extends Config
                 /* @var $factory \InoOicServer\User\Validator\ValidatorFactory */
                 $factory = $sm->get('InoOicServer\UserValidatorFactory');
                 
-                $validator = $factory->createValidator(array(
-                    'class' => '\InoOicServer\User\Validator\ChainValidator'
-                ));
+                $validator = $factory->createValidator(
+                    array(
+                        'class' => '\InoOicServer\User\Validator\ChainValidator'
+                    ));
                 foreach ($validatorsConfig as $validatorConfig) {
-                    $validator->addValidator($factory->createValidator($validatorConfig));
+                    $subValidator = $factory->createValidator($validatorConfig);
+                    $subValidator->setSessionContainer($sm->get('InoOicServer\SessionContainer'));
+                    $validator->addValidator($subValidator);
                 }
                 
                 return $validator;
@@ -213,7 +231,7 @@ class ServiceManagerConfig extends Config
                 return new $className();
             },
             
-            'InoOicServer\SessionManager' => function (ServiceManager $sm) use($smc)
+            'InoOicServer\OicSessionManager' => function (ServiceManager $sm) use($smc)
             {
                 $config = $sm->get('Config');
                 if (! isset($config[$smc::CONFIG_SESSION_MANAGER]) || ! is_array($config[$smc::CONFIG_SESSION_MANAGER])) {
@@ -274,7 +292,8 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ClientAuthenticationManager' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
-                if (! isset($config['client_authentication_manager']) || ! is_array($config['client_authentication_manager'])) {
+                if (! isset($config['client_authentication_manager']) ||
+                     ! is_array($config['client_authentication_manager'])) {
                     throw new Exception\ConfigNotFoundException('client_authentication_manager');
                 }
                 
@@ -286,6 +305,9 @@ class ServiceManagerConfig extends Config
             'InoOicServer\AuthorizeContextManager' => function (ServiceManager $sm)
             {
                 $contextStorage = $sm->get('InoOicServer\ContextStorage');
+                $sessionContainer = $sm->get('InoOicServer\SessionContainer');
+                $contextStorage->setSessionContainer($sessionContainer);
+                
                 $contextFactory = $sm->get('InoOicServer\AuthorizeContextFactory');
                 $requestFactory = $sm->get('InoOicServer\AuthorizeRequestFactory');
                 
@@ -302,7 +324,7 @@ class ServiceManagerConfig extends Config
                 
                 $dispatcher->setAuthorizeResponse($sm->get('InoOicServer\AuthorizeResponse'));
                 $dispatcher->setClientRegistry($sm->get('InoOicServer\ClientRegistry'));
-                $dispatcher->setSessionManager($sm->get('InoOicServer\SessionManager'));
+                $dispatcher->setSessionManager($sm->get('InoOicServer\OicSessionManager'));
                 $dispatcher->setDataConnector($sm->get('InoOicServer\UserDataConnector'));
                 $dispatcher->setUserValidator($sm->get('InoOicServer\UserValidator'));
                 
@@ -332,7 +354,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher = new Dispatcher\Token();
                 
                 $dispatcher->setClientRegistry($sm->get('InoOicServer\ClientRegistry'));
-                $dispatcher->setSessionManager($sm->get('InoOicServer\SessionManager'));
+                $dispatcher->setSessionManager($sm->get('InoOicServer\OicSessionManager'));
                 $dispatcher->setTokenRequest($sm->get('InoOicServer\TokenRequest'));
                 $dispatcher->setTokenResponse($sm->get('InoOicServer\TokenResponse'));
                 $dispatcher->setClientAuthenticationManager($sm->get('InoOicServer\ClientAuthenticationManager'));
@@ -363,7 +385,7 @@ class ServiceManagerConfig extends Config
             {
                 $dispatcher = new Dispatcher\UserInfo();
                 
-                $dispatcher->setSessionManager($sm->get('InoOicServer\SessionManager'));
+                $dispatcher->setSessionManager($sm->get('InoOicServer\OicSessionManager'));
                 $dispatcher->setUserInfoRequest($sm->get('InoOicServer\UserInfoRequest'));
                 $dispatcher->setUserInfoResponse($sm->get('InoOicServer\UserInfoResponse'));
                 $dispatcher->setUserInfoMapper($sm->get('InoOicServer\UserInfoMapper'));

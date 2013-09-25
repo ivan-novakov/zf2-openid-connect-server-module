@@ -64,5 +64,16 @@ return array(
                 'file' => 'data/auth/users.php'
             )
         )
+    ),
+    
+    'user_validators' => array(
+        
+        'dummy' => array(
+            'class' => '\InoOicServer\User\Validator\Dummy',
+            'options' => array(
+                'valid' => true,
+                'redirect_uri' => 'http://registration.example.org/'
+            )
+        )
     )
 );
