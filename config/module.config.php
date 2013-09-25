@@ -286,20 +286,24 @@ return array(
     ),
     
     'data_connectors' => array(
+        /*
         'test' => array(
             'class' => '\InoOicServer\User\DataConnector\Dummy',
             'options' => array()
         )
+        */
     ),
     
     'user_validators' => array(
+        /*
         'dummy' => array(
             'class' => '\InoOicServer\User\Validator\Dummy',
             'options' => array(
-                'valid' => false,
+                'valid' => true,
                 'redirect_uri' => 'http://registration.example.org/'
             )
         )
+        */
     ),
     
     'user_info_mapper' => array(
