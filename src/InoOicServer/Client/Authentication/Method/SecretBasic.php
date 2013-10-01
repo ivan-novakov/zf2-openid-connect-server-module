@@ -31,7 +31,7 @@ class SecretBasic extends AbstractMethod
         
         $value = $authorizationHeader->getFieldValue();
         $parts = explode(' ', $value);
-        if ('basic' !== strtolower($parts[0])) {
+        if ('basic' !== trim(strtolower($parts[0]))) {
             return $this->createFailureResult(sprintf("Unsupported authorization '%s'", $parts[0]));
         }
         
@@ -39,7 +39,7 @@ class SecretBasic extends AbstractMethod
             return $this->createFailureResult('Missing authorization hash');
         }
         
-        $receivedHash = $parts[1];
+        $receivedHash = trim($parts[1]);
         $clientHash = base64_encode(sprintf("%s:%s", $info->getClientId(), $info->getOption(self::AUTH_OPTION_SECRET)));
         
         if ($receivedHash !== $clientHash) {
