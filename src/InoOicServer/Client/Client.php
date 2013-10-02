@@ -12,7 +12,6 @@ use InoOicServer\Entity\Entity;
  * @method string getType()
  * @method string|array getRedirectUri()
  * @method string getUserAuthenticationHandler()
- * @method \InoOicServer\Client\Authentication\Info getAuthenticationInfo()
  */
 class Client extends Entity
 {
