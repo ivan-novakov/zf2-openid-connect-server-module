@@ -2,13 +2,10 @@
 
 namespace InoOicServer\Session\Storage;
 
-use InoOicServer\Session\Token\AuthrozationCode;
 use Zend\Db;
-use InoOicServer\Entity\Entity;
 use InoOicServer\Session\Token\AccessToken;
 use InoOicServer\Session\Token\RefreshToken;
 use InoOicServer\Session\Token\AuthorizationCode;
-use InoOicServer\Session\SessionHydrator;
 use InoOicServer\Session\Session;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Adapter\Adapter;
@@ -69,17 +66,16 @@ class MysqlLite extends AbstractStorage
     public function saveSession(Session $session)
     {
         try {
-            //$this->_beginTransaction($adapter);
+            // $this->_beginTransaction($adapter);
             
-
             $sql = $this->getSql();
             $insert = $sql->insert($this->_getSessionTableName());
             $insert->values($this->_sessionToArray($session));
             
             $result = $this->executeSqlQuery($insert);
-            //$this->_commit($adapter);
+            // $this->_commit($adapter);
         } catch (\Exception $e) {
-            //$this->_rollback($adapter);
+            // $this->_rollback($adapter);
             throw new Exception\SaveException($session, $e);
         }
     }
@@ -107,8 +103,7 @@ class MysqlLite extends AbstractStorage
         $data = (array) $result->current();
         $authorizationCode = new AuthorizationCode();
         
-        return $this->getAuthorizationCodeHydrator()
-            ->hydrateObject($data, $authorizationCode);
+        return $this->getAuthorizationCodeHydrator()->hydrateObject($data, $authorizationCode);
     }
 
 
@@ -171,8 +166,7 @@ class MysqlLite extends AbstractStorage
         $data = (array) $result->current();
         $accessToken = new AccessToken();
         
-        return $this->getAccessTokenHydrator()
-            ->hydrate($data, $accessToken);
+        return $this->getAccessTokenHydrator()->hydrate($data, $accessToken);
     }
 
 
@@ -320,10 +314,8 @@ class MysqlLite extends AbstractStorage
          * temp fix
          */
         $driver = $this->dbAdapter->getDriver();
-        $driver->getConnection()
-            ->connect();
-        $this->dbAdapter->getPlatform()
-            ->setDriver($driver);
+        $driver->getConnection()->connect();
+        $this->dbAdapter->getPlatform()->setDriver($driver);
         /* --- */
         
         $this->setSqlFromAdapter($dbAdapter);
@@ -417,8 +409,7 @@ class MysqlLite extends AbstractStorage
      */
     protected function executeSqlQuery(SqlInterface $sqlObject)
     {
-        $sqlString = $this->getSql()
-            ->getSqlStringForSqlObject($sqlObject);
+        $sqlString = $this->getSql()->getSqlStringForSqlObject($sqlObject);
         $result = $this->dbAdapter->query($sqlString, Adapter::QUERY_MODE_EXECUTE);
         
         return $result;

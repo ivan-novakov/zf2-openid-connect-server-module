@@ -2,7 +2,6 @@
 
 namespace InoOicServer\Controller;
 
-use Zend\Http;
 use Zend\Session;
 use InoOicServer\OpenIdConnect\Response;
 use InoOicServer\OpenIdConnect\Dispatcher;

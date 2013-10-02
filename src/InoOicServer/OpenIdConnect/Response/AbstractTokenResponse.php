@@ -2,8 +2,6 @@
 
 namespace InoOicServer\OpenIdConnect\Response;
 
-use InoOicServer\OpenIdConnect\Entity;
-
 
 abstract class AbstractTokenResponse extends AbstractResponse
 {
@@ -35,7 +33,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      *
      * @param unknown_type $message
      */
-    public function setError ($message, $description = NULL)
+    public function setError($message, $description = NULL)
     {
         $this->_errorMessage = $message;
         $this->_errorDescription = $description;
@@ -47,7 +45,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      *
      * @return boolean
      */
-    public function isError ()
+    public function isError()
     {
         return (NULL !== $this->_errorMessage);
     }
@@ -58,7 +56,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      *
      * @return string|NULL
      */
-    public function getErrorMessage ()
+    public function getErrorMessage()
     {
         return $this->_errorMessage;
     }
@@ -69,7 +67,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      * 
      * @return string|NULL
      */
-    public function getErrorDescription ()
+    public function getErrorDescription()
     {
         return $this->_errorDescription;
     }
@@ -80,11 +78,10 @@ abstract class AbstractTokenResponse extends AbstractResponse
      * @see \InoOicServer\OpenIdConnect\Response\AbstractResponse::getHttpResponse()
      * @return \Zend\Http\Response
      */
-    public function getHttpResponse ()
+    public function getHttpResponse()
     {
         $httpResponse = parent::getHttpResponse();
-        $httpResponse->getHeaders()
-            ->addHeaders(array(
+        $httpResponse->getHeaders()->addHeaders(array(
             'Content-Type' => 'application/json'
         ));
         
@@ -104,7 +101,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      * 
      * @return string
      */
-    abstract protected function _createResponseContent ();
+    abstract protected function _createResponseContent();
 
 
     /**
@@ -112,7 +109,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      *
      * @return string
      */
-    protected function _createErrorResponseContent ()
+    protected function _createErrorResponseContent()
     {
         $errorData = array(
             'error' => $this->getErrorMessage()
@@ -132,7 +129,7 @@ abstract class AbstractTokenResponse extends AbstractResponse
      * @param array $data
      * @return string
      */
-    protected function _jsonEncode (Array $data)
+    protected function _jsonEncode(Array $data)
     {
         return \Zend\Json\Json::encode($data);
     }

@@ -5,6 +5,7 @@ namespace InoOicServer\Storage;
 use Zend\Stdlib\Parameters;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Adapter\Adapter;
+use Zend\Db\Sql\SqlInterface;
 
 
 abstract class AbstractStorage

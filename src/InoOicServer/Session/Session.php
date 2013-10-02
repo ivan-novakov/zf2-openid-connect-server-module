@@ -3,10 +3,6 @@
 namespace InoOicServer\Session;
 
 use InoOicServer\Session\Token\AbstractToken;
-use InoOicServer\Entity\Entity;
-use InoOicServer\Client\Client;
-use InoOicServer\User\User;
-use InoOicServer\Authentication;
 
 
 /**
@@ -42,49 +38,49 @@ class Session extends AbstractToken
     const FIELD_USER_DATA = 'user_data';
 
     protected $_fields = array(
-        self::FIELD_ID, 
-        self::FIELD_USER_ID, 
-        self::FIELD_CREATE_TIME, 
-        self::FIELD_MODIFY_TIME, 
-        self::FIELD_EXPIRATION_TIME, 
-        self::FIELD_AUTHENTICATION_TIME, 
-        self::FIELD_AUTHENTICATION_METHOD, 
+        self::FIELD_ID,
+        self::FIELD_USER_ID,
+        self::FIELD_CREATE_TIME,
+        self::FIELD_MODIFY_TIME,
+        self::FIELD_EXPIRATION_TIME,
+        self::FIELD_AUTHENTICATION_TIME,
+        self::FIELD_AUTHENTICATION_METHOD,
         self::FIELD_USER_DATA
     );
 
 
-    public function setCreateTime ($timeString)
+    public function setCreateTime($timeString)
     {
         $this->setValue(self::FIELD_CREATE_TIME, $this->_timeStringToDateObject($timeString));
     }
 
 
-    public function setModifyTime ($timeString)
+    public function setModifyTime($timeString)
     {
         $this->setValue(self::FIELD_MODIFY_TIME, $this->_timeStringToDateObject($timeString));
     }
 
 
-    public function setExpirationTime ($timeString)
+    public function setExpirationTime($timeString)
     {
         $this->setValue(self::FIELD_EXPIRATION_TIME, $this->_timeStringToDateObject($timeString));
     }
 
 
-    public function setAuthenticationTime ($timeString)
+    public function setAuthenticationTime($timeString)
     {
         $this->setValue(self::FIELD_AUTHENTICATION_TIME, $this->_timeStringToDateObject($timeString));
     }
 
 
-    public function toArray ()
+    public function toArray()
     {
         $arrayData = parent::toArray();
         
         return $this->_arrayDateObjectToTimeString($arrayData, array(
-            self::FIELD_CREATE_TIME, 
-            self::FIELD_MODIFY_TIME, 
-            self::FIELD_EXPIRATION_TIME, 
+            self::FIELD_CREATE_TIME,
+            self::FIELD_MODIFY_TIME,
+            self::FIELD_EXPIRATION_TIME,
             self::FIELD_AUTHENTICATION_TIME
         ));
     }

@@ -8,7 +8,6 @@ use InoOicServer\Authentication\Info;
 use InoOicServer\Util\Options;
 use InoOicServer\Controller\BaseController;
 use Zend\InputFilter\Factory;
-use InoOicServer\Context\AuthorizeContext;
 use InoOicServer\Context\AuthorizeContextManager;
 use InoOicServer\General\Exception as GeneralException;
 use InoOicServer\Context\Exception\MissingContextException;

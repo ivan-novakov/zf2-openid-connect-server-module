@@ -199,7 +199,7 @@ class SessionManager
     /**
      * @param Util\DateTimeUtil $dateTimeUtil
      */
-    public function setDateTimeUtil(DateTimeUtil $dateTimeUtil)
+    public function setDateTimeUtil(Util\DateTimeUtil $dateTimeUtil)
     {
         $this->dateTimeUtil = $dateTimeUtil;
     }
@@ -255,17 +255,16 @@ class SessionManager
         $now = $dateTimeUtil->createDateTime();
         $expire = $dateTimeUtil->createExpireDateTime($now, $this->getSessionExpireInterval());
         
-        $session = new Session(
-            array(
-                Session::FIELD_ID => $sessionId,
-                Session::FIELD_USER_ID => $user->getId(),
-                Session::FIELD_CREATE_TIME => $now,
-                Session::FIELD_MODIFY_TIME => $now,
-                Session::FIELD_AUTHENTICATION_TIME => $authenticationInfo->getTime(),
-                Session::FIELD_EXPIRATION_TIME => $expire,
-                Session::FIELD_AUTHENTICATION_METHOD => $authenticationInfo->getMethod(),
-                Session::FIELD_USER_DATA => $serializedUserData
-            ));
+        $session = new Session(array(
+            Session::FIELD_ID => $sessionId,
+            Session::FIELD_USER_ID => $user->getId(),
+            Session::FIELD_CREATE_TIME => $now,
+            Session::FIELD_MODIFY_TIME => $now,
+            Session::FIELD_AUTHENTICATION_TIME => $authenticationInfo->getTime(),
+            Session::FIELD_EXPIRATION_TIME => $expire,
+            Session::FIELD_AUTHENTICATION_METHOD => $authenticationInfo->getMethod(),
+            Session::FIELD_USER_DATA => $serializedUserData
+        ));
         
         $storage->saveSession($session);
         
@@ -323,15 +322,14 @@ class SessionManager
         $now = $this->getDateTimeUtil()->createDateTime();
         $expire = $this->getDateTimeUtil()->createExpireDateTime($now, $this->getAuthorizationCodeExpireInterval());
         
-        $authorizationCode = new AuthorizationCode(
-            array(
-                AuthorizationCode::FIELD_CODE => $code,
-                AuthorizationCode::FIELD_SESSION_ID => $session->getId(),
-                AuthorizationCode::FIELD_ISSUE_TIME => $now,
-                AuthorizationCode::FIELD_EXPIRATION_TIME => $expire,
-                AuthorizationCode::FIELD_CLIENT_ID => $client->getId(),
-                AuthorizationCode::FIELD_SCOPE => 'openid'
-            ));
+        $authorizationCode = new AuthorizationCode(array(
+            AuthorizationCode::FIELD_CODE => $code,
+            AuthorizationCode::FIELD_SESSION_ID => $session->getId(),
+            AuthorizationCode::FIELD_ISSUE_TIME => $now,
+            AuthorizationCode::FIELD_EXPIRATION_TIME => $expire,
+            AuthorizationCode::FIELD_CLIENT_ID => $client->getId(),
+            AuthorizationCode::FIELD_SCOPE => 'openid'
+        ));
         
         $storage->saveAuthorizationCode($authorizationCode);
         
@@ -373,16 +371,15 @@ class SessionManager
         $now = $this->getDateTimeUtil()->createDateTime();
         $expire = $this->getDateTimeUtil()->createExpireDateTime($now, $this->getAccessTokenExpireInterval());
         
-        $accessToken = new AccessToken(
-            array(
-                AccessToken::FIELD_TOKEN => $token,
-                AccessToken::FIELD_SESSION_ID => $session->getId(),
-                AccessToken::FIELD_CLIENT_ID => $client->getId(),
-                AccessToken::FIELD_ISSUE_TIME => $now,
-                AccessToken::FIELD_EXPIRATION_TIME => $expire,
-                AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER,
-                AccessToken::FIELD_SCOPE => 'openid'
-            ));
+        $accessToken = new AccessToken(array(
+            AccessToken::FIELD_TOKEN => $token,
+            AccessToken::FIELD_SESSION_ID => $session->getId(),
+            AccessToken::FIELD_CLIENT_ID => $client->getId(),
+            AccessToken::FIELD_ISSUE_TIME => $now,
+            AccessToken::FIELD_EXPIRATION_TIME => $expire,
+            AccessToken::FIELD_TYPE => AccessToken::TYPE_BEARER,
+            AccessToken::FIELD_SCOPE => 'openid'
+        ));
         
         $storage->saveAccessToken($accessToken);
         

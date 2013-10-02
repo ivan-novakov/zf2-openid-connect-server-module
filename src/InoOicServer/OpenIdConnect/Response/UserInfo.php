@@ -2,9 +2,6 @@
 
 namespace InoOicServer\OpenIdConnect\Response;
 
-use InoOicServer\General\Exception as GeneralException;
-use InoOicServer\User\UserInterface;
-
 
 /**
  * Dispatches a userinfo request.
@@ -46,7 +43,7 @@ class UserInfo extends AbstractTokenResponse
      *
      * @param @array $userData
      */
-    public function setUserData (array $userData)
+    public function setUserData(array $userData)
     {
         $this->_userData = $userData;
     }
@@ -57,7 +54,7 @@ class UserInfo extends AbstractTokenResponse
      *
      * @return array
      */
-    public function getUserData ()
+    public function getUserData()
     {
         return $this->_userData;
     }
@@ -67,7 +64,7 @@ class UserInfo extends AbstractTokenResponse
      * (non-PHPdoc)
      * @see \InoOicServer\OpenIdConnect\Response\AbstractTokenResponse::setError()
      */
-    public function setError ($message, $description = NULL)
+    public function setError($message, $description = NULL)
     {
         /*
          * The different error codes require different HTTP status codes:
@@ -96,7 +93,7 @@ class UserInfo extends AbstractTokenResponse
      * @throws GeneralException\MissingDependencyException
      * @return string
      */
-    protected function _createResponseContent ()
+    protected function _createResponseContent()
     {
         return $this->_jsonEncode($this->getUserData());
     }

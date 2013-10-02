@@ -5,8 +5,6 @@ namespace InoOicServer\OpenIdConnect\Dispatcher;
 use InoOicServer\General\Exception as GeneralException;
 use InoOicServer\Session\SessionManager;
 use InoOicServer\Client\Registry\Registry;
-use InoOicServer\OpenIdConnect\Request;
-use InoOicServer\OpenIdConnect\Response;
 
 
 abstract class AbstractDispatcher implements DispatcherInterface

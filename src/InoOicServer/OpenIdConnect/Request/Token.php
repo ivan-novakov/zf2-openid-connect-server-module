@@ -2,9 +2,6 @@
 
 namespace InoOicServer\OpenIdConnect\Request;
 
-use InoOicServer\Http\AuthorizationHeaderParser;
-use InoOicServer\Client;
-
 
 /**
  * Token request object.

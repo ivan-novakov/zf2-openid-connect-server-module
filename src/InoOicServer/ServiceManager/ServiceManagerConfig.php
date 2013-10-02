@@ -2,12 +2,13 @@
 
 namespace InoOicServer\ServiceManager;
 
-use InoOicServer\Server\ServerInfo;
-use InoOicServer\Session\SessionManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
+use Zend\InputFilter\Factory;
+use Zend\Filter\FilterChain;
+use InoOicServer\Server\ServerInfo;
+use InoOicServer\Session\SessionManager;
 use InoOicServer\General\Exception as GeneralException;
-use InoOicServer\User\DataConnector\DataConnectorFactory;
 use InoOicServer\Util\String;
 use InoOicServer\User;
 use InoOicServer\Authentication;
@@ -15,8 +16,6 @@ use InoOicServer\OpenIdConnect\Dispatcher;
 use InoOicServer\OpenIdConnect\Response;
 use InoOicServer\OpenIdConnect\Request;
 use InoOicServer\Client;
-use Zend\InputFilter\Factory;
-use Zend\Filter\FilterChain;
 use InoOicServer\Util\ErrorHandler;
 use InoOicServer\OpenIdConnect\Request\Authorize\Simple;
 use InoOicServer\Context\AuthorizeContextManager;
