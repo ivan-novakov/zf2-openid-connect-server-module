@@ -9,11 +9,17 @@ use InoOicServer\Entity\Entity;
  * The user entity.
  * 
  * @method string getId()
+ * @method void setId(integer $id)
  * @method string getName()
+ * @method void setName(string $name)
  * @method string getGivenName()
+ * @method void setGivenName(string $givenName)
  * @method string getFamilyName()
+ * @method void setFamilyName(string $familyName)
  * @method string getNickname()
+ * @method void setNickname(string $nickname)
  * @method string getEmail()
+ * @method void setEmail(string $email)
  * 
  *
  */
