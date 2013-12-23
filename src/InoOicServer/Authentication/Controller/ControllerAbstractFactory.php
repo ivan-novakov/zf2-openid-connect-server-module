@@ -84,17 +84,17 @@ class ControllerAbstractFactory implements AbstractFactoryInterface
     protected function getControllerConfig(ServiceLocatorInterface $serviceLocator, $requestedName)
     {
         $config = $this->getServiceManager($serviceLocator)->get('Config');
-        
-        if (! isset($config['authentication_handlers']) || ! is_array($config['authentication_handlers'])) {
+
+        if (! isset($config['oic_server']['authentication_handlers']) || ! is_array($config['oic_server']['authentication_handlers'])) {
             throw new ServiceManagerException\ConfigNotFoundException('authentication_handlers');
         }
-        
-        $authConfig = $config['authentication_handlers'];
+
+        $authConfig = $config['oic_server']['authentication_handlers'];
         
         if (! isset($authConfig[$requestedName]) || ! is_array($authConfig[$requestedName])) {
             return null;
         }
-        
+ 
         return $authConfig[$requestedName];
     }
 

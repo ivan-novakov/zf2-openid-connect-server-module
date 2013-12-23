@@ -43,6 +43,7 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         $services = $application->getServiceManager();
         $eventManager->attach('dispatch.error', function ($event) use($services)
         {
+            
             $exception = $event->getResult()->exception;
             $error = $event->getError();
             if (! $exception && ! $error) {

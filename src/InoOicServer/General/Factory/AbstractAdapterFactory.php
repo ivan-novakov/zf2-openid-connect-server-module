@@ -19,11 +19,11 @@ class AbstractAdapterFactory implements \Zend\ServiceManager\FactoryInterface
         
         $config = $serviceLocator->get('Config');
         
-        if (! isset($config[$configField])) {
+        if (! isset($config['oic_server'][$configField])) {
             throw new ServiceManager\Exception\ConfigNotFoundException($configField);
         }
         
-        $storageConfig = $config[$configField];
+        $storageConfig = $config['oic_server'][$configField];
         
         if (! isset($storageConfig['type'])) {
             throw new ServiceManager\Exception\ConfigNotFoundException($configField . '/type');

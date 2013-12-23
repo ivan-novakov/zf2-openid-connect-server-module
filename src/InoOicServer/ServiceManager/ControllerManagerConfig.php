@@ -3,8 +3,8 @@
 namespace InoOicServer\ServiceManager;
 
 use Zend\ServiceManager\Config;
-use InoOicServer\Controller\IndexController;
 use Zend\Mvc\Controller\ControllerManager;
+use InoOicServer\Controller\IndexController;
 use InoOicServer\Controller\DiscoveryController;
 use InoOicServer\Controller\AuthorizeController;
 use InoOicServer\Controller\TokenController;
@@ -51,7 +51,7 @@ class ControllerManagerConfig extends Config
                 $controller->setAuthorizeDispatcher($sm->get('InoOicServer\AuthorizeDispatcher'));
                 $controller->setAuthenticationManager($sm->get('InoOicServer\AuthenticationManager'));
                 $controller->setSessionContainer($sm->get('InoOicServer\SessionContainer'));
-                
+
                 return $controller;
             },
             
