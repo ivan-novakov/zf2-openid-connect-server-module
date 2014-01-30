@@ -197,8 +197,9 @@ class AuthorizeController extends BaseController
         $response = null;
         
         $contextManager = $this->getAuthorizeContextManager();
-        $context = $contextManager->initContext();
+        //$context = $contextManager->initContext();
         // $contextManager->unpersistContext();
+        $context = $contextManager->getExistingContext();
         
         $dispatcher = $this->getAuthorizeDispatcher();
         $dispatcher->setContext($context);

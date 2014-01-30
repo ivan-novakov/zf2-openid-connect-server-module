@@ -56,7 +56,7 @@ class AuthorizeContextManager
      * @param RequestFactory $requestFactory
      * @param \Zend\Http\Request $httpRequest
      */
-    public function __construct(Storage\StorageInterface $storage, RequestFactory $requestFactory, AuthorizeContextFactory $contextFactory = null,\Zend\Http\Request $httpRequest = null)
+    public function __construct(Storage\StorageInterface $storage, RequestFactory $requestFactory, AuthorizeContextFactory $contextFactory = null, \Zend\Http\Request $httpRequest = null)
     {
         if (null === $contextFactory) {
             $contextFactory = new AuthorizeContextFactory();
@@ -108,6 +108,17 @@ class AuthorizeContextManager
         }
         
         return $this->createContext();
+    }
+
+
+    public function getExistingContext()
+    {
+        $context = $this->loadContext();
+        if (! $context instanceof AuthorizeContext) {
+            throw new Exception\MissingContextException('Missing context');
+        }
+        
+        return $context;
     }
 
 
