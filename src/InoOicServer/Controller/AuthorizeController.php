@@ -134,20 +134,22 @@ class AuthorizeController extends BaseController
         
         /*
          * Check if the user has been already authenticated
+         * QUICKFIX
          */
         $existingContext = $contextManager->loadContext();
         if ($existingContext && ($user = $existingContext->getUser())) {
             $authenticationInfo = $existingContext->getAuthenticationInfo();
-            $authTime = $authenticationInfo->getTime();
-            $expireTime = new \DateTime("+1 hour");
-            // $expireTime = new \DateTime('@' .(time() + 3600));
-            if ($authTime < $expireTime) {
+            
+            $authTime = $authenticationInfo->getTime()->getTimestamp();
+            $expireTime = $authTime + 3600;
+
+            if (time() < $expireTime) {
                 
                 $contextManager->updateContextRequest($existingContext);
                 $contextManager->persistContext($existingContext);
                 
                 // redirect to dispatch
-                $this->logInfo(sprintf("User '%s' has been logged in at %s, skipping authentication...", $user->getId(), $authTime->format('c')));
+                $this->logInfo(sprintf("User '%s' has been logged in at %s, skipping authentication...", $user->getId(), $authenticationInfo->getTime()->format('c')));
                 
                 $authorizeRoute = 'php-id-server/authorize-response-endpoint';
                 $this->logInfo(sprintf("redirecting to response endpoint '%s'", $authorizeRoute));
