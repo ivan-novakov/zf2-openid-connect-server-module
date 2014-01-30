@@ -18,7 +18,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->will($this->returnValue($context));
         
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         
         $manager = new AuthorizeContextManager($storage, $requestFactory);
         $this->assertSame($context, $manager->loadContext());
@@ -34,7 +34,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
             ->method('save')
             ->with($context);
         
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         
         $manager = new AuthorizeContextManager($storage, $requestFactory);
         $manager->persistContext($context);
@@ -49,7 +49,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
         $storage->expects($this->once())
             ->method('clear');
         
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         
         $manager = new AuthorizeContextManager($storage, $requestFactory);
         $manager->unpersistContext();
@@ -63,7 +63,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $httpRequest = $this->createHttpRequest();
         
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         $requestFactory->expects($this->once())
             ->method('createRequest')
             ->with($httpRequest)
@@ -109,7 +109,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
         
         $storage = $this->createStorageMock();
         
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         
         $manager = $this->getMockBuilder('InoOicServer\Context\AuthorizeContextManager')
             ->setConstructorArgs(array(
@@ -139,15 +139,11 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testInitContextWithMissingContext()
     {
-        $this->setExpectedException('InoOicServer\Context\Exception\MissingContextException');
         
         $httpRequest = $this->createHttpRequest();
-        
         $context = $this->createContextMock();
-        
         $storage = $this->createStorageMock();
-        
-        $requestFactory = $this->createAuthorizeRequestFactory();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
         
         $manager = $this->getMockBuilder('InoOicServer\Context\AuthorizeContextManager')
             ->setConstructorArgs(array(
@@ -158,7 +154,8 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
         ))
             ->setMethods(array(
             'isInitialHttpRequest',
-            'loadContext'
+            'loadContext',
+                'createContext'
         ))
             ->getMock();
         
@@ -170,6 +167,8 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
         $manager->expects($this->once())
             ->method('loadContext')
             ->will($this->returnValue(null));
+        
+        $manager->expects($this->once())->method('createContext')->will($this->returnValue($context));
         
         $this->assertSame($context, $manager->initContext());
     }
@@ -194,7 +193,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    protected function createAuthorizeRequestFactory()
+    protected function createAuthorizeRequestFactoryMock()
     {
         $factory = $this->getMock('InoOicServer\OpenIdConnect\Request\Authorize\RequestFactory');
         return $factory;

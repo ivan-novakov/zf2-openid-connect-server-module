@@ -3,6 +3,7 @@
 namespace InoOicServer\Context;
 
 use InoOicServer\OpenIdConnect\Request\Authorize\RequestFactory;
+use InoOicServer\OpenIdConnect\Request;
 
 
 /**
@@ -34,6 +35,11 @@ class AuthorizeContextManager
      * @var \Zend\Http\Request
      */
     protected $httpRequest;
+
+    /**
+     * @var Request\Authorize\Simple
+     */
+    protected $authorizeRequest;
 
 
     /**
@@ -70,6 +76,15 @@ class AuthorizeContextManager
      */
     public function initContext()
     {
+        if (! $this->isInitialHttpRequest($this->httpRequest)) {
+            $context = $this->loadContext();
+            if ($context instanceof AuthorizeContext) {
+                return $context;
+            }
+        }
+        
+        return $this->createContext();
+        /*
         if ($this->isInitialHttpRequest($this->httpRequest)) {
             $authorizeRequest = $this->requestFactory->createRequest($this->httpRequest);
             $context = $this->contextFactory->createContext();
@@ -82,6 +97,7 @@ class AuthorizeContextManager
         }
         
         return $context;
+        */
     }
 
 
@@ -117,6 +133,41 @@ class AuthorizeContextManager
 
 
     /**
+     * Updates the context with the current authorize request.
+     * 
+     * @param AuthorizeContext $context
+     */
+    public function updateContextRequest(AuthorizeContext $context)
+    {
+        $context->setRequest($this->getAuthorizeRequest());
+    }
+
+
+    /**
+     * @return Request\Authorize\Simple
+     */
+    public function getAuthorizeRequest()
+    {
+        if (! $this->authorizeRequest instanceof Request\Authorize\Simple) {
+            $this->authorizeRequest = $this->requestFactory->createRequest($this->httpRequest);
+        }
+        
+        return $this->authorizeRequest;
+    }
+
+
+    protected function createContext()
+    {
+        // $authorizeRequest = $this->requestFactory->createRequest($this->httpRequest);
+        $authorizeRequest = $this->getAuthorizeRequest();
+        $context = $this->contextFactory->createContext();
+        $context->setRequest($authorizeRequest);
+        
+        return $context;
+    }
+
+
+    /**
      * Returns true if the HTTP request is an initial authorize request (originating from the client).
      * 
      * @param \Zend\Http\Request $httpRequest
@@ -124,9 +175,10 @@ class AuthorizeContextManager
      */
     protected function isInitialHttpRequest(\Zend\Http\Request $httpRequest)
     {
-        if (! $httpRequest->getQuery()->count()) {
+        if (! $httpRequest->getQuery()->get('client_id')) {
             return false;
         }
+        
         return true;
     }
 }

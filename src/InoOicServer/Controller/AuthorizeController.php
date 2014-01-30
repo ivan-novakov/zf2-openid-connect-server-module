@@ -131,6 +131,33 @@ class AuthorizeController extends BaseController
         $response = null;
         
         $contextManager = $this->getAuthorizeContextManager();
+        
+        /*
+         * Check if the user has been already authenticated
+         */
+        $existingContext = $contextManager->loadContext();
+        if ($existingContext && ($user = $existingContext->getUser())) {
+            $authenticationInfo = $existingContext->getAuthenticationInfo();
+            $authTime = $authenticationInfo->getTime();
+            $expireTime = new \DateTime("+1 hour");
+            // $expireTime = new \DateTime('@' .(time() + 3600));
+            if ($authTime < $expireTime) {
+                
+                $contextManager->updateContextRequest($existingContext);
+                $contextManager->persistContext($existingContext);
+                
+                // redirect to dispatch
+                $this->logInfo(sprintf("User '%s' has been logged in at %s, skipping authentication...", $user->getId(), $authTime->format('c')));
+                
+                $authorizeRoute = 'php-id-server/authorize-response-endpoint';
+                $this->logInfo(sprintf("redirecting to response endpoint '%s'", $authorizeRoute));
+                
+                return $this->redirectToRoute($authorizeRoute);
+            }
+            
+            $this->logInfo(sprintf("Existing context for user '%s' found, but it has expired", $user->getId()));
+        }
+        
         $context = $contextManager->initContext();
         
         $dispatcher = $this->getAuthorizeDispatcher();
@@ -158,10 +185,9 @@ class AuthorizeController extends BaseController
         $authenticationHandlerName = $manager->getAuthenticationHandler();
         $this->logInfo(sprintf("redirecting user to authentication handler [%s]", $authenticationHandlerName));
         
-        return $this->redirectToRoute($manager->getAuthenticationRouteName(), 
-            array(
-                'controller' => $authenticationHandlerName
-            ));
+        return $this->redirectToRoute($manager->getAuthenticationRouteName(), array(
+            'controller' => $authenticationHandlerName
+        ));
     }
 
 
@@ -173,7 +199,7 @@ class AuthorizeController extends BaseController
         
         $contextManager = $this->getAuthorizeContextManager();
         $context = $contextManager->initContext();
-        $contextManager->unpersistContext();
+        // $contextManager->unpersistContext();
         
         $dispatcher = $this->getAuthorizeDispatcher();
         $dispatcher->setContext($context);
@@ -188,9 +214,7 @@ class AuthorizeController extends BaseController
             }
         } catch (\Exception $e) {
             if ($e instanceof InvalidUserException && $redirectUri = $e->getRedirectUri()) {
-                $this->logError(
-                    sprintf("Invalid user: [%s] %s - redirecting to '%s'", get_class($e), $e->getMessage(), 
-                        $redirectUri));
+                $this->logError(sprintf("Invalid user: [%s] %s - redirecting to '%s'", get_class($e), $e->getMessage(), $redirectUri));
                 
                 return $this->redirect()->toUrl($redirectUri);
             }
