@@ -139,7 +139,6 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testInitContextWithMissingContext()
     {
-        
         $httpRequest = $this->createHttpRequest();
         $context = $this->createContextMock();
         $storage = $this->createStorageMock();
@@ -155,7 +154,7 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array(
             'isInitialHttpRequest',
             'loadContext',
-                'createContext'
+            'createContext'
         ))
             ->getMock();
         
@@ -168,14 +167,67 @@ class AuthorizeContextManagerTest extends \PHPUnit_Framework_TestCase
             ->method('loadContext')
             ->will($this->returnValue(null));
         
-        $manager->expects($this->once())->method('createContext')->will($this->returnValue($context));
+        $manager->expects($this->once())
+            ->method('createContext')
+            ->will($this->returnValue($context));
         
         $this->assertSame($context, $manager->initContext());
+    }
+
+
+    /**
+     * @dataProvider dataForIsExpiredContext
+     */
+    public function testIsExpiredContext($authTimeString, $nowTimeString, $expirationPeriod, $result)
+    {
+        $authTime = new \DateTime($authTimeString);
+        $nowTime = new \DateTime($nowTimeString);
+        
+        $authenticationInfo = $this->getMockBuilder('InoOicServer\Authentication\Info')
+            ->setMethods(array(
+            'getTime'
+        ))
+            ->getMock();
+        $authenticationInfo->expects($this->once())
+            ->method('getTime')
+            ->will($this->returnValue($authTime));
+        
+        $context = $this->createContextMock();
+        $context->expects($this->once())
+            ->method('getAuthenticationInfo')
+            ->will($this->returnValue($authenticationInfo));
+        
+        $storage = $this->createStorageMock();
+        $requestFactory = $this->createAuthorizeRequestFactoryMock();
+        
+        $manager = new AuthorizeContextManager($storage, $requestFactory);
+        $manager->setTimeout($expirationPeriod);
+        
+        $this->assertSame($result, $manager->isExpiredContext($context, $nowTime));
     }
     
     /*
      * -----------------------------------------------------------------------------
      */
+    public function dataForIsExpiredContext()
+    {
+        return array(
+            array(
+                'auth_time' => '2014-01-30 10:00:00',
+                'now_time' => '2014-01-30 10:31:00',
+                'expiration_period' => '1800',
+                'result' => true
+            ),
+            array(
+                'auth_time' => '2014-01-30 10:00:00',
+                'now_time' => '2014-01-30 10:29:00',
+                'expiration_period' => '1800',
+                'result' => false
+            )
+        );
+    }
+
+
     protected function createContextMock()
     {
         $context = $this->getMockBuilder('InoOicServer\Context\AuthorizeContext')

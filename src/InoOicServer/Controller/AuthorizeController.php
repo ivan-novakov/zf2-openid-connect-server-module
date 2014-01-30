@@ -138,18 +138,15 @@ class AuthorizeController extends BaseController
          */
         $existingContext = $contextManager->loadContext();
         if ($existingContext && ($user = $existingContext->getUser())) {
-            $authenticationInfo = $existingContext->getAuthenticationInfo();
             
-            $authTime = $authenticationInfo->getTime()->getTimestamp();
-            $expireTime = $authTime + 3600;
-
-            if (time() < $expireTime) {
-                
+            if (! $contextManager->isExpiredContext($existingContext)) {
                 $contextManager->updateContextRequest($existingContext);
                 $contextManager->persistContext($existingContext);
                 
                 // redirect to dispatch
-                $this->logInfo(sprintf("User '%s' has been logged in at %s, skipping authentication...", $user->getId(), $authenticationInfo->getTime()->format('c')));
+                $this->logInfo(sprintf("User '%s' has been logged in at %s, skipping authentication...", $user->getId(), $existingContext->getAuthenticationInfo()
+                    ->getTime()
+                    ->format('c')));
                 
                 $authorizeRoute = 'php-id-server/authorize-response-endpoint';
                 $this->logInfo(sprintf("redirecting to response endpoint '%s'", $authorizeRoute));

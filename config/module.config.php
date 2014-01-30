@@ -236,6 +236,10 @@ return array(
             )
         ),
         
+        'context_authorize' => array(
+            'timeout' => 1800
+        ),
+        
         'context_storage' => array(
             'type' => 'Session',
             'options' => array(

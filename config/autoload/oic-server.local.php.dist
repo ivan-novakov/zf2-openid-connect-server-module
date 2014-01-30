@@ -77,6 +77,10 @@ return array(
                     'redirect_uri' => 'http://registration.example.org/'
                 )
             )
-        )
+        ),
+        
+        'context_authorize' => array(
+            'timeout' => 1800
+        ),
     )
 );

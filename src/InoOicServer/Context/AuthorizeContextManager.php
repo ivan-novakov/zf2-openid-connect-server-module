@@ -4,6 +4,7 @@ namespace InoOicServer\Context;
 
 use InoOicServer\OpenIdConnect\Request\Authorize\RequestFactory;
 use InoOicServer\OpenIdConnect\Request;
+use DateTime;
 
 
 /**
@@ -41,6 +42,11 @@ class AuthorizeContextManager
      */
     protected $authorizeRequest;
 
+    /**
+     * @var integer
+     */
+    protected $timeout = 600;
+
 
     /**
      * Constructor.
@@ -68,6 +74,24 @@ class AuthorizeContextManager
 
 
     /**
+     * @return integer
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+
+    /**
+     * @param integer $timeout
+     */
+    public function setTimeout($timeout)
+    {
+        $this->timeout = $timeout;
+    }
+
+
+    /**
      * Initializes the context. If the request is initial, new context is created with a new authorize request. 
      * Otherwise the context is loaded from the storage.
      * 
@@ -84,20 +108,6 @@ class AuthorizeContextManager
         }
         
         return $this->createContext();
-        /*
-        if ($this->isInitialHttpRequest($this->httpRequest)) {
-            $authorizeRequest = $this->requestFactory->createRequest($this->httpRequest);
-            $context = $this->contextFactory->createContext();
-            $context->setRequest($authorizeRequest);
-        } else {
-            $context = $this->loadContext();
-            if (! $context instanceof AuthorizeContext) {
-                throw new Exception\MissingContextException('Expected authorize context not found');
-            }
-        }
-        
-        return $context;
-        */
     }
 
 
@@ -153,6 +163,30 @@ class AuthorizeContextManager
         }
         
         return $this->authorizeRequest;
+    }
+
+
+    public function isExpiredContext(AuthorizeContext $context, DateTime $now = null)
+    {
+        if (null === $now) {
+            $now = new DateTime('now');
+        }
+        
+        $authenticationInfo = $context->getAuthenticationInfo();
+        if (! $authenticationInfo) {
+            return true;
+        }
+        
+        $authTime = $authenticationInfo->getTime();
+        
+        $authTimestamp = $authTime->getTimestamp();
+        $expireTimestamp = $authTimestamp + $this->getTimeout();
+        
+        if ($now->getTimestamp() > $expireTimestamp) {
+            return true;
+        }
+        
+        return false;
     }
 
 

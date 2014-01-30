@@ -304,6 +304,12 @@ class ServiceManagerConfig extends Config
             
             'InoOicServer\AuthorizeContextManager' => function (ServiceManager $sm)
             {
+                $config = $sm->get('Config');
+                $timeout = null;
+                if (isset($config['oic_server']['context_authorize']['timeout'])) {
+                    $timeout = intval($config['oic_server']['context_authorize']['timeout']);
+                }
+                
                 $contextStorage = $sm->get('InoOicServer\ContextStorage');
                 $sessionContainer = $sm->get('InoOicServer\SessionContainer');
                 $contextStorage->setSessionContainer($sessionContainer);
@@ -312,6 +318,10 @@ class ServiceManagerConfig extends Config
                 $requestFactory = $sm->get('InoOicServer\AuthorizeRequestFactory');
                 
                 $manager = new AuthorizeContextManager($contextStorage, $requestFactory, $contextFactory);
+                if ($timeout) {
+                    $manager->setTimeout($timeout);
+                }
+                
                 return $manager;
             },
             
