@@ -210,7 +210,7 @@ class Authorize extends AbstractDispatcher
     public function dispatch()
     {
         $context = $this->getContext(true);
-        
+
         $client = $context->getClient();
         if (! ($client instanceof Client)) {
             return $this->clientErrorResponse(Error::ERROR_INVALID_REQUEST, 'no client data in context');

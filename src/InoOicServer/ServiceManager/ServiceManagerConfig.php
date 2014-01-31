@@ -27,8 +27,6 @@ class ServiceManagerConfig extends Config
 
     const CONFIG_SESSION_MANAGER = 'oic_session_manager';
 
-    const CONFIG_SERVER_INFO = 'oic_server_info';
-
 
     public function getInvokables()
     {
@@ -54,11 +52,11 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ServerInfo' => function (ServiceManager $sm) use($smc)
             {
                 $config = $sm->get('Config');
-                if (! isset($config[$smc::CONFIG_SERVER_INFO]) || ! is_array($config[$smc::CONFIG_SERVER_INFO])) {
-                    throw new Exception\ConfigNotFoundException($smc::CONFIG_SERVER_INFO);
+                if (! isset($config['oic_server']['oic_server_info']) || ! is_array($config['oic_server']['oic_server_info'])) {
+                    throw new Exception\ConfigNotFoundException('oic_server/oic_server_info');
                 }
                 
-                $serverInfo = new ServerInfo($config[$smc::CONFIG_SERVER_INFO]);
+                $serverInfo = new ServerInfo($config['oic_server']['oic_server_info']);
                 return $serverInfo;
             },
         

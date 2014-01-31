@@ -221,7 +221,7 @@ class AuthorizeController extends BaseController
             $response = $dispatcher->serverErrorResponse(sprintf("[%s] %s", get_class($e), $e->getMessage()));
             return $this->errorResponse($response, 'General error in dispatch');
         }
-        
+
         return $this->validResponse($response);
     }
 
@@ -235,7 +235,6 @@ class AuthorizeController extends BaseController
 
     protected function errorResponse(Response\Authorize\Error $response, $label = 'Error')
     {
-        // $this->clearContext();
         $this->getAuthorizeContextManager()->unpersistContext();
         $this->logError(sprintf("%s: %s (%s)", $label, $response->getErrorMessage(), $response->getErrorDescription()));
         return $response->getHttpResponse();
