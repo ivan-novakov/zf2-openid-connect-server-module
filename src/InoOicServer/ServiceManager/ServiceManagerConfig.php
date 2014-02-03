@@ -6,6 +6,7 @@ use Zend\ServiceManager\ServiceManager;
 use Zend\ServiceManager\Config;
 use Zend\InputFilter\Factory;
 use Zend\Filter\FilterChain;
+use Zend\Session\SessionManager as ZendSessionManager;
 use Zend\Log;
 use InoOicServer\Server\ServerInfo;
 use InoOicServer\Session\SessionManager;
@@ -49,7 +50,7 @@ class ServiceManagerConfig extends Config
             'InoOicServer\ClientRegistryStorage' => 'InoOicServer\Client\Registry\StorageFactory',
             'InoOicServer\ClientRegistry' => 'InoOicServer\Client\RegistryFactory',
             
-            'InoOicServer\ServerInfo' => function (ServiceManager $sm) use($smc)
+            'InoOicServer\ServerInfo' => function (ServiceManager $sm)
             {
                 $config = $sm->get('Config');
                 if (! isset($config['oic_server']['oic_server_info']) || ! is_array($config['oic_server']['oic_server_info'])) {
@@ -116,17 +117,57 @@ class ServiceManagerConfig extends Config
                 return new ErrorHandler($sm->get('InoOicServer\Logger'));
             },
             
-            'InoOicServer\SessionManager' => function (ServiceManager $sm)
+            'InoOicServer\UaSessionManager' => function (ServiceManager $sm)
             {
-                $sessionManager = new \Zend\Session\SessionManager();
-                return $sessionManager;
+                $config = $sm->get('Config');
+                
+                if (! isset($config['oic_server']['ua_session_manager']) || ! is_array($config['oic_server']['ua_session_manager'])) {
+                    throw new Exception\ConfigNotFoundException('oic_server/ua_session_manager');
+                }
+                
+                $uaSessionManagerConfig = $config['oic_server']['ua_session_manager'];
+                
+                $uaSessionConfig = null;
+                if (isset($uaSessionManagerConfig['config'])) {
+                    $class = isset($uaSessionManagerConfig['config']['class']) ? $uaSessionManagerConfig['config']['class'] : 'Zend\Session\Config\SessionConfig';
+                    $options = isset($uaSessionManagerConfig['config']['options']) ? $uaSessionManagerConfig['config']['options'] : array();
+                    $uaSessionConfig = new $class();
+                    $uaSessionConfig->setOptions($options);
+                }
+                
+                $uaSessionStorage = null;
+                if (isset($uaSessionManagerConfig['storage'])) {
+                    $class = $uaSessionManagerConfig['storage'];
+                    $uaSessionStorage = new $class();
+                }
+                
+                $uaSessionSaveHandler = null;
+                if (isset($uaSessionManagerConfig['save_handler'])) {
+                    // class should be fetched from service manager since it will require constructor arguments
+                    $uaSessionSaveHandler = $sm->get($uaSessionManagerConfig['save_handler']);
+                }
+                
+                $uaSessionManager = new ZendSessionManager($uaSessionConfig, $uaSessionStorage, $uaSessionSaveHandler);
+                
+                if (isset($uaSessionManagerConfig['validators'])) {
+                    $chain = $uaSessionManager->getValidatorChain();
+                    foreach ($uaSessionManagerConfig['validators'] as $validator) {
+                        $validator = new $validator();
+                        $chain->attach('session.validate', array(
+                            $validator,
+                            'isValid'
+                        ));
+                    }
+                }
+                $uaSessionManager->start();
+                
+                return $uaSessionManager;
             },
             
             'InoOicServer\SessionContainer' => function (ServiceManager $sm)
             {
-                // $config = $sm->get('Config');
-                $sessionManager = $sm->get('InoOicServer\SessionManager');
-                $container = new \Zend\Session\Container('InoOicServer', $sessionManager);
+                $uaSessionManager = $sm->get('InoOicServer\UaSessionManager');
+                $container = new \Zend\Session\Container('InoOicServer', $uaSessionManager);
                 return $container;
             },
        
@@ -237,14 +278,14 @@ class ServiceManagerConfig extends Config
                     throw new Exception\ConfigNotFoundException($smc::CONFIG_SESSION_MANAGER);
                 }
                 
-                $sessionManager = new SessionManager($config['oic_server'][$smc::CONFIG_SESSION_MANAGER]);
+                $uaSessionManager = new SessionManager($config['oic_server'][$smc::CONFIG_SESSION_MANAGER]);
                 
-                $sessionManager->setStorage($sm->get('InoOicServer\SessionStorage'));
-                $sessionManager->setSessionIdGenerator($sm->get('InoOicServer\SessionIdGenerator'));
-                $sessionManager->setTokenGenerator($sm->get('InoOicServer\TokenGenerator'));
-                $sessionManager->setUserSerializer($sm->get('InoOicServer\UserSerializer'));
+                $uaSessionManager->setStorage($sm->get('InoOicServer\SessionStorage'));
+                $uaSessionManager->setSessionIdGenerator($sm->get('InoOicServer\SessionIdGenerator'));
+                $uaSessionManager->setTokenGenerator($sm->get('InoOicServer\TokenGenerator'));
+                $uaSessionManager->setUserSerializer($sm->get('InoOicServer\UserSerializer'));
                 
-                return $sessionManager;
+                return $uaSessionManager;
             },
             
             /*

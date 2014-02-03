@@ -335,6 +335,18 @@ return array(
         
         'filter_invokables' => array(
             'shibboleth_serialized_value' => 'InoOicServer\Util\Filter\ShibbolethSerializedValue'
+        ),
+        
+        'ua_session_manager' => array(
+            'config' => array(
+                'class' => 'Zend\Session\Config\SessionConfig',
+                'options' => array(
+                    'name' => 'oicserver',
+                    'cookie_secure' => true,
+                    'cookie_httponly' => true,
+                    'remember_me_seconds' => 3600
+                )
+            )
         )
     )
 );
