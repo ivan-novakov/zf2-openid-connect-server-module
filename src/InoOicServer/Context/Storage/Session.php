@@ -2,7 +2,12 @@
 
 namespace InoOicServer\Context\Storage;
 
+use InoOicServer\Context\ContextInterface;
 
+
+/**
+ * The session context storage saves the context into the user session.
+ */
 class Session extends AbstractStorage
 {
 
@@ -11,9 +16,12 @@ class Session extends AbstractStorage
      *
      * @var \Zend\Session\Container
      */
-    protected $sessionContainer = NULL;
+    protected $sessionContainer;
 
-    protected $key = 'context';
+    /**
+     * @var string
+     */
+    protected $sessionKey = 'context';
 
 
     /**
@@ -35,8 +43,7 @@ class Session extends AbstractStorage
     public function getSessionContainer()
     {
         if (! ($this->sessionContainer instanceof \Zend\Session\Container)) {
-            $this->sessionContainer = new \Zend\Session\Container(
-                $this->_options->get('session_container_name', 'authorize'));
+            $this->sessionContainer = new \Zend\Session\Container($this->_options->get('session_container_name', 'authorize'));
         }
         
         return $this->sessionContainer;
@@ -44,12 +51,30 @@ class Session extends AbstractStorage
 
 
     /**
+     * @return string
+     */
+    public function getSessionKey()
+    {
+        return $this->sessionKey;
+    }
+
+
+    /**
+     * @param string $sessionKey
+     */
+    public function setSessionKey($sessionKey)
+    {
+        $this->sessionKey = $sessionKey;
+    }
+
+
+    /**
      * {@inheritdoc}
      * @see \InoOicServer\Context\Storage\StorageInterface::save()
      */
-    public function save($context)
+    public function save(ContextInterface $context)
     {
-        $this->getSessionContainer()->offsetSet($this->key, $context);
+        $this->getSessionContainer()->offsetSet($this->sessionKey, $context);
     }
 
 
@@ -59,16 +84,20 @@ class Session extends AbstractStorage
      */
     public function load()
     {
-        if (! $this->getSessionContainer()->offsetExists($this->key)) {
-            return NULL;
+        if (! $this->getSessionContainer()->offsetExists($this->sessionKey)) {
+            return null;
         }
         
-        return $this->getSessionContainer()->offsetGet($this->key);
+        return $this->getSessionContainer()->offsetGet($this->sessionKey);
     }
 
 
+    /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Context\Storage\StorageInterface::clear()
+     */
     public function clear()
     {
-        $this->getSessionContainer()->offsetUnset($this->key);
+        $this->getSessionContainer()->offsetUnset($this->sessionKey);
     }
 }

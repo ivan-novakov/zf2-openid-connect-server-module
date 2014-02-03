@@ -3,7 +3,7 @@
 namespace InoOicServer\Context;
 
 
-class AbstractContext
+class AbstractContext implements ContextInterface
 {
 
     /**
@@ -14,12 +14,8 @@ class AbstractContext
     protected $contextData = NULL;
 
 
-    /**
-     * Sets context information.
-     * 
-     * @param string $label
-     * @param mixed $value
-     */
+
+
     public function setValue ($label, $value)
     {
         $this->getContextData()

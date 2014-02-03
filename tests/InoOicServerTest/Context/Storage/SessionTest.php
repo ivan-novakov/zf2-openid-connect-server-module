@@ -9,46 +9,97 @@ class SessionTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * The session container.
-     * 
      * @var Context\Storage\Session
      */
-    protected $_storage = NULL;
+    protected $storage;
+
+    protected $sessionKey = 'test_context';
 
 
-    public function setUp ()
+    public function setUp()
     {
-        $this->_storage = new Context\Storage\Session();
+        $this->storage = new Context\Storage\Session();
+        $this->storage->setSessionKey($this->sessionKey);
     }
 
 
-    public function tearDown ()
+    public function tearDown()
     {
-        $this->_storage->clear();
+        $this->storage->clear();
     }
 
 
-    public function testSave ()
+    public function testSave()
     {
-        $context = 'bar';
-        $this->_storage->save($context);
-        $context = $this->_storage->load();
+        $context = $this->createContextMock();
+        $container = $this->createSessionContainerMock();
+        $container->expects($this->once())
+            ->method('offsetSet')
+            ->with($this->sessionKey, $context);
+        $this->storage->setSessionContainer($container);
         
-        $this->assertEquals('bar', $context);
+        $this->storage->save($context);
     }
 
 
-    public function testLoadNull ()
+    public function testLoad()
     {
-        $this->assertNull($this->_storage->load());
-    }
-
-
-    public function testClear ()
-    {
-        $this->_storage->save('some data');
-        $this->_storage->clear();
+        $context = $this->createContextMock();
+        $container = $this->createSessionContainerMock();
+        $container->expects($this->once())
+            ->method('offsetExists')
+            ->with($this->sessionKey)
+            ->will($this->returnValue(true));
+        $container->expects($this->once())
+            ->method('offsetGet')
+            ->with($this->sessionKey)
+            ->will($this->returnValue($context));
+        $this->storage->setSessionContainer($container);
         
-        $this->assertNull($this->_storage->load());
+        $this->assertSame($context, $this->storage->load());
+    }
+
+
+    public function testLoadWithNonExistingContext()
+    {
+        $context = $this->createContextMock();
+        $container = $this->createSessionContainerMock();
+        $container->expects($this->once())
+            ->method('offsetExists')
+            ->with($this->sessionKey)
+            ->will($this->returnValue(false));
+        $this->storage->setSessionContainer($container);
+        
+        $this->assertNull($this->storage->load());
+    }
+
+
+    public function testClear()
+    {
+        $container = $this->createSessionContainerMock();
+        $container->expects($this->once())
+            ->method('offsetUnset')
+            ->with($this->sessionKey);
+        $this->storage->setSessionContainer($container);
+        
+        $this->storage->clear();
+    }
+    
+    /*
+     * 
+     */
+    protected function createContextMock()
+    {
+        $context = $this->getMock('InoOicServer\Context\ContextInterface');
+        return $context;
+    }
+
+
+    protected function createSessionContainerMock()
+    {
+        $container = $this->getMockBuilder('Zend\Session\Container')
+            ->disableOriginalConstructor()
+            ->getMock();
+        return $container;
     }
 }

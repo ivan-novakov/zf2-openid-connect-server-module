@@ -1,16 +1,35 @@
 <?php
+
 namespace InoOicServer\Context\Storage;
 
+use InoOicServer\Context\ContextInterface;
 
+
+/**
+ * Interface for context storage.
+ */
 interface StorageInterface
 {
 
 
-    public function load ();
+    /**
+     * Loads the context from the srtorage.
+     * 
+     * @return ContextInterface
+     */
+    public function load();
 
 
-    public function save ($context);
+    /**
+     * Saves a context to the storage.
+     * 
+     * @param ContextInterface $context
+     */
+    public function save(ContextInterface $context);
 
 
-    public function clear ();
+    /**
+     * Clears the context from the storage.
+     */
+    public function clear();
 }
