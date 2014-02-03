@@ -13,7 +13,7 @@ $module = new Module();
 \Zend\Loader\AutoloaderFactory::factory(array(
     'Zend\Loader\StandardAutoloader' => array(
         'namespaces' => array(
-            'InoOicServerTest' => TESTS_ROOT . 'InoOicServerTest/', 
+            'InoOicServerTest' => TESTS_ROOT . 'unit/InoOicServerTest/', 
             'MyUnit' => TESTS_ROOT . 'MyUnit'
         )
     )

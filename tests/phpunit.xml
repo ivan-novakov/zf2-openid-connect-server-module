@@ -3,7 +3,7 @@
 
     <testsuites>
         <testsuite name="OpenID Connect Server Test Suite">
-            <directory>./InoOicServerTest/</directory>
+            <directory>./unit/</directory>
         </testsuite>
     </testsuites>
 
