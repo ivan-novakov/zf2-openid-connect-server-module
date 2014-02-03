@@ -41,6 +41,7 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         $eventManager = $application->getEventManager();
         
         $services = $application->getServiceManager();
+        
         $eventManager->attach('dispatch.error', function ($event) use($services)
         {
             
@@ -50,15 +51,18 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
                 return;
             }
             
-            $service = $services->get('InoOicServer\ErrorHandler');
+            //$service = $services->get('InoOicServer\ErrorHandler');
             if ($exception) {
-                $service->logException($exception);
+                //$service->logException($exception);
+                _dump($exception);
             }
             
             if ($error) {
-                $service->logError('Dispatch ERROR: ' . $error);
+                //$service->logError('Dispatch ERROR: ' . $error);
+                _dump('Dispatch ERROR: ' . $error);
             }
         });
+        
     }
 
 
