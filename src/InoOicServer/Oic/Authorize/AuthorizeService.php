@@ -13,7 +13,7 @@ class AuthorizeService
     {
         // validate HTTP request
         // identify and validate client (application)
-        // check if there is active authorize context, if true, skip to response endpoint (create redirect)
+        // check if there is active/valid session, if true, skip to response endpoint (create redirect)
         // create new Authorize\Context
         // create Authorize\Request
         // save Authorize\Request to context
