@@ -19,6 +19,11 @@ class Context
     protected $uniqueId;
 
     /**
+     * @var \DateTime
+     */
+    protected $createTime;
+
+    /**
      * @var Authorize\Request\Request
      */
     protected $authorizeRequest;
@@ -27,6 +32,36 @@ class Context
      * @var User\Authentication\Status
      */
     protected $authStatus;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct(\DateTime $createTime = null)
+    {
+        if (null === $createTime) {
+            $createTime = new \DateTime();
+        }
+        $this->setCreateTime($createTime);
+    }
+
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreateTime()
+    {
+        return $this->createTime;
+    }
+
+
+    /**
+     * @param \DateTime $createTime
+     */
+    protected function setCreateTime(\DateTime $createTime)
+    {
+        $this->createTime = $createTime;
+    }
 
 
     /**

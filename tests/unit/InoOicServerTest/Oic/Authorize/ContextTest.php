@@ -9,6 +9,15 @@ class ContextTest extends \PHPUnit_Framework_Testcase
 {
 
 
+    public function testConstructor()
+    {
+        $now = new \DateTime();
+        $context = new Context($now);
+        
+        $this->assertSame($now, $context->getCreateTime());
+    }
+
+
     public function testSettersAndGetters()
     {
         $uniqueId = 'abc';
@@ -23,5 +32,6 @@ class ContextTest extends \PHPUnit_Framework_Testcase
         $this->assertSame($uniqueId, $context->getUniqueId());
         $this->assertSame($request, $context->getAuthorizeRequest());
         $this->assertSame($authStatus, $context->getAuthStatus());
+        $this->assertInstanceOf('DateTime', $context->getCreateTime());
     }
 }
