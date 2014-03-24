@@ -5,7 +5,7 @@ namespace InoOicServerTest\Util;
 use InoOicServer\Util\FileReader;
 
 
-class FileReaderTest extends \PHPUnit_Framework_Testcase
+class FileReaderTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

@@ -5,7 +5,7 @@ namespace InoOicServerTest\Oic\Authorize\Context;
 use InoOicServer\Oic\Authorize\Context\ContextFactory;
 
 
-class ContextFactoryTest extends \PHPUnit_Framework_Testcase
+class ContextFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
 

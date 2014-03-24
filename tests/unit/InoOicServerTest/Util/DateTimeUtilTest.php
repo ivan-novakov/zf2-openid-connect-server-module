@@ -5,7 +5,7 @@ namespace InoOicServerTest\Util;
 use InoOicServer\Util\DateTimeUtil;
 
 
-class DateTimeUtilTest extends \PHPUnit_Framework_Testcase
+class DateTimeUtilTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $dt;

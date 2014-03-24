@@ -17,7 +17,7 @@ if (file_exists($moduleAutoload)) {
     die('No autoload available');
 }
 
-require $autoload;
+$loader = require $autoload;
 
 // --
 function _dump($value)
