@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Oic\Authorize;
 
+use InoOicServer\Oic\Authorize\Request\Request;
 use Zend\Http;
 
 
@@ -9,26 +10,24 @@ class AuthorizeService
 {
 
 
-    public function initialDispatch(Http\Request $httpRequest)
+    public function processRequest(Request $request)
     {
-        // validate HTTP request
         // identify and validate client (application)
-        // check if there is active/valid session, if true, skip to response endpoint (create redirect)
         // create new Authorize\Context
-        // create Authorize\Request
         // save Authorize\Request to context
         // save client to context
-        // create and return redirect to the authentication endpoint
+        // check if there is active/valid (authentication) session, if true, skip to response endpoint (create redirect)
+        // create and return the corresponding Authorize\Response
     }
 
 
-    public function dispatch(Http\Request $httpRequest)
+    public function processResponse(ResponseInterface $response = null)
     {
         // check context
-        // check user authentication, client and request from context
-        // check for existing session and auth. code, if true - re-use them
-        // otherwise create new session and an auth. code
-        // create Authorize\Response
-        // create the corresponding HTTP response
+        // check client and request from context
+        // check authorize request (from context), if there is active/valid (authentication) session, 
+        //   if true, check for existing auth. code and create it if missing, then skip to create response
+        // otherwise check user authentication and create new session and an auth. code
+        // create and return the corresponding Authorize\Response
     }
 }
