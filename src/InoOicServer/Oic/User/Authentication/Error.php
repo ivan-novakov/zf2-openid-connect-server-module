@@ -19,11 +19,24 @@ class Error
      */
     protected $description;
 
+    /**
+     * @var $extraData
+     */
+    protected $extraData;
 
-    public function __construct($message, $description = null)
+
+    /**
+     * Constructor.
+     * 
+     * @param string $message
+     * @param string $description
+     * @param array $extraData
+     */
+    public function __construct($message, $description = null, array $extraData = array())
     {
         $this->setMessage($message);
         $this->setDescription($description);
+        $this->setExtraData($extraData);
     }
 
 
@@ -60,5 +73,23 @@ class Error
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getExtraData()
+    {
+        return $this->extraData;
+    }
+
+
+    /**
+     * @param array $extraData
+     */
+    public function setExtraData($extraData)
+    {
+        $this->extraData = $extraData;
     }
 }

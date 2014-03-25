@@ -13,9 +13,14 @@ class ErrorTest extends \PHPUnit_Framework_Testcase
     {
         $message = 'error message';
         $description = 'error description';
+        $extraData = array(
+            'foo' => 'bar'
+        );
         
-        $error = new Error($message, $description);
+        $error = new Error($message, $description, $extraData);
+        
         $this->assertSame($message, $error->getMessage());
         $this->assertSame($description, $error->getDescription());
+        $this->assertSame($extraData, $error->getExtraData());
     }
 }
