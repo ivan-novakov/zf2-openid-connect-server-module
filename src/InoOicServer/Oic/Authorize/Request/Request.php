@@ -32,7 +32,15 @@ class Request
     /**
      * @var string
      */
-    protected $nonce;
+    protected $scope;
+
+    /**
+     * Unique ID (set as a cookie) used to associate the user agent with
+     * an existing OIC session.
+     * 
+     * @var string
+     */
+    protected $authenticationSessionId;
 
 
     /**
@@ -110,17 +118,35 @@ class Request
     /**
      * @return string
      */
-    public function getNonce()
+    public function getScope()
     {
-        return $this->nonce;
+        return $this->scope;
     }
 
 
     /**
-     * @param string $nonce
+     * @param string $scope
      */
-    public function setNonce($nonce)
+    public function setScope($scope)
     {
-        $this->nonce = $nonce;
+        $this->scope = $scope;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAuthenticationSessionId()
+    {
+        return $this->authenticationSessionId;
+    }
+
+
+    /**
+     * @param string $id
+     */
+    public function setAuthenticationSessionId($id)
+    {
+        $this->authenticationSessionId = $id;
     }
 }
