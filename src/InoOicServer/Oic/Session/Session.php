@@ -5,7 +5,7 @@ namespace InoOicServer\Oic\Session;
 use DateTime;
 use Zend\Stdlib\ArrayObject;
 use InoOicServer\Util\ConvertToDateTimeTrait;
-use InoOicServer\Oic\User\User;
+use InoOicServer\Oic\User\UserInterface;
 
 
 /**
@@ -34,7 +34,7 @@ class Session
     protected $authenticationSessionId;
 
     /**
-     * @var User
+     * @var UserInterface
      */
     protected $user;
 
@@ -101,7 +101,7 @@ class Session
 
 
     /**
-     * @return User
+     * @return UserInterface
      */
     public function getUser()
     {
@@ -110,9 +110,9 @@ class Session
 
 
     /**
-     * @param User $user
+     * @param UserInterface $user
      */
-    public function setUser(User $user)
+    public function setUser(UserInterface $user)
     {
         $this->user = $user;
     }
