@@ -4,6 +4,7 @@ namespace InoOicServer\Oic\User\Authentication;
 
 use DateTime;
 use InoOicServer\Oic\User\UserInterface;
+use InoOicServer\Util\ConvertToDateTimeTrait;
 
 
 /**
@@ -11,6 +12,7 @@ use InoOicServer\Oic\User\UserInterface;
  */
 class Status
 {
+    use ConvertToDateTimeTrait;
 
     /**
      * @var boolean
@@ -52,7 +54,7 @@ class Status
      */
     public function setAuthenticated($authenticated)
     {
-        $this->authenticated = $authenticated;
+        $this->authenticated = (bool) $authenticated;
     }
 
 
@@ -84,11 +86,11 @@ class Status
 
 
     /**
-     * @param DateTime $time
+     * @param string|DateTime $time
      */
-    public function setTime(DateTime $time)
+    public function setTime($time)
     {
-        $this->time = $time;
+        $this->time = $this->convertToDateTime($time);
     }
 
 
