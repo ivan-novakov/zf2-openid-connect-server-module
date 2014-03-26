@@ -3,21 +3,23 @@
 namespace InoOicServer\Oic\Authorize\Request;
 
 use Zend\Stdlib\ArrayUtils;
-use InoOicServer\Util\Options;
 use Zend\Http\Header\HeaderInterface;
 use Zend\Stdlib\Hydrator\ClassMethods;
 use Zend\Http;
+use InoOicServer\Util\OptionsTrait;
 
 
 class RequestFactory implements RequestFactoryInterface
 {
+    
+    use OptionsTrait;
 
     const OPT_AUTH_COOKIE_NAME = 'auth_cookie_name';
 
     /**
      * @var array
      */
-    protected $options = array(
+    protected $defaultOptions = array(
         self::OPT_AUTH_COOKIE_NAME => 'oic_auth'
     );
 
@@ -40,27 +42,7 @@ class RequestFactory implements RequestFactoryInterface
      */
     public function __construct(array $options = array())
     {
-        $options = ArrayUtils::merge($this->options, $options);
         $this->setOptions($options);
-    }
-
-
-    /**
-     * @param array $options
-     */
-    public function setOptions(array $options)
-    {
-        $this->options = new Options($options);
-    }
-
-
-    /**
-     * @param string $optionName
-     * @param mixed $defaultValue
-     */
-    public function getOption($optionName, $defaultValue = null)
-    {
-        return $this->options->get($optionName, $defaultValue);
     }
 
 
