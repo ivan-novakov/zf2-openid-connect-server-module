@@ -2,7 +2,6 @@
 
 namespace InoOicServer\Oic\Session;
 
-use InoOicServer\Util\TokenGenerator\Simple;
 use DateTime;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use InoOicServer\Util\OptionsTrait;
@@ -12,6 +11,7 @@ use InoOicServer\Oic\AuthCode\AuthCode;
 use InoOicServer\Oic\User;
 use InoOicServer\Oic\Session\Mapper\MapperInterface;
 use InoOicServer\Util\TokenGenerator\TokenGeneratorInterface;
+use InoOicServer\Util\TokenGenerator\Simple;
 
 
 /**
@@ -62,13 +62,11 @@ class SessionService
     /**
      * Constructor.
      * 
-     * @param SessionFactoryInterface $sessionFactory
      * @param MapperInterface $sessionMapper
+     * @param array $options
      */
-    public function __construct(SessionFactoryInterface $sessionFactory, MapperInterface $sessionMapper, 
-        array $options = array())
+    public function __construct(MapperInterface $sessionMapper, array $options = array())
     {
-        $this->setSessionFactory($sessionFactory);
         $this->setSessionMapper($sessionMapper);
         $this->setOptions($options);
     }
@@ -159,6 +157,13 @@ class SessionService
     }
 
 
+    /**
+     * Creates an OIC session based on information from the user authentication status.
+     * 
+     * @param User\Authentication\Status $userAuthStatus
+     * @param DateTime $createTime
+     * @return Session
+     */
     public function createSession(User\Authentication\Status $userAuthStatus, DateTime $createTime = null)
     {
         if (! $userAuthStatus->isAuthenticated()) {

@@ -13,7 +13,7 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->service = new SessionService($this->createSessionFactoryMock(), $this->createSessionMapperMock());
+        $this->service = new SessionService($this->createSessionMapperMock());
     }
 
 
