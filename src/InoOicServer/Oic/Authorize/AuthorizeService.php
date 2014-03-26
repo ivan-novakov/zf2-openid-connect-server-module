@@ -3,7 +3,7 @@
 namespace InoOicServer\Oic\Authorize;
 
 use InoOicServer\Oic\Authorize\Request\Request;
-use Zend\Http;
+use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 
 
 class AuthorizeService
