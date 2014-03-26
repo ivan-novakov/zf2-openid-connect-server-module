@@ -73,12 +73,18 @@ class SessionFactory implements SessionFactoryInterface
         $this->tokenGenerator = $tokenGenerator;
     }
 
+    
+    
+    public function createEmptySession()
+    {
+        return new Session();
+    }
 
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\Session\SessionFactoryInterface::createInitialSession()
      */
-    public function createInitialSession(User\Authentication\Status $userAuthStatus, DateTime $createTime = null)
+    public function createSession(User\Authentication\Status $userAuthStatus, DateTime $createTime = null)
     {
         /* @var $userAuthStatus \InoOicServer\Oic\User\Authentication\Status */
         if (! $userAuthStatus->isAuthenticated()) {
@@ -91,7 +97,7 @@ class SessionFactory implements SessionFactoryInterface
             throw new Exception\InvalidUserAuthenticationStatusException('User identity not found');
         }
         
-        $session = new Session();
+        $session = $this->createEmptySession();
         $session->setId($this->generateSessionId($userAuthStatus));
         $session->setAuthenticationSessionId($this->generateAuthSessionId($userAuthStatus));
         

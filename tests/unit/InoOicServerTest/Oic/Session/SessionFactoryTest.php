@@ -17,31 +17,35 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testCreateEmptySession()
+    {
+        $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $this->factory->createEmptySession());
+    }
+
+
     public function testCreateSessionWithUnauthenticatedUser()
     {
-        $this->setExpectedException('InoOicServer\Oic\Session\Exception\InvalidUserAuthenticationStatusException', 
-            'Cannot create session for unauthenticated user');
+        $this->setExpectedException('InoOicServer\Oic\Session\Exception\InvalidUserAuthenticationStatusException', 'Cannot create session for unauthenticated user');
         
         $userAuthStatus = $this->createUserAuthStatusMock();
         $userAuthStatus->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue(false));
         
-        $session = $this->factory->createInitialSession($userAuthStatus);
+        $session = $this->factory->createSession($userAuthStatus);
     }
 
 
     public function testCreateSessionWithMissingIdentity()
     {
-        $this->setExpectedException('InoOicServer\Oic\Session\Exception\InvalidUserAuthenticationStatusException', 
-            'User identity not found');
+        $this->setExpectedException('InoOicServer\Oic\Session\Exception\InvalidUserAuthenticationStatusException', 'User identity not found');
         
         $userAuthStatus = $this->createUserAuthStatusMock();
         $userAuthStatus->expects($this->once())
             ->method('isAuthenticated')
             ->will($this->returnValue(true));
         
-        $session = $this->factory->createInitialSession($userAuthStatus);
+        $session = $this->factory->createSession($userAuthStatus);
     }
 
 
@@ -97,7 +101,7 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->setOptions(array(
             'session_age' => $sessionAge
         ));
-        $session = $this->factory->createInitialSession($userAuthStatus, $createTime);
+        $session = $this->factory->createSession($userAuthStatus, $createTime);
         
         $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
         $this->assertSame($sessionId, $session->getId());
