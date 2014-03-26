@@ -14,7 +14,7 @@
     ],
 
     "require" : {
-        "php" : ">=5.3.3",
+        "php" : ">=5.4.0",
         "zendframework/zend-servicemanager" : "~2.3",
         "zendframework/zend-serializer" : "~2.3",
         "zendframework/zend-mvc" : "~2.3",
