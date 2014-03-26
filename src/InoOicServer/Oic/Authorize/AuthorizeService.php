@@ -27,7 +27,12 @@ class AuthorizeService
         // check client and request from context
         // check authorize request (from context), if there is active/valid (authentication) session, 
         //   if true, check for existing auth. code and create it if missing, then skip to create response
-        // otherwise check user authentication and create new session and an auth. code
+        // otherwise check user authentication and:
+        //   if a valid session exists for the user, reuse it
+        //   or create new session
+        // check for auth. code and:
+        //   if a valid code exists for the user and the client, reuse it
+        //   or create a new one
         // create and return the corresponding Authorize\Response
     }
 }
