@@ -5,6 +5,7 @@ namespace InoOicServer\Oic\Session;
 use DateTime;
 use Zend\Stdlib\ArrayObject;
 use InoOicServer\Util\ConvertToDateTimeTrait;
+use InoOicServer\Oic\User\User;
 
 
 /**
@@ -33,9 +34,9 @@ class Session
     protected $authenticationSessionId;
 
     /**
-     * @var string
+     * @var User
      */
-    protected $userId;
+    protected $user;
 
     /**
      * @var DateTime
@@ -61,11 +62,6 @@ class Session
      * @var DateTime
      */
     protected $authenticationTime;
-
-    /**
-     * @var ArrayObject
-     */
-    protected $userData;
 
 
     /**
@@ -105,20 +101,20 @@ class Session
 
 
     /**
-     * @return string
+     * @return User
      */
-    public function getUserId()
+    public function getUser()
     {
-        return $this->userId;
+        return $this->user;
     }
 
 
     /**
-     * @param string $userId
+     * @param User $user
      */
-    public function setUserId($userId)
+    public function setUser(User $user)
     {
-        $this->userId = $userId;
+        $this->user = $user;
     }
 
 
@@ -209,23 +205,5 @@ class Session
     public function setAuthenticationTime($authenticationTime)
     {
         $this->authenticationTime = $this->convertToDateTime($authenticationTime);
-    }
-
-
-    /**
-     * @return ArrayObject
-     */
-    public function getUserData()
-    {
-        return $this->userData;
-    }
-
-
-    /**
-     * @param \Traversable|ArrayObject $userData
-     */
-    public function setUserData($userData)
-    {
-        $this->userData = new ArrayObject($userData);
     }
 }
