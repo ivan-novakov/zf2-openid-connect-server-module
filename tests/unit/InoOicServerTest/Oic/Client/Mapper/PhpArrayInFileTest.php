@@ -1,8 +1,8 @@
 <?php
 
-namespace InoOicServerTest\Oic\Client\Repository;
+namespace InoOicServerTest\Oic\Client\Mapper;
 
-use InoOicServer\Oic\Client\Repository\PhpArrayInFile;
+use InoOicServer\Oic\Client\Mapper\PhpArrayInFile;
 
 
 class PhpArrayInFileTest extends \PHPUnit_Framework_Testcase

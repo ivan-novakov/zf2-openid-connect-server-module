@@ -1,12 +1,12 @@
 <?php
 
-namespace InoOicServer\Oic\Client\Repository;
+namespace InoOicServer\Oic\Client\Mapper;
 
 
 /**
  * Client persistence.
  */
-interface RepositoryInterface
+interface MapperInterface
 {
 
 

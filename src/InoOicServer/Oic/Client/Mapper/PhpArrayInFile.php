@@ -1,6 +1,6 @@
 <?php
 
-namespace InoOicServer\Oic\Client\Repository;
+namespace InoOicServer\Oic\Client\Mapper;
 
 use InoOicServer\Util\Options;
 use InoOicServer\Util\FileReader;
@@ -11,7 +11,7 @@ use InoOicServer\Oic\Client;
 /**
  * Client data are stored as a PHP array in a file.
  */
-class PhpArrayInFile implements RepositoryInterface
+class PhpArrayInFile implements MapperInterface
 {
 
     const OPT_FILE = 'file';
