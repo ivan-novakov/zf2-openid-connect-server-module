@@ -9,6 +9,7 @@ use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 class AuthorizeService
 {
 
+    protected $contextService;
 
     public function processRequest(Request $request)
     {

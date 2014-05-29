@@ -2,10 +2,10 @@
 
 namespace InoOicServerTest\Oic\Authorize\Context;
 
-use InoOicServer\Oic\Authorize\Context\Service;
+use InoOicServer\Oic\Authorize\Context\ContextService;
 
 
-class ServiceTest extends \PHPUnit_Framework_Testcase
+class ContextServiceTest extends \PHPUnit_Framework_Testcase
 {
 
 
@@ -14,7 +14,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
         $storage = $this->createStorageMock();
         $factory = $this->createFactoryMock();
         
-        $service = new Service($storage, $factory);
+        $service = new ContextService($storage, $factory);
         
         $this->assertSame($storage, $service->getStorage(), 'Storage object is not the same');
         $this->assertSame($factory, $service->getFactory(), 'Factory object is not the same');
@@ -25,7 +25,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
     {
         $storage = $this->createStorageMock();
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         
         $this->assertSame($storage, $service->getStorage(), 'Storage object is not the same');
         $this->assertInstanceOf('InoOicServer\Oic\Authorize\Context\ContextFactory', $service->getFactory());
@@ -46,7 +46,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
             ->method('save')
             ->with($context);
         
-        $service = new Service($storage, $factory);
+        $service = new ContextService($storage, $factory);
         
         $this->assertSame($context, $service->createContext());
     }
@@ -61,7 +61,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
             ->method('save')
             ->with($context);
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         $service->saveContext($context);
     }
 
@@ -75,7 +75,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
             ->method('load')
             ->will($this->returnValue($context));
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         
         $this->assertSame($context, $service->loadContext());
     }
@@ -90,7 +90,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
             ->method('load')
             ->will($this->returnValue($context));
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         
         $this->assertTrue($service->existsValidContext());
     }
@@ -103,7 +103,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
             ->method('load')
             ->will($this->returnValue(null));
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         
         $this->assertFalse($service->existsValidContext());
     }
@@ -115,7 +115,7 @@ class ServiceTest extends \PHPUnit_Framework_Testcase
         $storage->expects($this->once())
             ->method('clear');
         
-        $service = new Service($storage);
+        $service = new ContextService($storage);
         $service->clearContext();
     }
     

@@ -8,7 +8,7 @@ use InoOicServer\Oic\Authorize;
 /**
  * Authorize context service.
  */
-class Service
+class ContextService
 {
 
     /**
