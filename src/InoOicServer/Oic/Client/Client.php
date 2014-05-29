@@ -84,6 +84,10 @@ class Client
     }
 
 
+    /**
+     * @param string $redirectUri
+     * @return boolean
+     */
     public function hasRedirectUri($redirectUri)
     {
         return (in_array($redirectUri, $this->getRedirectUris()));

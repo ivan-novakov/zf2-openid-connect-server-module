@@ -2,6 +2,9 @@
 .project
 .settings
 composer.lock
-vendor
-tmp
+vendor/
+tmp/
+doc/auth_server_session_storage.mwb.bak
+doc/object_model_2.dia.autosave
+
 
