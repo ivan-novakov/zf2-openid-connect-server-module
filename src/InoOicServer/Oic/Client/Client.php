@@ -22,7 +22,7 @@ class Client
     /**
      * @var array
      */
-    protected $redirectUris;
+    protected $redirectUris = array();
 
     /**
      * @var string
@@ -81,6 +81,12 @@ class Client
     public function setRedirectUris(array $redirectUris)
     {
         $this->redirectUris = $redirectUris;
+    }
+
+
+    public function hasRedirectUri($redirectUri)
+    {
+        return (in_array($redirectUri, $this->getRedirectUris()));
     }
 
 

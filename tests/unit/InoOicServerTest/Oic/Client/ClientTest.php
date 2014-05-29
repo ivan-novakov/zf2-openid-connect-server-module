@@ -30,4 +30,20 @@ class ClientTest extends \PHPUnit_Framework_Testcase
         $this->assertSame($redirectUris, $client->getRedirectUris());
         $this->assertSame($userAuthenticationMethod, $client->getUserAuthenticationMethod());
     }
+
+
+    public function testHasRedirectUri()
+    {
+        $redirectUri = 'http://uri/foo';
+        $redirectUris = array(
+            'http://uri/bar',
+            'http://uri/foo'
+        );
+        
+        $client = new Client();
+        $this->assertFalse($client->hasRedirectUri($redirectUri));
+        
+        $client->setRedirectUris($redirectUris);
+        $this->assertTrue($client->hasRedirectUri($redirectUri));
+    }
 }
