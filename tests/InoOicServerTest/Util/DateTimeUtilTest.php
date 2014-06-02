@@ -19,7 +19,7 @@ class DateTimeUtilTest extends \PHPUnit_Framework_Testcase
 
     public function testCreateDateTime()
     {
-        $dateTime = $this->dt->createDateTime('2010-09-08 07:06:05');
+        $dateTime = $this->dt->createDateTime('2010-09-08 07:06:05', new \DateTimeZone('UTC'));
         $this->assertInstanceOf('DateTime', $dateTime);
         $this->assertSame(1283929565, $dateTime->getTimestamp());
     }
