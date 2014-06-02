@@ -149,7 +149,7 @@ class UserInfoTest extends DispatcherTestCase
     }
 
 
-    protected function _getSessionManagerStub ()
+    protected function _getSessionManagerStub ($noAuthorizationCode = false, $expired = false, $returnSession = false)
     {
         $sm = $this->getMockBuilder('\InoOicServer\Session\SessionManager')
             ->getMock();

@@ -241,7 +241,7 @@ class TokenTest extends DispatcherTestCase
     }
 
 
-    protected function _getAccessTokenStub()
+    protected function _getAccessTokenStub($expired = false)
     {
         $accessToken = $this->getMock('\InoOicServer\Session\Token\AccessToken');
         

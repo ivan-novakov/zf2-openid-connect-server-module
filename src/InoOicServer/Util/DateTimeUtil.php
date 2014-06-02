@@ -19,12 +19,17 @@ class DateTimeUtil
      * @param string $dateTimeString
      * @return \DateTime
      */
-    public function createDateTime($dateTimeString = null)
+    public function createDateTime($dateTimeString = null,\DateTimeZone $dateTimeZone = null)
     {
         if (null === $dateTimeString) {
             $dateTimeString = 'now';
         }
-        return new \DateTime($dateTimeString);
+        
+        if (null === $dateTimeZone) {
+            $dateTimeZone = new \DateTimeZone('UTC');
+        }
+        
+        return new \DateTime($dateTimeString, $dateTimeZone);
     }
 
 
