@@ -58,6 +58,18 @@ return array(
                 
                 'child_routes' => array(
                     
+                    'jkws-endpoint' => array(
+                        'type' => 'Literal',
+                        'may_terminate' => true,
+                        'options' => array(
+                            'route' => '/jwks',
+                            'defaults' => array(
+                                'controller' => 'InoOicServer\JwksController',
+                                'action' => 'index'
+                            )
+                        )
+                    ),
+                    
                     'authorize-endpoint' => array(
                         'type' => 'Literal',
                         'may_terminate' => true,
@@ -162,7 +174,10 @@ return array(
         
         'oic_server_info' => array(
             'base_uri' => 'https://oic.server.org/authn',
-            'service_documentation' => 'https://github.com/ivan-novakov/zf2-openid-connect-server-module'
+            'service_documentation' => 'https://github.com/ivan-novakov/zf2-openid-connect-server-module',
+            'jwe' => array(
+                'alg' => 'HS256'
+            )
         ),
         
         'client_registry_storage' => array(

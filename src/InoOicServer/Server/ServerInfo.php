@@ -10,6 +10,7 @@ use InoOicServer\Entity\Entity;
  * 
  * @method string getBaseUri()
  * @method string getServiceDocumentation()
+ * @method array getJwe()
  */
 class ServerInfo extends Entity
 {
@@ -18,8 +19,11 @@ class ServerInfo extends Entity
 
     const FIELD_SERVICE_DOCUMENTATION = 'service_documentation';
 
+    const FIELD_JWE = 'jwe';
+
     protected $_fields = array(
         self::FIELD_BASE_URI,
-        self::FIELD_SERVICE_DOCUMENTATION
+        self::FIELD_SERVICE_DOCUMENTATION,
+        self::FIELD_JWE
     );
 }

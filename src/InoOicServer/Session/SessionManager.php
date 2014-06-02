@@ -11,6 +11,7 @@ use InoOicServer\User\Serializer;
 use InoOicServer\Client\Client;
 use InoOicServer\Authentication;
 use InoOicServer\Util;
+use InoOicServer\OpenIdConnect\Request\Authorize\Simple;
 
 
 class SessionManager
@@ -231,7 +232,7 @@ class SessionManager
      * @throws Exception\MissingComponentException
      * @return Session
      */
-    public function createSession(UserInterface $user, Authentication\Info $authenticationInfo)
+    public function createSession(UserInterface $user, Authentication\Info $authenticationInfo, Simple $request)
     {
         $sessionIdGenerator = $this->getSessionIdGenerator();
         if (! $sessionIdGenerator) {
@@ -263,7 +264,8 @@ class SessionManager
             Session::FIELD_AUTHENTICATION_TIME => $authenticationInfo->getTime(),
             Session::FIELD_EXPIRATION_TIME => $expire,
             Session::FIELD_AUTHENTICATION_METHOD => $authenticationInfo->getMethod(),
-            Session::FIELD_USER_DATA => $serializedUserData
+            Session::FIELD_USER_DATA => $serializedUserData,
+            Session::FIELD_NONCE => $request->getNonce()
         ));
         
         $storage->saveSession($session);

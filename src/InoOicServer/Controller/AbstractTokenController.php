@@ -36,7 +36,7 @@ abstract class AbstractTokenController extends BaseController
     }
     
     // FIXME - unify
-    protected function handleException(\Exception $e)
+    protected function handleException(\Exception $e, $label = 'Exception')
     {
         _dump("$e");
         $this->logError(sprintf("[%s] %s", get_class($e), $e->getMessage()));
@@ -75,7 +75,7 @@ abstract class AbstractTokenController extends BaseController
             // FIXME - use the $oicResponse instead of the raw http response
             $response = $this->handleException($e);
         }
-        
+
         return $response;
     }
 }

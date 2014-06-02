@@ -10,6 +10,11 @@ use InoOicServer\OpenIdConnect\Request;
 use InoOicServer\OpenIdConnect\Response;
 use InoOicServer\OpenIdConnect\Entity;
 use InoOicServer\Client;
+use InoOicServer\User\UserInterface;
+use InoOicServer\Session\Session;
+use InoOicServer\OpenIdConnect\IdToken\IdTokenFactory;
+use InoOicServer\Server\ServerInfo;
+use InoOicServer\OpenIdConnect\IdToken\IdToken;
 
 
 /**
@@ -46,6 +51,16 @@ class Token extends AbstractDispatcher
      * @var Client\Authentication\Manager 
      */
     protected $_clientAuthenticationManager = NULL;
+
+    /**
+     * @var IdTokenFactory
+     */
+    protected $_idTokenFactory;
+
+    /**
+     * @var ServerInfo
+     */
+    protected $_serverInfo;
 
 
     /**
@@ -153,6 +168,46 @@ class Token extends AbstractDispatcher
 
 
     /**
+     * @return IdTokenFactory
+     */
+    public function getIdTokenFactory()
+    {
+        if (! $this->_idTokenFactory instanceof IdTokenFactory) {
+            $this->_idTokenFactory = new IdTokenFactory();
+        }
+        
+        return $this->_idTokenFactory;
+    }
+
+
+    /**
+     * @param IdTokenFactory $_idTokenFactory
+     */
+    public function setIdTokenFactory(IdTokenFactory $_idTokenFactory)
+    {
+        $this->_idTokenFactory = $_idTokenFactory;
+    }
+
+
+    /**
+     * @return ServerInfo
+     */
+    public function getServerInfo()
+    {
+        return $this->_serverInfo;
+    }
+
+
+    /**
+     * @param ServerInfo $_serverInfo
+     */
+    public function setServerInfo(ServerInfo $_serverInfo)
+    {
+        $this->_serverInfo = $_serverInfo;
+    }
+
+
+    /**
      * Dispatches the request and returns the response.
      * 
      * @throws GeneralException\MissingDependencyException
@@ -166,8 +221,7 @@ class Token extends AbstractDispatcher
          * Validate request
          */
         if (! $request->isValid()) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, 
-                sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_REQUEST, sprintf("Reasons: %s", implode(', ', $request->getInvalidReasons())));
         }
         
         /*
@@ -177,8 +231,7 @@ class Token extends AbstractDispatcher
         
         $client = $clientRegistry->getClientById($request->getClientId());
         if (! $client) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, 
-                sprintf("Client with ID '%s' not found in registry", $request->getClientId()));
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, sprintf("Client with ID '%s' not found in registry", $request->getClientId()));
         }
         
         /*
@@ -187,9 +240,8 @@ class Token extends AbstractDispatcher
         $clientAuthenticationManager = $this->getClientAuthenticationManager(true);
         $result = $clientAuthenticationManager->authenticate($request, $client);
         if (! $result->isAuthenticated()) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, 
-                sprintf("Client authentication failure with method '%s': %s", $client->getAuthenticationInfo()
-                    ->getMethod(), $result->getNotAuthenticatedReason()));
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_CLIENT, sprintf("Client authentication failure with method '%s': %s", $client->getAuthenticationInfo()
+                ->getMethod(), $result->getNotAuthenticatedReason()));
         }
         
         /*
@@ -211,36 +263,59 @@ class Token extends AbstractDispatcher
          */
         $session = $sessionManager->getSessionForAuthorizationCode($authorizationCode);
         if (! $session) {
-            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_NO_SESSION, 
-                'No session associated with the authorization code');
+            return $this->_errorResponse(Response\Token::ERROR_INVALID_GRANT_NO_SESSION, 'No session associated with the authorization code');
         }
         
+        $user = $sessionManager->getUserFromSession($session);
+        
+        $idToken = $this->getIdTokenFactory()->createIdToken($user, $client, $session, $this->getServerInfo());
+        $encodedIdToken = $this->_encodeIdToken($idToken, $client);
         /*
          * Create the access token object.
          */
         $accessToken = $sessionManager->createAccessToken($session, $client);
         
-        $accessTokenEntity = $this->_createTokenEntity($accessToken);
-        
+        $accessTokenEntity = $this->_createTokenEntity($accessToken, $encodedIdToken);
+        // _dump($accessTokenEntity);
         return $this->_validResponse($accessTokenEntity);
     }
 
 
-    protected function _createTokenEntity(AccessToken $accessToken)
+    protected function _createTokenEntity(AccessToken $accessToken, $idToken)
     {
         $tokenFactory = $this->getTokenFactory();
         if (! ($tokenFactory instanceof EntityFactoryInterface)) {
             throw new GeneralException\MissingDependencyException('token factory');
         }
         
-        return $tokenFactory->createEntity(
-            array(
-                Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(),
-                Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(),
-                Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(),
-                Entity\Token::FIELD_REFRESH_TOKEN => 'not set',
-                Entity\Token::FIELD_ID_TOKEN => 'not set'
-            ));
+        return $tokenFactory->createEntity(array(
+            Entity\Token::FIELD_ACCESS_TOKEN => $accessToken->getToken(),
+            Entity\Token::FIELD_TOKEN_TYPE => $accessToken->getType(),
+            Entity\Token::FIELD_EXPIRES_IN => $accessToken->expiresIn(),
+            Entity\Token::FIELD_REFRESH_TOKEN => 'not set',
+            Entity\Token::FIELD_ID_TOKEN => $idToken
+        ));
+    }
+
+
+    protected function _encodeIdToken(IdToken $idToken, Client\Client $client)
+    {
+        $claims = $idToken->getClaims();
+        $header = $idToken->getHeader();
+        
+        $headerString = base64_encode(\Zend\Json\Json::encode($header));
+        $payloadString = base64_encode(\Zend\Json\Json::encode($claims));
+        
+        $clientAuthOptions = $client->getAuthenticationInfo()->getOptions();
+        $secret = $clientAuthOptions['secret'];
+        
+        $signingInput = $headerString . '.' . $payloadString;
+        $signature = hash_hmac('sha256', $signingInput, $secret, true);
+        $signatureString = base64_encode($signature);
+        
+        $encodedIdToken = sprintf("%s.%s.%s", $headerString, $payloadString, $signatureString);
+        
+        return $encodedIdToken;
     }
 
 

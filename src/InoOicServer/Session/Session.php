@@ -16,6 +16,7 @@ use InoOicServer\Session\Token\AbstractToken;
  * @method DateTime getAuthenticationTime()
  * @method string getAuthenticationMethod()
  * @method string getUserData()
+ * @method string getNonce()
  *
  */
 class Session extends AbstractToken
@@ -37,6 +38,8 @@ class Session extends AbstractToken
 
     const FIELD_USER_DATA = 'user_data';
 
+    const FIELD_NONCE = 'nonce';
+
     protected $_fields = array(
         self::FIELD_ID,
         self::FIELD_USER_ID,
@@ -45,7 +48,8 @@ class Session extends AbstractToken
         self::FIELD_EXPIRATION_TIME,
         self::FIELD_AUTHENTICATION_TIME,
         self::FIELD_AUTHENTICATION_METHOD,
-        self::FIELD_USER_DATA
+        self::FIELD_USER_DATA,
+        self::FIELD_NONCE
     );
 
 

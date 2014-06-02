@@ -244,7 +244,7 @@ class Authorize extends AbstractDispatcher
         $response = $this->getAuthorizeResponse(true);
         $sessionManager = $this->getSessionManager(true);
         
-        $session = $sessionManager->createSession($user, $authenticationInfo);
+        $session = $sessionManager->createSession($user, $authenticationInfo, $request);
         $authorizationCode = $sessionManager->createAuthorizationCode($session, $client);
         
         $response->setAuthorizationCode($authorizationCode->getCode());

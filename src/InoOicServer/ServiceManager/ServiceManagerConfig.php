@@ -407,6 +407,7 @@ class ServiceManagerConfig extends Config
                 $dispatcher->setTokenRequest($sm->get('InoOicServer\TokenRequest'));
                 $dispatcher->setTokenResponse($sm->get('InoOicServer\TokenResponse'));
                 $dispatcher->setClientAuthenticationManager($sm->get('InoOicServer\ClientAuthenticationManager'));
+                $dispatcher->setServerInfo($sm->get('InoOicServer\ServerInfo'));
                 
                 return $dispatcher;
             }, 

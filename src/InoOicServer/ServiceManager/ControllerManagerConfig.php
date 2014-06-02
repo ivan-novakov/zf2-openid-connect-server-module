@@ -9,6 +9,7 @@ use InoOicServer\Controller\DiscoveryController;
 use InoOicServer\Controller\AuthorizeController;
 use InoOicServer\Controller\TokenController;
 use InoOicServer\Controller\UserinfoController;
+use InoOicServer\Controller\JwksController;
 
 
 class ControllerManagerConfig extends Config
@@ -41,6 +42,14 @@ class ControllerManagerConfig extends Config
                 return $controller;
             },
             
+            'InoOicServer\JwksController' => function (ControllerManager $controllerManager)
+            {
+                
+                $controller = new JwksController();
+                
+                return $controller;
+            },
+            
             'InoOicServer\AuthorizeController' => function (ControllerManager $controllerManager)
             {
                 $sm = $controllerManager->getServiceLocator();
@@ -51,7 +60,7 @@ class ControllerManagerConfig extends Config
                 $controller->setAuthorizeDispatcher($sm->get('InoOicServer\AuthorizeDispatcher'));
                 $controller->setAuthenticationManager($sm->get('InoOicServer\AuthenticationManager'));
                 $controller->setSessionContainer($sm->get('InoOicServer\SessionContainer'));
-
+                
                 return $controller;
             },
             
