@@ -2,9 +2,20 @@
 
 namespace InoOicServer\Oic\Client;
 
+use Zend\Http;
+
 
 interface ClientServiceInterface
 {
+
+
+    /**
+     * Resolves, validates and authenticates a client based on its request.
+     * 
+     * @param Http\Request $httpRequest
+     * @return Client
+     */
+    public function resolveClient(Http\Request $httpRequest);
 
 
     /**
@@ -12,7 +23,7 @@ interface ClientServiceInterface
      * 
      * @param string $clientId
      * @param string $redirectUri
-     * @return \InoOicServer\Oic\Client\Client
+     * @return Client
      */
     public function fetchClient($clientId, $redirectUri = null);
 }

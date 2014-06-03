@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Oic\Client;
 
+use Zend\Http;
 use InoOicServer\Oic\Client\Mapper\MapperInterface;
 
 
@@ -55,5 +56,15 @@ class ClientService implements ClientServiceInterface
         }
         
         return $client;
+    }
+    
+    
+    public function resolveClient(Http\Request $httpRequest)
+    {
+        // extract credentials from HTTP request
+        // validate credentials - exists client ID and secret
+        // fetch client entity for the corresponding client ID
+        // authenticate client - check secret and request URI
+        // return client
     }
 }
