@@ -175,13 +175,40 @@ class TokenTest extends DispatcherTestCase
         $this->_dispatcher->setSessionManager($smStub);
         $this->_dispatcher->setClientAuthenticationManager($this->_getClientAuthenticationManagerStub(true));
         
+        $idToken = $this->_getIdTokenStub();
+        $idTokenFactory = $this->_getIdTokenFactoryStub();
+        $idTokenFactory->expects($this->once())
+            ->method('createIdToken')
+            ->with($this->anything())
+            ->will($this->returnValue($idToken));
+        $this->_dispatcher->setIdTokenFactory($idTokenFactory);
+        
         $response = $this->_dispatcher->dispatch();
         
         $this->assertInstanceOf('\InoOicServer\OpenIdConnect\Response\Token', $response);
     }
 
 
-    public function _getRequestStub($invalid = false)
+    protected function _getIdTokenStub()
+    {
+        $idToken = $this->getMock('InoOicServer\OpenIdConnect\IdToken\IdTOken');
+        
+        return $idToken;
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function _getIdTokenFactoryStub()
+    {
+        $factory = $this->getMock('InoOicServer\OpenIdConnect\IdToken\IdTokenFactory');
+        
+        return $factory;
+    }
+
+
+    protected function _getRequestStub($invalid = false)
     {
         $request = $this->getMockBuilder('\InoOicServer\OpenIdConnect\Request\Token')
             ->disableOriginalConstructor()

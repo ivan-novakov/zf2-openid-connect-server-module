@@ -1,4 +1,6 @@
+.buildpath
+.project
+.settings/
 composer.lock
-vendor
-tmp
-
+vendor/
+tmp/

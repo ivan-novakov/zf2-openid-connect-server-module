@@ -181,11 +181,11 @@ class Token extends AbstractDispatcher
 
 
     /**
-     * @param IdTokenFactory $_idTokenFactory
+     * @param IdTokenFactory $idTokenFactory
      */
-    public function setIdTokenFactory(IdTokenFactory $_idTokenFactory)
+    public function setIdTokenFactory(IdTokenFactory $idTokenFactory)
     {
-        $this->_idTokenFactory = $_idTokenFactory;
+        $this->_idTokenFactory = $idTokenFactory;
     }
 
 
@@ -199,11 +199,11 @@ class Token extends AbstractDispatcher
 
 
     /**
-     * @param ServerInfo $_serverInfo
+     * @param ServerInfo $serverInfo
      */
-    public function setServerInfo(ServerInfo $_serverInfo)
+    public function setServerInfo(ServerInfo $serverInfo)
     {
-        $this->_serverInfo = $_serverInfo;
+        $this->_serverInfo = $serverInfo;
     }
 
 
