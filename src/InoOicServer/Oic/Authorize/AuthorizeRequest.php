@@ -1,6 +1,6 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize\Request;
+namespace InoOicServer\Oic\Authorize;
 
 use InoOicServer\Oic\AbstractRequest;
 
@@ -8,7 +8,7 @@ use InoOicServer\Oic\AbstractRequest;
 /**
  * Authorize request entity.
  */
-class Request extends AbstractRequest
+class AuthorizeRequest extends AbstractRequest
 {
 
     /**

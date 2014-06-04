@@ -1,12 +1,12 @@
 <?php
 
-namespace InoOicServerTest\Oic\Authorize\Request;
+namespace InoOicServerTest\Oic\Authorize;
 
 use Zend\Http;
-use InoOicServer\Oic\Authorize\Request\RequestFactory;
+use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 
 
-class RequestFactoryTest extends \PHPUnit_Framework_TestCase
+class AuthorizeRequestFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
 
@@ -14,7 +14,7 @@ class RequestFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $authCookieName = 'foo';
         
-        $factory = new RequestFactory(array(
+        $factory = new AuthorizeRequestFactory(array(
             'auth_cookie_name' => $authCookieName
         ));
         
@@ -40,12 +40,12 @@ class RequestFactoryTest extends \PHPUnit_Framework_TestCase
             'Cookie' => $authCookieName . '=' . $authSessionId
         ));
         
-        $factory = new RequestFactory(array(
-            RequestFactory::OPT_AUTH_COOKIE_NAME => $authCookieName
+        $factory = new AuthorizeRequestFactory(array(
+            AuthorizeRequestFactory::OPT_AUTH_COOKIE_NAME => $authCookieName
         ));
         $request = $factory->createRequest($httpRequest);
         
-        $this->assertInstanceOf('InoOicServer\Oic\Authorize\Request\Request', $request);
+        $this->assertInstanceOf('InoOicServer\Oic\Authorize\AuthorizeRequest', $request);
         $this->assertSame($params['client_id'], $request->getClientId());
         $this->assertSame($params['redirect_uri'], $request->getRedirectUri());
         $this->assertSame($params['response_type'], $request->getResponseType());

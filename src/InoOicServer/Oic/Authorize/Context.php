@@ -2,7 +2,6 @@
 
 namespace InoOicServer\Oic\Authorize;
 
-use InoOicServer\Oic\Authorize;
 use InoOicServer\Oic\User;
 
 
@@ -24,7 +23,7 @@ class Context
     protected $createTime;
 
     /**
-     * @var Authorize\Request\Request
+     * @var AuthorizeRequest
      */
     protected $authorizeRequest;
 
@@ -83,7 +82,7 @@ class Context
 
 
     /**
-     * @return Authorize\Request\Request
+     * @return AuthorizeRequest
      */
     public function getAuthorizeRequest()
     {
@@ -92,9 +91,9 @@ class Context
 
 
     /**
-     * @param Authorize\Request\Request $authorizeRequest
+     * @param AuthorizeRequest $authorizeRequest
      */
-    public function setAuthorizeRequest(Authorize\Request\Request $authorizeRequest)
+    public function setAuthorizeRequest(AuthorizeRequest $authorizeRequest)
     {
         $this->authorizeRequest = $authorizeRequest;
     }

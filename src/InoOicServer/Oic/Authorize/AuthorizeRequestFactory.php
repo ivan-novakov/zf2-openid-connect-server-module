@@ -1,15 +1,15 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize\Request;
+namespace InoOicServer\Oic\Authorize;
 
-use Zend\Stdlib\ArrayUtils;
-use Zend\Http\Header\HeaderInterface;
-use Zend\Stdlib\Hydrator\ClassMethods;
 use Zend\Http;
+use Zend\Http\Header\HeaderInterface;
+use Zend\Stdlib\ArrayUtils;
+use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Util\OptionsTrait;
 
 
-class RequestFactory implements RequestFactoryInterface
+class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
 {
     
     use OptionsTrait;
@@ -52,7 +52,7 @@ class RequestFactory implements RequestFactoryInterface
      */
     public function createRequest(Http\Request $httpRequest)
     {
-        $request = new Request();
+        $request = new AuthorizeRequest();
         $request->setHttpRequest($httpRequest);
         
         /*

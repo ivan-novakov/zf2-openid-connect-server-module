@@ -21,7 +21,7 @@ class ContextTest extends \PHPUnit_Framework_Testcase
     public function testSettersAndGetters()
     {
         $uniqueId = 'abc';
-        $request = $this->getMock('InoOicServer\Oic\Authorize\Request\Request');
+        $request = $this->getMock('InoOicServer\Oic\Authorize\AuthorizeRequest');
         $authStatus = $this->getMock('InoOicServer\Oic\User\Authentication\Status');
         
         $context = new Context();

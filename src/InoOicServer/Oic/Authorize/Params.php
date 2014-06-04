@@ -1,6 +1,6 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize\Request;
+namespace InoOicServer\Oic\Authorize;
 
 
 class Params

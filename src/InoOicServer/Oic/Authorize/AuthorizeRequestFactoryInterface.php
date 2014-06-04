@@ -1,11 +1,11 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize\Request;
+namespace InoOicServer\Oic\Authorize;
 
 use Zend\Http;
 
 
-interface RequestFactoryInterface
+interface AuthorizeRequestFactoryInterface
 {
 
 

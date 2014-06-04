@@ -1,11 +1,11 @@
 <?php
 
-namespace InoOicServerTest\Oic\Authorize\Request;
+namespace InoOicServerTest\Oic\Authorize;
 
-use InoOicServer\Oic\Authorize\Request\Request;
+use InoOicServer\Oic\Authorize\AuthorizeRequest;
 
 
-class RequestTest extends \PHPUnit_Framework_Testcase
+class AuthorizeRequestTest extends \PHPUnit_Framework_Testcase
 {
 
 
@@ -18,7 +18,7 @@ class RequestTest extends \PHPUnit_Framework_Testcase
         $scope = 'foo';
         $authSessionId = 'asd456';
         
-        $request = new Request();
+        $request = new AuthorizeRequest();
         $request->setClientId($clientId);
         $request->setRedirectUri($redirectUri);
         $request->setState($state);
