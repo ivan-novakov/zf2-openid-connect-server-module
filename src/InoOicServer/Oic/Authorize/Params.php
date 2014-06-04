@@ -15,4 +15,6 @@ class Params
     const SCOPE = 'scope';
 
     const STATE = 'state';
+
+    const NONCE = 'nonce';
 }

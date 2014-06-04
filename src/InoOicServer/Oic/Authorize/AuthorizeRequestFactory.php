@@ -7,6 +7,7 @@ use Zend\Http\Header\HeaderInterface;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Util\OptionsTrait;
+use InoOicServer\Util\CookieManager;
 
 
 class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
@@ -15,6 +16,13 @@ class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
     use OptionsTrait;
 
     const OPT_AUTH_COOKIE_NAME = 'auth_cookie_name';
+
+    const OPT_SESSION_COOKIE_NAME = 'session_cookie_name';
+
+    /**
+     * @var CookieManager
+     */
+    protected $cookieManager;
 
     /**
      * @var array
@@ -31,7 +39,8 @@ class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
         Params::REDIRECT_URI,
         Params::RESPONSE_TYPE,
         Params::SCOPE,
-        Params::STATE
+        Params::STATE,
+        Params::NONCE
     );
 
 
@@ -43,6 +52,28 @@ class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
     public function __construct(array $options = array())
     {
         $this->setOptions($options);
+    }
+
+
+    /**
+     * @return CookieManager
+     */
+    public function getCookieManager()
+    {
+        if (! $this->cookieManager instanceof CookieManager) {
+            $this->cookieManager = new CookieManager();
+        }
+        
+        return $this->cookieManager;
+    }
+
+
+    /**
+     * @param CookieManager $cookieManager
+     */
+    public function setCookieManager(CookieManager $cookieManager)
+    {
+        $this->cookieManager = $cookieManager;
     }
 
 
@@ -72,10 +103,16 @@ class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
         /*
          * Headers
          */
-        $cookieHeader = $httpRequest->getCookie();
-        if ($cookieHeader instanceof HeaderInterface) {
-            $value = $cookieHeader->offsetGet($this->getOption(self::OPT_AUTH_COOKIE_NAME));
-            $request->setAuthenticationSessionId($value);
+        $cookieManager = $this->getCookieManager();
+        
+        $sessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_SESSION_COOKIE_NAME));
+        if (null !== $sessionId) {
+            $request->setSessionId($sessionId);
+        }
+        
+        $authenticationSessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_AUTH_COOKIE_NAME));
+        if (null !== $authenticationSessionId) {
+            $request->setAuthenticationSessionId($authenticationSessionId);
         }
         
         return $request;

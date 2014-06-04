@@ -37,8 +37,21 @@ class AuthorizeRequest extends AbstractRequest
     protected $scope;
 
     /**
+     * @var string
+     */
+    protected $nonce;
+
+    /**
+     * Unique ID (set as a cookie) used to associate the user with an 
+     * existing OIC session.
+     * 
+     * @var string
+     */
+    protected $sessionId;
+
+    /**
      * Unique ID (set as a cookie) used to associate the user agent with
-     * an existing OIC session.
+     * an authentication session.
      * 
      * @var string
      */
@@ -132,6 +145,42 @@ class AuthorizeRequest extends AbstractRequest
     public function setScope($scope)
     {
         $this->scope = $scope;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getNonce()
+    {
+        return $this->nonce;
+    }
+
+
+    /**
+     * @param string $nonce
+     */
+    public function setNonce($nonce)
+    {
+        $this->nonce = $nonce;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getSessionId()
+    {
+        return $this->sessionId;
+    }
+
+
+    /**
+     * @param string $sessionId
+     */
+    public function setSessionId($sessionId)
+    {
+        $this->sessionId = $sessionId;
     }
 
 

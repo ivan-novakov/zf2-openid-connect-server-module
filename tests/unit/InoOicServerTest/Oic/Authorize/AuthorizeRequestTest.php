@@ -16,6 +16,8 @@ class AuthorizeRequestTest extends \PHPUnit_Framework_Testcase
         $state = 'abc123';
         $responseType = 'dummy';
         $scope = 'foo';
+        $nonce = 'testnonce';
+        $sessionId = 'qwe123';
         $authSessionId = 'asd456';
         
         $request = new AuthorizeRequest();
@@ -24,6 +26,8 @@ class AuthorizeRequestTest extends \PHPUnit_Framework_Testcase
         $request->setState($state);
         $request->setResponseType($responseType);
         $request->setState($state);
+        $request->setNonce($nonce);
+        $request->setSessionId($sessionId);
         $request->setAuthenticationSessionId($authSessionId);
         
         $this->assertSame($clientId, $request->getClientId());
@@ -31,6 +35,8 @@ class AuthorizeRequestTest extends \PHPUnit_Framework_Testcase
         $this->assertSame($state, $request->getState());
         $this->assertSame($responseType, $request->getResponseType());
         $this->assertSame($state, $request->getState());
+        $this->assertSame($nonce, $request->getNonce());
+        $this->assertSame($sessionId, $request->getSessionId());
         $this->assertSame($authSessionId, $request->getAuthenticationSessionId());
     }
 }
