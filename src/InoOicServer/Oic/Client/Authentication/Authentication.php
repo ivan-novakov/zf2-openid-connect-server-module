@@ -20,4 +20,5 @@ class Authentication
 
     const REQUEST_FIELD_CLIENT_SECRET = 'client_secret';
 
+    const REQUEST_FIELD_REDIRECT_URI = 'redirect_uri';
 }

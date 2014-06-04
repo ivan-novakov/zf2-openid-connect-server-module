@@ -19,6 +19,11 @@ class Credentials
     /**
      * @var string
      */
+    protected $redirectUri;
+
+    /**
+     * @var string
+     */
     protected $type;
 
 
@@ -61,6 +66,24 @@ class Credentials
     /**
      * @return string
      */
+    public function getRedirectUri()
+    {
+        return $this->redirectUri;
+    }
+
+
+    /**
+     * @param string $redirectUri
+     */
+    public function setRedirectUri($redirectUri)
+    {
+        $this->redirectUri = $redirectUri;
+    }
+
+
+    /**
+     * @return string
+     */
     public function getType()
     {
         return $this->type;
@@ -74,5 +97,4 @@ class Credentials
     {
         $this->type = $type;
     }
-
 }

@@ -38,7 +38,7 @@ class CredentialsExtractor
         $clientSecret = $postVars->get(Authentication::REQUEST_FIELD_CLIENT_SECRET);
         
         if ($this->isValidString($clientId) && $this->isValidString($clientSecret)) {
-            return $this->createCredentials($clientId, $clientSecret, Authentication::TYPE_CLIENT_SECRET_POST);
+            return $this->createCredentials($clientId, $clientSecret, $this->extractRedirectUri($httpRequest), Authentication::TYPE_CLIENT_SECRET_POST);
         }
         
         return null;
@@ -73,15 +73,22 @@ class CredentialsExtractor
             throw new Exception\CredentialsExtractionException('Invalid basic authentication credentials');
         }
         
-        return $this->createCredentials(trim($credentials[0]), trim($credentials[1]), Authentication::TYPE_CLIENT_SECRET_BASIC);
+        return $this->createCredentials(trim($credentials[0]), trim($credentials[1]), $this->extractRedirectUri($httpRequest), Authentication::TYPE_CLIENT_SECRET_BASIC);
     }
 
 
-    protected function createCredentials($clientId, $clientSecret, $type)
+    protected function extractRedirectUri(Http\Request $httpRequest)
+    {
+        return $httpRequest->getPost(Authentication::REQUEST_FIELD_REDIRECT_URI);
+    }
+
+
+    protected function createCredentials($clientId, $clientSecret, $redirectUri, $type)
     {
         $credentials = new Credentials();
         $credentials->setClientId($clientId);
         $credentials->setClientSecret($clientSecret);
+        $credentials->setRedirectUri($redirectUri);
         $credentials->setType($type);
         
         return $credentials;
