@@ -17,17 +17,20 @@ class ClientTest extends \PHPUnit_Framework_Testcase
             'https://dummy1/',
             'https://dummy2'
         );
+        $authenticationMethod = 'client_secret_post';
         $userAuthenticationMethod = 'basic';
         
         $client = new Client();
         $client->setId($id);
         $client->setSecret($secret);
         $client->setRedirectUris($redirectUris);
+        $client->setAuthenticationMethod($authenticationMethod);
         $client->setUserAuthenticationMethod($userAuthenticationMethod);
         
         $this->assertSame($id, $client->getId());
         $this->assertSame($secret, $client->getSecret());
         $this->assertSame($redirectUris, $client->getRedirectUris());
+        $this->assertSame($authenticationMethod, $client->getAuthenticationMethod());
         $this->assertSame($userAuthenticationMethod, $client->getUserAuthenticationMethod());
     }
 

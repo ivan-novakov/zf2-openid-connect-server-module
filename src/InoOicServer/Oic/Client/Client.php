@@ -27,6 +27,11 @@ class Client
     /**
      * @var string
      */
+    protected $authenticationMethod;
+
+    /**
+     * @var string
+     */
     protected $userAuthenticationMethod;
 
 
@@ -91,6 +96,24 @@ class Client
     public function hasRedirectUri($redirectUri)
     {
         return (in_array($redirectUri, $this->getRedirectUris()));
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getAuthenticationMethod()
+    {
+        return $this->authenticationMethod;
+    }
+
+
+    /**
+     * @param string $authenticationMethod
+     */
+    public function setAuthenticationMethod($authenticationMethod)
+    {
+        $this->authenticationMethod = $authenticationMethod;
     }
 
 
