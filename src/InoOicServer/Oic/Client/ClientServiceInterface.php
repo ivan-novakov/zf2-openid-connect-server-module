@@ -2,7 +2,7 @@
 
 namespace InoOicServer\Oic\Client;
 
-use Zend\Http;
+use InoOicServer\Oic\Token\TokenRequest;
 
 
 interface ClientServiceInterface
@@ -15,7 +15,7 @@ interface ClientServiceInterface
      * @param Http\Request $httpRequest
      * @return Client
      */
-    public function resolveClient(Http\Request $httpRequest);
+    public function resolveClientByTokenRequest(TokenRequest $request);
 
 
     /**

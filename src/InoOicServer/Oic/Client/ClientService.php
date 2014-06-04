@@ -2,8 +2,10 @@
 
 namespace InoOicServer\Oic\Client;
 
-use Zend\Http;
+use InoOicServer\Oic\Token\TokenRequest;
 use InoOicServer\Oic\Client\Mapper\MapperInterface;
+use InoOicServer\Oic\Client\Authentication\CredentialsExtractor;
+use InoOicServer\Oic\RequestInterface;
 
 
 class ClientService implements ClientServiceInterface
@@ -13,6 +15,11 @@ class ClientService implements ClientServiceInterface
      * @var MapperInterface
      */
     protected $clientMapper;
+
+    /**
+     * @var CredentialsExtractor
+     */
+    protected $credentialsExtractor;
 
 
     /**
@@ -45,6 +52,28 @@ class ClientService implements ClientServiceInterface
 
 
     /**
+     * @return CredentialsExtractor
+     */
+    public function getCredentialsExtractor()
+    {
+        if (! $this->credentialsExtractor instanceof CredentialsExtractor) {
+            $this->credentialsExtractor = new CredentialsExtractor();
+        }
+        
+        return $this->credentialsExtractor;
+    }
+
+
+    /**
+     * @param CredentialsExtractor $credentialsExtractor
+     */
+    public function setCredentialsExtractor(CredentialsExtractor $credentialsExtractor)
+    {
+        $this->credentialsExtractor = $credentialsExtractor;
+    }
+
+
+    /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Client\ClientServiceInterface::fetchClient()
      */
@@ -57,14 +86,31 @@ class ClientService implements ClientServiceInterface
         
         return $client;
     }
-    
-    
-    public function resolveClient(Http\Request $httpRequest)
+
+
+    public function resolveClientByTokenRequest(TokenRequest $request)
     {
         // extract credentials from HTTP request
-        // validate credentials - exists client ID and secret
+        $credentials = $this->getCredentialsExtractor()->extract($request->getHttpRequest());
+        if (null === $credentials) {
+            return null;
+        }
+        
         // fetch client entity for the corresponding client ID
+        $client = $this->getClientMapper()->getClientById($credentials->getClientId());
+        if (null === $client) {
+            throw new Exception\UnknownClientException(sprintf("Unkonwn client '%s'", $credentials->getClientId()));
+        }
+        
         // authenticate client - check secret and request URI
+        if ($client->getSecret() !== $credentials->getClientSecret()) {
+            // invalid secret
+        }
+        
+        if (! $client->hasRedirectUri($credentials->getRedirectUri())) {
+            // invalid redirect URI
+        }
+        
         // return client
     }
 }
