@@ -2,11 +2,13 @@
 
 namespace InoOicServer\Oic\Authorize\Request;
 
+use InoOicServer\Oic\AbstractRequest;
+
 
 /**
  * Authorize request entity.
  */
-class Request
+class Request extends AbstractRequest
 {
 
     /**

@@ -53,6 +53,7 @@ class RequestFactory implements RequestFactoryInterface
     public function createRequest(Http\Request $httpRequest)
     {
         $request = new Request();
+        $request->setHttpRequest($httpRequest);
         
         /*
          * GET params

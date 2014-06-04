@@ -51,6 +51,7 @@ class RequestFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($params['response_type'], $request->getResponseType());
         $this->assertSame($params['scope'], $request->getScope());
         $this->assertSame($params['state'], $request->getState());
+        $this->assertSame($httpRequest, $request->getHttpRequest());
         
         $this->assertSame($authSessionId, $request->getAuthenticationSessionId());
     }
