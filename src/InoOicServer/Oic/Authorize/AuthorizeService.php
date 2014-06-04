@@ -139,13 +139,9 @@ class AuthorizeService
         // save client to context
         // ?? is it necessary?
         
-        // check if there is active/valid (authentication) session, if true, skip to response endpoint (create redirect)
-        $session = $this->getSessionService()->fetchSessionByRequest($request);
-        if (null !== $session) {
-            // redirect to response
-        }
-        
-        // redirect to authentication
+        // check if there is active/valid authentication session
+        // if true, check if there is valid session bound to the authn session to be reused or create new one and redirect to response action
+        // otherwise redirect to authentication
     }
 
 
