@@ -20,6 +20,7 @@ class FactoryTest extends \PHPUnit_Framework_Testcase
                 'https://bar1/',
                 'https://bar2/'
             ),
+            'authenticationMethod' => 'test',
             'userAuthenticationMethod' => 'dummy'
         );
         
@@ -29,6 +30,7 @@ class FactoryTest extends \PHPUnit_Framework_Testcase
         $this->assertSame($data['id'], $client->getId());
         $this->assertSame($data['secret'], $client->getSecret());
         $this->assertSame($data['redirectUris'], $client->getRedirectUris());
+        $this->assertSame($data['authenticationMethod'], $client->getAuthenticationMethod());
         $this->assertSame($data['userAuthenticationMethod'], $client->getUserAuthenticationMethod());
     }
 }
