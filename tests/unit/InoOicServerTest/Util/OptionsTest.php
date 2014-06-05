@@ -1,6 +1,6 @@
 <?php
 
-namespace InoOicServer\Util;
+namespace InoOicServerTest\Util;
 
 use InoOicServer\Util\Options;
 
