@@ -2,6 +2,10 @@
 
 namespace InoOicServer\Util;
 
+use DateTime;
+use DateInterval;
+use DateTimeZone;
+
 
 /**
  * Date/time utility functions.
@@ -19,12 +23,13 @@ class DateTimeUtil
      * @param string $dateTimeString
      * @return \DateTime
      */
-    public function createDateTime($dateTimeString = null)
+    public function createDateTime($dateTimeString = null, DateTimeZone $dateTimeZone = null)
     {
         if (null === $dateTimeString) {
             $dateTimeString = 'now';
         }
-        return new \DateTime($dateTimeString);
+        
+        return new DateTime($dateTimeString, $dateTimeZone);
     }
 
 
@@ -38,12 +43,12 @@ class DateTimeUtil
      * @param string|\DateInterval $interfal
      * @return DateTime
      */
-    public function createExpireDateTime(\DateTime $dateTimeFrom, $interval)
+    public function createExpireDateTime(DateTime $dateTimeFrom, $interval)
     {
         $expireDateTime = clone $dateTimeFrom;
         
-        if (! $interval instanceof \DateInterval) {
-            $interval = new \DateInterval($interval);
+        if (! $interval instanceof DateInterval) {
+            $interval = new DateInterval($interval);
         }
         
         return $expireDateTime->add($interval);
