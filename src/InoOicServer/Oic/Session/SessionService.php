@@ -10,8 +10,8 @@ use InoOicServer\Oic\AccessToken\AccessToken;
 use InoOicServer\Oic\AuthCode\AuthCode;
 use InoOicServer\Oic\User;
 use InoOicServer\Oic\Session\Mapper\MapperInterface;
-use InoOicServer\Util\TokenGenerator\TokenGeneratorInterface;
-use InoOicServer\Util\TokenGenerator\Simple;
+use InoOicServer\Crypto\Hash\HashGeneratorInterface;
+use InoOicServer\Crypto\Hash\SimpleHashGenerator;
 
 
 /**
@@ -46,9 +46,9 @@ class SessionService
     protected $sessionHydrator;
 
     /**
-     * @var TokenGeneratorInterface
+     * @var HashGeneratorInterface
      */
-    protected $tokenGenerator;
+    protected $hashGenerator;
 
     /**
      * @var array
@@ -135,25 +135,26 @@ class SessionService
 
 
     /**
-     * @return TokenGeneratorInterface
+     * @return HashGeneratorInterface
      */
-    public function getTokenGenerator()
+    public function getHashGenerator()
     {
-        if (! $this->tokenGenerator instanceof TokenGeneratorInterface) {
-            $this->tokenGenerator = new Simple(array(
-                Simple::OPT_SECRET_SALT => $this->getOption(self::OPT_AUTH_SESSION_SALT)
+        if (! $this->hashGenerator instanceof HashGeneratorInterface) {
+            $this->hashGenerator = new SimpleHashGenerator(array(
+                SimpleHashGenerator::OPT_SECRET_SALT => $this->getOption(self::OPT_AUTH_SESSION_SALT)
             ));
         }
-        return $this->tokenGenerator;
+        
+        return $this->hashGenerator;
     }
 
 
     /**
-     * @param TokenGeneratorInterface $tokenGenerator
+     * @param HashGeneratorInterface $hashGenerator
      */
-    public function setTokenGenerator($tokenGenerator)
+    public function setHashGenerator(HashGeneratorInterface $hashGenerator)
     {
-        $this->tokenGenerator = $tokenGenerator;
+        $this->hashGenerator = $hashGenerator;
     }
 
 
@@ -239,7 +240,7 @@ class SessionService
      */
     protected function generateSessionId(User\Authentication\Status $userAuthStatus)
     {
-        return $this->getTokenGenerator()->generate(array(
+        return $this->getHashGenerator()->generate(array(
             'Session ID',
             $userAuthStatus->getIdentity()
                 ->getId()
@@ -255,7 +256,7 @@ class SessionService
      */
     protected function generateAuthSessionId(User\Authentication\Status $userAuthStatus)
     {
-        return $this->getTokenGenerator()->generate(array(
+        return $this->getHashGenerator()->generate(array(
             'Authentication Session ID',
             $userAuthStatus->getIdentity()
                 ->getId()

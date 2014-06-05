@@ -1,11 +1,11 @@
 <?php
 
-namespace InoOicServerTest\Util\TokenGenerator;
+namespace InoOicServerTest\Crypto\Hash;
 
-use InoOicServer\Util\TokenGenerator\Simple;
+use InoOicServer\Crypto\Hash\SimpleHashGenerator;
 
 
-class SimpleTest extends \PHPUnit_Framework_TestCase
+class SimpleHashGeneratorTest extends \PHPUnit_Framework_TestCase
 {
 
 
@@ -18,8 +18,8 @@ class SimpleTest extends \PHPUnit_Framework_TestCase
         
         $secretSalt = 'blah';
         
-        $generator = new Simple(array(
-            Simple::OPT_SECRET_SALT => $secretSalt
+        $generator = new SimpleHashGenerator(array(
+            SimpleHashGenerator::OPT_SECRET_SALT => $secretSalt
         ));
         
         $usedValues = $inputValues + array(

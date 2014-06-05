@@ -1,9 +1,9 @@
 <?php
 
-namespace InoOicServer\Util\TokenGenerator;
+namespace InoOicServer\Crypto\Hash;
 
 
-interface TokenGeneratorInterface
+interface HashGeneratorInterface
 {
 
 

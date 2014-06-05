@@ -1,6 +1,6 @@
 <?php
 
-namespace InoOicServer\Util\TokenGenerator;
+namespace InoOicServer\Crypto\Hash;
 
 use InoOicServer\Util\OptionsTrait;
 
@@ -8,7 +8,7 @@ use InoOicServer\Util\OptionsTrait;
 /**
  * Simple token generator implementation.
  */
-class Simple implements TokenGeneratorInterface
+class SimpleHashGenerator implements HashGeneratorInterface
 {
     use OptionsTrait;
 
@@ -35,7 +35,7 @@ class Simple implements TokenGeneratorInterface
 
     /**
      * {@inheritdoc}
-     * @see \InoOicServer\Util\TokenGenerator\TokenGeneratorInterface::generate()
+     * @see \InoOicServer\Crypto\Hash\HashGeneratorInterface::generate()
      */
     public function generate(array $inputValues = array())
     {

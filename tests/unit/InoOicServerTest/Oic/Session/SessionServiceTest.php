@@ -87,7 +87,7 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getTime')
             ->will($this->returnValue($authTime));
         
-        $generator = $this->createTokenGeneratorMock();
+        $generator = $this->createHashGeneratorMock();
         $generator->expects($this->at(0))
             ->method('generate')
             ->with(array(
@@ -102,7 +102,7 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
             $userId
         ))
             ->will($this->returnValue($authSessionId));
-        $this->service->setTokenGenerator($generator);
+        $this->service->setHashGenerator($generator);
         
         $session = $this->getMock('InoOicServer\Oic\Session\Session');
         
@@ -154,9 +154,9 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createTokenGeneratorMock()
+    protected function createHashGeneratorMock()
     {
-        $generator = $this->getMock('InoOicServer\Util\TokenGenerator\TokenGeneratorInterface');
+        $generator = $this->getMock('InoOicServer\Crypto\Hash\HashGeneratorInterface');
         
         return $generator;
     }
