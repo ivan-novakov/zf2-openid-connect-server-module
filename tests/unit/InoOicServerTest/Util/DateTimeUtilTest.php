@@ -44,6 +44,10 @@ class DateTimeUtilTest extends \PHPUnit_Framework_TestCase
     public function testCreateExpireDateTimeWithObjectInterval($base, $interval, $expectedResult)
     {
         $baseDateTime = new \DateTime($base);
+        if (is_int($interval)) {
+            $interval = sprintf("PT%dS", $interval);
+        }
+        
         $interval = new \DateInterval($interval);
         $expireDateTime = $this->dt->createExpireDateTime($baseDateTime, $interval);
         $result = $expireDateTime->format('Y-m-d H:i:s');
@@ -80,6 +84,11 @@ class DateTimeUtilTest extends \PHPUnit_Framework_TestCase
                 '2010-09-08 07:06:05',
                 'PT24H30M',
                 '2010-09-09 07:36:05'
+            ),
+            array(
+                '2010-09-08 07:06:05',
+                3600,
+                '2010-09-08 08:06:05'
             )
         );
     }

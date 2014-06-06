@@ -40,7 +40,7 @@ class DateTimeUtil
      * @see http://php.net/manual/en/dateinterval.construct.php
      * 
      * @param \DateTime $dateTimeFrom
-     * @param string|\DateInterval $interfal
+     * @param string|integer|\DateInterval $interfal
      * @return DateTime
      */
     public function createExpireDateTime(DateTime $dateTimeFrom, $interval)
@@ -48,6 +48,10 @@ class DateTimeUtil
         $expireDateTime = clone $dateTimeFrom;
         
         if (! $interval instanceof DateInterval) {
+            if (($seconds = intval($interval)) !== 0) {
+                $interval = sprintf("PT%dS", $seconds);
+            }
+            
             $interval = new DateInterval($interval);
         }
         
