@@ -18,20 +18,6 @@ class AuthSessionFactoryTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testSetHashGenerator()
-    {
-        $hashGenerator = $this->createHashGeneratorMock();
-        $this->factory->setHashGenerator($hashGenerator);
-        $this->assertSame($hashGenerator, $this->factory->getHashGenerator());
-    }
-
-
-    public function testGetImplicitDateTimeUtil()
-    {
-        $this->assertInstanceOf('InoOicServer\Util\DateTimeUtil', $this->factory->getDateTimeUtil());
-    }
-
-
     public function testCreateAuthSessionWithNoAuthentication()
     {
         $this->setExpectedException('InoOicServer\Oic\AuthSession\Exception\UnauthenticatedUserException', 'Unauthenticated user');
