@@ -31,6 +31,12 @@ class AbstractSessionFactoryTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf('InoOicServer\Util\DateTimeUtil', $this->factory->getDateTimeUtil());
     }
+
+
+    public function testGetImplicitHydrator()
+    {
+        $this->assertInstanceOf('Zend\Stdlib\Hydrator\ClassMethods', $this->factory->getHydrator());
+    }
     
     /*
      * 

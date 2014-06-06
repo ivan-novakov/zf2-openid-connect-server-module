@@ -4,6 +4,8 @@ namespace InoOicServer\Oic;
 
 use InoOicServer\Crypto\Hash\HashGeneratorInterface;
 use InoOicServer\Util\DateTimeUtil;
+use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Stdlib\Hydrator\ClassMethods;
 
 
 abstract class AbstractSessionFactory
@@ -13,6 +15,11 @@ abstract class AbstractSessionFactory
      * @var HashGeneratorInterface
      */
     protected $hashGenerator;
+
+    /**
+     * @var HydratorInterface
+     */
+    protected $hydrator;
 
     /**
      * @var DateTimeUtil
@@ -47,6 +54,28 @@ abstract class AbstractSessionFactory
     public function setHashGenerator(HashGeneratorInterface $hashGenerator)
     {
         $this->hashGenerator = $hashGenerator;
+    }
+
+
+    /**
+     * @return HydratorInterface
+     */
+    public function getHydrator()
+    {
+        if (! $this->hydrator instanceof HydratorInterface) {
+            $this->hydrator = new ClassMethods();
+        }
+        
+        return $this->hydrator;
+    }
+
+
+    /**
+     * @param HydratorInterface $hydrator
+     */
+    public function setHydrator(HydratorInterface $hydrator)
+    {
+        $this->hydrator = $hydrator;
     }
 
 
