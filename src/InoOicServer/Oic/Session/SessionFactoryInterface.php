@@ -2,15 +2,19 @@
 
 namespace InoOicServer\Oic\Session;
 
+use InoOicServer\Oic\AuthSession\AuthSession;
+
 
 interface SessionFactoryInterface
 {
 
 
     /**
-     * Creates an emtpy session entity "prototype".
-     * 
+     * @param AuthSession $authSession
+     * @param integer $age
+     * @param string $salt
+     * @param string $nonce
      * @return Session
      */
-    public function createSession();
+    public function createSession(AuthSession $authSession, $age, $salt, $nonce = null);
 }
