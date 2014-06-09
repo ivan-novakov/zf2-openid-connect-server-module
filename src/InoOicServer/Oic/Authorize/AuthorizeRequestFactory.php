@@ -3,8 +3,6 @@
 namespace InoOicServer\Oic\Authorize;
 
 use Zend\Http;
-use Zend\Http\Header\HeaderInterface;
-use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Util\CookieManager;

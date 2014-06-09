@@ -5,7 +5,6 @@ namespace InoOicServer\Oic\Client;
 use InoOicServer\Oic\Token\TokenRequest;
 use InoOicServer\Oic\Client\Mapper\MapperInterface;
 use InoOicServer\Oic\Client\Authentication\CredentialsExtractor;
-use InoOicServer\Oic\RequestInterface;
 
 
 class ClientService implements ClientServiceInterface
