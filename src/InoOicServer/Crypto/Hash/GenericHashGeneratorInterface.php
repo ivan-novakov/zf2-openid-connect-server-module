@@ -3,15 +3,15 @@
 namespace InoOicServer\Crypto\Hash;
 
 
-interface HashGeneratorInterface
+interface GenericHashGeneratorInterface
 {
 
 
     /**
-     * Generates a token based on the input values.
-     * 
-     * @param array $inputValues
+     * @param string $algo
+     * @param string $data
+     * @param string $salt
      * @return string
      */
-    public function generate(array $inputValues = array());
+    public function generateHash($algo, $data, $salt = null);
 }

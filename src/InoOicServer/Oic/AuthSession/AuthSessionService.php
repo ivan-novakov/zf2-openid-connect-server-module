@@ -6,7 +6,6 @@ use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\User;
 use InoOicServer\Crypto\Hash\HashGeneratorInterface;
 use InoOicServer\Oic\AuthSession\Mapper\MapperInterface;
-use InoOicServer\Oic\User\UserInterface;
 
 
 class AuthSessionService implements AuthSessionServiceInterface

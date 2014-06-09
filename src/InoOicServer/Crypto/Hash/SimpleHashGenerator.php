@@ -8,7 +8,7 @@ use InoOicServer\Util\OptionsTrait;
 /**
  * Simple token generator implementation.
  */
-class SimpleHashGenerator implements HashGeneratorInterface
+class SimpleHashGenerator
 {
     use OptionsTrait;
 

@@ -44,12 +44,8 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
         
         $hashGenerator = $this->createHashGeneratorMock();
         $hashGenerator->expects($this->once())
-            ->method('generate')
-            ->with(array(
-            $authSessionId,
-            $createTime->getTimestamp(),
-            $salt
-        ))
+            ->method('generateSessionHash')
+            ->with($authSession, $salt)
             ->will($this->returnValue($sessionId));
         $this->factory->setHashGenerator($hashGenerator);
         
@@ -63,7 +59,7 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createHashGeneratorMock()
     {
-        $hashGenerator = $this->getMock('InoOicServer\Crypto\Hash\HashGeneratorInterface');
+        $hashGenerator = $this->getMock('InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface');
         
         return $hashGenerator;
     }

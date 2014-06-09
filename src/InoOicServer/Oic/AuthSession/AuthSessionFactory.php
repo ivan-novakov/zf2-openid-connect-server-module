@@ -4,14 +4,35 @@ namespace InoOicServer\Oic\AuthSession;
 
 use InoOicServer\Oic\User;
 use InoOicServer\Oic\User\UserInterface;
-use InoOicServer\Crypto\Hash\HashGeneratorInterface;
-use InoOicServer\Util\OptionsTrait;
-use InoOicServer\Util\DateTimeUtil;
 use InoOicServer\Oic\AbstractSessionFactory;
+use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGeneratorInterface;
 
 
 class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface
 {
+
+    /**
+     * @var AuthSessionHashGeneratorInterface
+     */
+    protected $hashGenerator;
+
+
+    /**
+     * @return AuthSessionHashGeneratorInterface
+     */
+    public function getHashGenerator()
+    {
+        return $this->hashGenerator;
+    }
+
+
+    /**
+     * @param AuthSessionHashGeneratorInterface $hashGenerator
+     */
+    public function setHashGenerator(AuthSessionHashGeneratorInterface $hashGenerator)
+    {
+        $this->hashGenerator = $hashGenerator;
+    }
 
 
     /**
@@ -31,11 +52,7 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         
         $createTime = $authStatus->getTime();
         
-        $authSessionId = $this->getHashGenerator()->generate(array(
-            $user->getId(),
-            $createTime->getTimestamp(),
-            $salt
-        ));
+        $authSessionId = $this->getHashGenerator()->generateAuthSessionHash($authStatus, $salt);
         
         $authSession = new AuthSession();
         $authSession->setId($authSessionId);

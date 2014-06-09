@@ -11,19 +11,7 @@ class AbstractSessionFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->factory = $this->getMockBuilder('InoOicServer\Oic\AbstractSessionFactory')
-            ->setConstructorArgs(array(
-            $this->createHashGeneratorMock()
-        ))
-            ->getMockForAbstractClass();
-    }
-
-
-    public function testSetHashGenerator()
-    {
-        $hashGenerator = $this->createHashGeneratorMock();
-        $this->factory->setHashGenerator($hashGenerator);
-        $this->assertSame($hashGenerator, $this->factory->getHashGenerator());
+        $this->factory = $this->getMockForAbstractClass('InoOicServer\Oic\AbstractSessionFactory');
     }
 
 
@@ -36,15 +24,5 @@ class AbstractSessionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testGetImplicitHydrator()
     {
         $this->assertInstanceOf('Zend\Stdlib\Hydrator\ClassMethods', $this->factory->getHydrator());
-    }
-    
-    /*
-     * 
-     */
-    protected function createHashGeneratorMock()
-    {
-        $generator = $this->getMock('InoOicServer\Crypto\Hash\HashGeneratorInterface');
-        
-        return $generator;
     }
 }

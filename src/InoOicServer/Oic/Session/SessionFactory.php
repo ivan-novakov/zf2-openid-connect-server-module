@@ -4,6 +4,7 @@ namespace InoOicServer\Oic\Session;
 
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\AuthSession;
+use InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface;
 
 
 /**
@@ -11,6 +12,29 @@ use InoOicServer\Oic\AuthSession\AuthSession;
  */
 class SessionFactory extends AbstractSessionFactory implements SessionFactoryInterface
 {
+
+    /**
+     * @var SessionHashGeneratorInterface
+     */
+    protected $hashGenerator;
+
+
+    /**
+     * @return SessionHashGeneratorInterface
+     */
+    public function getHashGenerator()
+    {
+        return $this->hashGenerator;
+    }
+
+
+    /**
+     * @param SessionHashGeneratorInterface $hashGenerator
+     */
+    public function setHashGenerator(SessionHashGeneratorInterface $hashGenerator)
+    {
+        $this->hashGenerator = $hashGenerator;
+    }
 
 
     /**
@@ -26,16 +50,11 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
         
         $session = new Session();
         
-        $authSessionId = $authSession->getId();
-        $sessionId = $this->getHashGenerator()->generate(array(
-            $authSessionId,
-            $createTime->getTimestamp(),
-            $salt
-        ));
+        $sessionId = $this->getHashGenerator()->generateSessionHash($authSession, $salt);
         
         $sessionData = array(
             'id' => $sessionId,
-            'authentication_session_id' => $authSessionId,
+            'authentication_session_id' => $authSession->getId(),
             'create_time' => $createTime,
             'modify_time' => clone $createTime,
             'expiration_time' => $expirationTime,

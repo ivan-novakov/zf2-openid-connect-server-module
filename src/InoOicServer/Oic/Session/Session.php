@@ -3,7 +3,6 @@
 namespace InoOicServer\Oic\Session;
 
 use DateTime;
-use Zend\Stdlib\ArrayObject;
 use InoOicServer\Util\ConvertToDateTimeTrait;
 use InoOicServer\Oic\User\UserInterface;
 
