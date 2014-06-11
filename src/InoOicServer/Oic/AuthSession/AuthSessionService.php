@@ -48,13 +48,10 @@ class AuthSessionService implements AuthSessionServiceInterface
      * @param MapperInterface $authSessionMapper
      * @param HashGeneratorInterface $hashGenerator
      */
-    public function __construct(MapperInterface $authSessionMapper, AuthSessionFactoryInterface $authSessionFactory = null)
+    public function __construct(MapperInterface $authSessionMapper, array $options = array())
     {
         $this->setAuthSessionMapper($authSessionMapper);
-        
-        if (null !== $authSessionFactory) {
-            $this->setAuthSessionFactory($authSessionFactory);
-        }
+        $this->setOptions($options);
     }
 
 

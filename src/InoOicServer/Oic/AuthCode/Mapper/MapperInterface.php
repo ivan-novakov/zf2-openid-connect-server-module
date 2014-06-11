@@ -27,4 +27,10 @@ interface MapperInterface
      * @return AuthCode|null
      */
     public function fetchBySessionId($sessionId);
+
+
+    /**
+     * @param string $code
+     */
+    public function delete($code);
 }

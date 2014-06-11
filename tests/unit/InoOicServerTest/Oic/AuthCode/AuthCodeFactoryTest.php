@@ -11,6 +11,23 @@ class AuthCodeFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
 
+    public function testSetHashGenerator()
+    {
+        $hashGenerator = $this->createAuthCodeHashGeneratorMock();
+        $factory = new AuthCodeFactory();
+        $factory->setHashGenerator($hashGenerator);
+        
+        $this->assertSame($hashGenerator, $factory->getHashGenerator());
+    }
+
+
+    public function testGetImplicitHashGenerator()
+    {
+        $factory = new AuthCodeFactory();
+        $this->assertInstanceOf('InoOicServer\Oic\AuthCode\Hash\AuthCodeHashGeneratorInterface', $factory->getHashGenerator());
+    }
+
+
     public function testCreateAuthCode()
     {
         $clientId = 'testclient';
@@ -56,5 +73,15 @@ class AuthCodeFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($createTime, $authCode->getCreateTime());
         $this->assertSame($expirationTime, $authCode->getExpirationTime());
         $this->assertSame($scope, $authCode->getScope());
+    }
+    
+    /*
+     * 
+     */
+    protected function createAuthCodeHashGeneratorMock()
+    {
+        $hashGenerator = $this->getMock('InoOicServer\Oic\AuthCode\Hash\AuthCodeHashGeneratorInterface');
+        
+        return $hashGenerator;
     }
 }
