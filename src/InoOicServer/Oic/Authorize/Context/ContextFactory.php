@@ -2,8 +2,6 @@
 
 namespace InoOicServer\Oic\Authorize\Context;
 
-use InoOicServer\Oic\Authorize\Context;
-
 
 /**
  * Authorize context factory.

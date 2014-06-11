@@ -5,7 +5,7 @@ namespace InoOicServerTest\Oic\Authorize\Context;
 use InoOicServer\Oic\Authorize\Context\SessionStorage;
 
 
-class SessionTest extends \PHPUnit_Framework_TestCase
+class SessionStorageTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -83,7 +83,7 @@ class SessionTest extends \PHPUnit_Framework_TestCase
     */
     protected function createContextMock()
     {
-        $context = $this->getMock('InoOicServer\Oic\Authorize\Context');
+        $context = $this->getMock('InoOicServer\Oic\Authorize\Context\Context');
         return $context;
     }
 

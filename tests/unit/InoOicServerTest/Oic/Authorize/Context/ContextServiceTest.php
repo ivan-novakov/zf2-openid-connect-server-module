@@ -129,6 +129,7 @@ class ContextServiceTest extends \PHPUnit_Framework_Testcase
     protected function createStorageMock()
     {
         $storage = $this->getMock('InoOicServer\Oic\Authorize\Context\StorageInterface');
+        
         return $storage;
     }
 
@@ -139,6 +140,7 @@ class ContextServiceTest extends \PHPUnit_Framework_Testcase
     protected function createFactoryMock()
     {
         $factory = $this->getMock('InoOicServer\Oic\Authorize\Context\ContextFactoryInterface');
+        
         return $factory;
     }
 
@@ -148,7 +150,8 @@ class ContextServiceTest extends \PHPUnit_Framework_Testcase
      */
     protected function createContextMock()
     {
-        $context = $this->getMock('InoOicServer\Oic\Authorize\Context');
+        $context = $this->getMock('InoOicServer\Oic\Authorize\Context\Context');
+        
         return $context;
     }
 }

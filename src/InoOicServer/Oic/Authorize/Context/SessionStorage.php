@@ -78,7 +78,7 @@ class SessionStorage implements StorageInterface
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Context\StorageInterface::save()
      */
-    public function save(Authorize\Context $context)
+    public function save(Context $context)
     {
         $this->getSessionContainer()->offsetSet($this->sessionIndex, $context);
     }

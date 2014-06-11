@@ -1,8 +1,8 @@
 <?php
 
-namespace InoOicServerTest\Oic\Authorize;
+namespace InoOicServerTest\Oic\Authorize\Context;
 
-use InoOicServer\Oic\Authorize\Context;
+use InoOicServer\Oic\Authorize\Context\Context;
 
 
 class ContextTest extends \PHPUnit_Framework_Testcase

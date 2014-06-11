@@ -1,8 +1,10 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize;
+namespace InoOicServer\Oic\Authorize\Context;
 
+use DateTime;
 use InoOicServer\Oic\User;
+use InoOicServer\Oic\Authorize\AuthorizeRequest;
 
 
 /**
@@ -18,7 +20,7 @@ class Context
     protected $uniqueId;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     protected $createTime;
 
@@ -36,17 +38,17 @@ class Context
     /**
      * Constructor.
      */
-    public function __construct(\DateTime $createTime = null)
+    public function __construct(DateTime $createTime = null)
     {
         if (null === $createTime) {
-            $createTime = new \DateTime();
+            $createTime = new DateTime();
         }
         $this->setCreateTime($createTime);
     }
 
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getCreateTime()
     {
@@ -55,9 +57,9 @@ class Context
 
 
     /**
-     * @param \DateTime $createTime
+     * @param DateTime $createTime
      */
-    protected function setCreateTime(\DateTime $createTime)
+    protected function setCreateTime(DateTime $createTime)
     {
         $this->createTime = $createTime;
     }

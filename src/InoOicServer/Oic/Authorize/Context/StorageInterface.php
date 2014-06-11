@@ -2,8 +2,6 @@
 
 namespace InoOicServer\Oic\Authorize\Context;
 
-use InoOicServer\Oic\Authorize;
-
 
 /**
  * Storage (persistence) for the context entity.
@@ -15,9 +13,9 @@ interface StorageInterface
     /**
      * Saves the context to the storage.
      * 
-     * @param Authorize\Context $context
+     * @param Context $context
      */
-    public function save(Authorize\Context $context);
+    public function save(Context $context);
 
 
     /**

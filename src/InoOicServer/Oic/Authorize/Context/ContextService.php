@@ -78,7 +78,7 @@ class ContextService
     /**
      * Creates a new context, saves it and returns it.
      * 
-     * @return Authorize\Context
+     * @return Context
      */
     public function createContext()
     {
@@ -92,9 +92,9 @@ class ContextService
     /**
      * Saves the provided authorize context.
      * 
-     * @param Authorize\Context $context
+     * @param Context $context
      */
-    public function saveContext(Authorize\Context $context)
+    public function saveContext(Context $context)
     {
         $this->getStorage()->save($context);
     }
@@ -103,7 +103,7 @@ class ContextService
     /**
      * Loads a previously saved authorize context.
      *
-     * @return Authorize\Context
+     * @return Context
      */
     public function loadContext()
     {

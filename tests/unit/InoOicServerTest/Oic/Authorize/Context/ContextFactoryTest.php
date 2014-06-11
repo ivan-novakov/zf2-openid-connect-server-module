@@ -14,6 +14,6 @@ class ContextFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new ContextFactory();
         $context = $factory->createContext();
         
-        $this->assertInstanceOf('InoOicServer\Oic\Authorize\Context', $context);
+        $this->assertInstanceOf('InoOicServer\Oic\Authorize\Context\Context', $context);
     }
 }
