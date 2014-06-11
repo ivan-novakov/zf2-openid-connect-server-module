@@ -138,8 +138,8 @@ class SessionService
     }
 
 
-    public function fetchSessionByRequest(AuthorizeRequest $request)
+    public function fetchSessionByAuthSession(AuthSession $authSession)
     {
-        return $this->getSessionMapper()->fetchByAuthSessionId($request->getAuthenticationSessionId());
+        return $this->getSessionMapper()->fetchByAuthSessionId($authSession->getId());
     }
 }

@@ -6,7 +6,6 @@ use InoOicServer\Oic\AuthSession\AuthSession;
 use InoOicServer\Oic\AuthCode\AuthCode;
 use InoOicServer\Oic\AccessToken\AccessToken;
 use InoOicServer\Oic\User\UserInterface;
-use InoOicServer\Oic\Authorize\AuthorizeRequest;
 
 
 interface SessionServiceInterface
@@ -28,5 +27,5 @@ interface SessionServiceInterface
     public function fetchSessionByUser(UserInterface $user);
 
 
-    public function fetchSessionByRequest(AuthorizeRequest $request);
+    public function fetchSessionByAuthSession(AuthSession $authSession);
 }

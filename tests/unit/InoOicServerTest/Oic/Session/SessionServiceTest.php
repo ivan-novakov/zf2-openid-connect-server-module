@@ -21,10 +21,10 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
     {
         $age = 3600;
         $salt = 'secretsalt';
-        $authSession = $this->getMock('InoOicServer\Oic\AuthSession\AuthSession');
+        $authSession = $this->createAuthSessionMock();
         $nonce = 'asd123';
         
-        $session = $this->getMock('InoOicServer\Oic\Session\Session');
+        $session = $this->createSessionMock();
         
         $factory = $this->createSessionFactoryMock();
         $factory->expects($this->once())
@@ -40,10 +40,53 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
         
         $this->assertSame($session, $this->service->createSession($authSession, $nonce));
     }
+
+
+    public function testFetchSessionByAuthSession()
+    {
+        $authSessionId = '123asd';
+        $authSession = $this->createAuthSessionMock();
+        $authSession->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($authSessionId));
+        
+        $session = $this->createSessionMock();
+        $mapper = $this->createSessionMapperMock();
+        $mapper->expects($this->once())
+            ->method('fetchByAuthSessionId')
+            ->with($authSessionId)
+            ->will($this->returnValue($session));
+        
+        $this->service->setSessionMapper($mapper);
+        
+        $this->assertSame($session, $this->service->fetchSessionByAuthSession($authSession));
+    }
     
     /*
      * 
      */
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createSessionMock()
+    {
+        $session = $this->getMock('InoOicServer\Oic\Session\Session');
+        
+        return $session;
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createAuthSessionMock()
+    {
+        $authSession = $this->getMock('InoOicServer\Oic\AuthSession\AuthSession');
+        
+        return $authSession;
+    }
+
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
