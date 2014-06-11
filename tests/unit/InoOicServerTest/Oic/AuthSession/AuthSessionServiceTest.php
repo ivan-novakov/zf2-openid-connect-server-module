@@ -25,6 +25,20 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testSetFactory()
+    {
+        $factory = $this->createAuthSessionFactory();
+        $this->service->setAuthSessionFactory($factory);
+        $this->assertSame($factory, $this->service->getAuthSessionFactory());
+    }
+
+
+    public function testGetImplicitFactory()
+    {
+        $this->assertInstanceOf('InoOicServer\Oic\AuthSession\AuthSessionFactoryInterface', $this->service->getAuthSessionFactory());
+    }
+
+
     public function testCreateSession()
     {
         $authStatus = $this->getMock('InoOicServer\Oic\User\Authentication\Status');
@@ -32,7 +46,7 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $salt = 'secretsalt';
         $authSession = $this->createAuthSessionMock();
         
-        $authSessionFactory = $this->getMock('InoOicServer\Oic\AuthSession\AuthSessionFactoryInterface');
+        $authSessionFactory = $this->createAuthSessionFactory();
         $authSessionFactory->expects($this->once())
             ->method('createAuthSession')
             ->with($authStatus, $age, $salt)
@@ -93,5 +107,13 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $authSession = $this->getMock('InoOicServer\Oic\AuthSession\AuthSession');
         
         return $authSession;
+    }
+
+
+    protected function createAuthSessionFactory()
+    {
+        $authSessionFactory = $this->getMock('InoOicServer\Oic\AuthSession\AuthSessionFactoryInterface');
+        
+        return $authSessionFactory;
     }
 }

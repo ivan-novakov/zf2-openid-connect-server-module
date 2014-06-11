@@ -6,6 +6,7 @@ use InoOicServer\Oic\User;
 use InoOicServer\Oic\User\UserInterface;
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGeneratorInterface;
+use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGenerator;
 
 
 class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface
@@ -22,6 +23,10 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
      */
     public function getHashGenerator()
     {
+        if (! $this->hashGenerator instanceof AuthSessionHashGeneratorInterface) {
+            $this->hashGenerator = new AuthSessionHashGenerator();
+        }
+        
         return $this->hashGenerator;
     }
 
