@@ -24,9 +24,11 @@ interface MapperInterface
 
     /**
      * @param string $sessionId
+     * @param string $clientId
+     * @param string $scope
      * @return AuthCode|null
      */
-    public function fetchBySessionId($sessionId);
+    public function fetchBySession($sessionId, $clientId, $scope = null);
 
 
     /**

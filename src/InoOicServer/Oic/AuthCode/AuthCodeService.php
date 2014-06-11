@@ -105,11 +105,33 @@ class AuthCodeService implements AuthCodeServiceInterface
 
     /**
      * {@inheritdoc}
+     * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::saveAuthCode()
+     */
+    public function saveAuthCode(AuthCode $authCode)
+    {
+        $this->getAuthCodeMapper()->save($authCode);
+        
+        return true;
+    }
+
+
+    /**
+     * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::fetchAuthCode()
      */
     public function fetchAuthCode($code)
     {
         return $this->getAuthCodeMapper()->fetch($code);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::fetchAuthCodeBySession()
+     */
+    public function fetchAuthCodeBySession(Session $session, Client $client, $scope = null)
+    {
+        return $this->getAuthCodeMapper()->fetchBySession($session->getId(), $client->getId(), $scope);
     }
 
 

@@ -45,8 +45,8 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
         $salt = 'secretsalt';
         $scope = 'foo bar';
         
-        $session = $this->getMock('InoOicServer\Oic\Session\Session');
-        $client = $this->getMock('InoOicServer\Oic\Client\Client');
+        $session = $this->createSessionMock();
+        $client = $this->createClientMock();
         $authCode = $this->createAuthCodeMock();
         
         $this->service->setOptions(array(
@@ -65,6 +65,19 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testSaveAuthCode()
+    {
+        $authCode = $this->createAuthCodeMock();
+        $mapper = $this->createAuthCodeMapperMock();
+        $mapper->expects($this->once())
+            ->method('save')
+            ->with($authCode);
+        $this->service->setAuthCodeMapper($mapper);
+        
+        $this->assertTrue($this->service->saveAuthCode($authCode));
+    }
+
+
     public function testFetchAuthCode()
     {
         $code = 'testcode';
@@ -78,6 +91,35 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
         $this->service->setAuthCodeMapper($mapper);
         
         $this->assertSame($authCode, $this->service->fetchAuthCode($code));
+    }
+
+
+    public function testFetchAuthCodeBySession()
+    {
+        $sessionId = 'testsession';
+        $clientId = 'testclient';
+        $scope = 'foo bar';
+        
+        $authCode = $this->createAuthCodeMock();
+        
+        $session = $this->createSessionMock();
+        $session->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($sessionId));
+        
+        $client = $this->createClientMock();
+        $client->expects($this->once())
+            ->method('getId')
+            ->will($this->returnValue($clientId));
+        
+        $mapper = $this->createAuthCodeMapperMock();
+        $mapper->expects($this->once())
+            ->method('fetchBySession')
+            ->with($sessionId, $clientId, $scope)
+            ->will($this->returnValue($authCode));
+        $this->service->setAuthCodeMapper($mapper);
+        
+        $this->assertSame($authCode, $this->service->fetchAuthCodeBySession($session, $client, $scope));
     }
 
 
@@ -109,6 +151,9 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function createAuthCodeMapperMock()
     {
         $mapper = $this->getMock('InoOicServer\Oic\AuthCode\Mapper\MapperInterface');
@@ -122,5 +167,27 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
         $authCode = $this->getMock('InoOicServer\Oic\AuthCode\AuthCode');
         
         return $authCode;
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createSessionMock()
+    {
+        $session = $this->getMock('InoOicServer\Oic\Session\Session');
+        
+        return $session;
+    }
+
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createClientMock()
+    {
+        $client = $this->getMock('InoOicServer\Oic\Client\Client');
+        
+        return $client;
     }
 }
