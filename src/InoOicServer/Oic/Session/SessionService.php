@@ -6,9 +6,10 @@ use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\Authorize\Request\Request;
 use InoOicServer\Oic\AccessToken\AccessToken;
 use InoOicServer\Oic\AuthCode\AuthCode;
-use InoOicServer\Oic\User\User;
 use InoOicServer\Oic\Session\Mapper\MapperInterface;
 use InoOicServer\Oic\AuthSession\AuthSession;
+use InoOicServer\Oic\Authorize\AuthorizeRequest;
+use InoOicServer\Oic\User\UserInterface;
 
 
 /**
@@ -131,13 +132,13 @@ class SessionService
     }
 
 
-    public function fetchSessionByUser(User $user)
+    public function fetchSessionByUser(UserInterface $user)
     {
         return $this->getSessionMapper()->fetchByUserId($user->getId());
     }
 
 
-    public function fetchSessionByRequest(Request $request)
+    public function fetchSessionByRequest(AuthorizeRequest $request)
     {
         return $this->getSessionMapper()->fetchByAuthSessionId($request->getAuthenticationSessionId());
     }

@@ -2,13 +2,11 @@
 
 namespace InoOicServer\Oic\Authorize\Context;
 
-use InoOicServer\Oic\Authorize;
-
 
 /**
  * Authorize context service.
  */
-class ContextService
+class ContextService implements ContextServiceInterface
 {
 
     /**

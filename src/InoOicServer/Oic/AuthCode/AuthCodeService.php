@@ -35,6 +35,12 @@ class AuthCodeService implements AuthCodeServiceInterface
     );
 
 
+    /**
+     * Constructor.
+     * 
+     * @param Mapper\MapperInterface $authCodeMapper
+     * @param array $options
+     */
     public function __construct(Mapper\MapperInterface $authCodeMapper, array $options = array())
     {
         $this->setAuthCodeMapper($authCodeMapper);

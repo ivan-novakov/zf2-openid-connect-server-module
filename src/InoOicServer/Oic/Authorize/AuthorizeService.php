@@ -2,34 +2,39 @@
 
 namespace InoOicServer\Oic\Authorize;
 
-use InoOicServer\Oic\AuthCode\AuthCodeService;
-use InoOicServer\Oic\Session\SessionService;
-use InoOicServer\Oic\Client\ClientService;
-use InoOicServer\Oic\Authorize\Context\ContextService;
-use InoOicServer\Oic\Authorize\Request\Request;
 use InoOicServer\Oic\Authorize\Response\ResponseInterface;
+use InoOicServer\Oic\AuthSession\AuthSessionServiceInterface;
+use InoOicServer\Oic\Client\ClientServiceInterface;
+use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
+use InoOicServer\Oic\Session\SessionServiceInterface;
+use InoOicServer\Oic\AuthCode\AuthCodeServiceInterface;
 
 
 class AuthorizeService
 {
 
     /**
-     * @var ContextService
+     * @var ContextServiceInterface
      */
     protected $contextService;
 
     /**
-     * @var ClientService
+     * @var ClientServiceInterface
      */
     protected $clientService;
 
     /**
-     * @var SessionService
+     * @var AuthSessionServiceInterface
+     */
+    protected $authSessionService;
+
+    /**
+     * @var SessionServiceInterface
      */
     protected $sessionService;
 
     /**
-     * @var AuthCodeService
+     * @var AuthCodeServiceInterface
      */
     protected $authCodeService;
 
@@ -42,18 +47,20 @@ class AuthorizeService
      * @param SessionService $sessionService
      * @param AuthCodeService $authCodeService
      */
-    public function __construct(ClientService $clientService, ContextService $contextService, 
-        SessionService $sessionService, AuthCodeService $authCodeService)
+    public function __construct(ClientServiceInterface $clientService, ContextServiceInterface $contextService, 
+        AuthSessionServiceInterface $authSessionService, SessionServiceInterface $sessionService, 
+        AuthCodeServiceInterface $authCodeService)
     {
         $this->setClientService($clientService);
         $this->setContextService($contextService);
+        $this->setAuthSessionService($authSessionService);
         $this->setSessionService($sessionService);
         $this->setAuthCodeService($authCodeService);
     }
 
 
     /**
-     * @return ContextService
+     * @return ContextServiceInterface
      */
     public function getContextService()
     {
@@ -62,16 +69,16 @@ class AuthorizeService
 
 
     /**
-     * @param ContextService $contextService
+     * @param ContextServiceInterface $contextService
      */
-    public function setContextService(ContextService $contextService)
+    public function setContextService(ContextServiceInterface $contextService)
     {
         $this->contextService = $contextService;
     }
 
 
     /**
-     * @return ClientService
+     * @return ClientServiceInterface
      */
     public function getClientService()
     {
@@ -80,16 +87,34 @@ class AuthorizeService
 
 
     /**
-     * @param ClientService $clientService
+     * @param ClientServiceInterface $clientService
      */
-    public function setClientService(ClientService $clientService)
+    public function setClientService(ClientServiceInterface $clientService)
     {
         $this->clientService = $clientService;
     }
 
 
     /**
-     * @return SessionService
+     * @return AuthSesAuthSessionServiceInterface
+     */
+    public function getAuthSessionService()
+    {
+        return $this->authSessionService;
+    }
+
+
+    /**
+     * @param AuthSessionServiceInterface $authSession
+     */
+    public function setAuthSessionService(AuthSessionServiceInterface $authSessionService)
+    {
+        $this->authSessionService = $authSessionService;
+    }
+
+
+    /**
+     * @return SessionServiceInterface
      */
     public function getSessionService()
     {
@@ -98,16 +123,16 @@ class AuthorizeService
 
 
     /**
-     * @param SessionService $sessionService
+     * @param SessionServiceInterface $sessionService
      */
-    public function setSessionService(SessionService $sessionService)
+    public function setSessionService(SessionServiceInterface $sessionService)
     {
         $this->sessionService = $sessionService;
     }
 
 
     /**
-     * @return AuthCodeService
+     * @return AuthCodeServiceInterface
      */
     public function getAuthCodeService()
     {
@@ -116,15 +141,15 @@ class AuthorizeService
 
 
     /**
-     * @param AuthCodeService $authCodeService
+     * @param AuthCodeServiceInterface $authCodeService
      */
-    public function setAuthCodeService(AuthCodeService $authCodeService)
+    public function setAuthCodeService(AuthCodeServiceInterface $authCodeService)
     {
         $this->authCodeService = $authCodeService;
     }
 
 
-    public function processRequest(Request $request)
+    public function processRequest(AuthorizeRequest $request)
     {
         // identify and validate client (application)
         $client = $this->getClientService()->fetchClient($request->getClientId(), $request->getRedirectUri());
@@ -140,7 +165,9 @@ class AuthorizeService
         // ?? is it necessary?
         
         // check if there is active/valid authentication session
-        // if true, check if there is valid session bound to the authn session to be reused or create new one and redirect to response action
+        
+        // if true, check if there is valid session bound to the authn session to be reused or create new one and
+        // redirect to response action
         // otherwise redirect to authentication
     }
 
