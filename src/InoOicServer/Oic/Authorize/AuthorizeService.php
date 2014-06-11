@@ -96,7 +96,7 @@ class AuthorizeService
 
 
     /**
-     * @return AuthSesAuthSessionServiceInterface
+     * @return AuthSessionServiceInterface
      */
     public function getAuthSessionService()
     {
@@ -165,9 +165,34 @@ class AuthorizeService
         // ?? is it necessary?
         
         // check if there is active/valid authentication session
+        if ($authSessionId = $request->getSessionId()) {
+            /*
+            $authSession = $this->getAuthSessionService()->fetchSession($authSessionId);
+            
+            // if true, check if there is valid session bound to the authn session to be reused or create new one
+            // and create authorization code and return response
+            if ($authSession) {
+                $sessionService = $this->getSessionService();
+                $session = $sessionService->fetchSessionByAuthSession($authSession);
+                if (! $session) {
+                    $session = $sessionService->createSession($authSession, $request->getNonce());
+                    $sessionService->saveSession($session);
+                }
+                
+                // check for auth code and create new if non-existent
+                $authCodeService = $this->getAuthCodeService();
+                $authCode = $authCodeService->fetchAuthCodeBySession($session, $client, $request->getScope());
+                if (! $authCode) {
+                    $authCode = $authCodeService->createAuthCode($session, $client, $request->getScope());
+                }
+                
+                $authCodeService->saveAuthCode($authCode);
+                
+                // create and return response with the code
+            }
+            */
+        }
         
-        // if true, check if there is valid session bound to the authn session to be reused or create new one and
-        // redirect to response action
         // otherwise redirect to authentication
     }
 
