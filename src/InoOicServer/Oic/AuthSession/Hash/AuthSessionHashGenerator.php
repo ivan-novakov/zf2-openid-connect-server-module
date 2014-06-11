@@ -9,29 +9,6 @@ use InoOicServer\Crypto\Hash\PhpHash;
 class AuthSessionHashGenerator extends PhpHash implements AuthSessionHashGeneratorInterface
 {
 
-    /**
-     * @var string
-     */
-    protected $defaultAlgo = 'sha1';
-
-
-    /**
-     * @return string
-     */
-    public function getDefaultAlgo()
-    {
-        return $this->defaultAlgo;
-    }
-
-
-    /**
-     * @param string $defaultAlgo
-     */
-    public function setDefaultAlgo($defaultAlgo)
-    {
-        $this->defaultAlgo = $defaultAlgo;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -39,12 +16,8 @@ class AuthSessionHashGenerator extends PhpHash implements AuthSessionHashGenerat
      */
     public function generateAuthSessionHash(Status $authStatus, $salt, $algo = null)
     {
-        if (null === $algo) {
-            $algo = $this->defaultAlgo;
-        }
-        
         $data = $authStatus->getIdentity()->getId() . $authStatus->getTime()->getTimestamp();
         
-        return $this->generateHash($algo, $data, $salt);
+        return $this->generateHash($data, $salt, $algo);
     }
 }

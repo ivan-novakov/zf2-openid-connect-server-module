@@ -9,29 +9,6 @@ use InoOicServer\Oic\Session\Session;
 class AuthCodeHashGenerator extends PhpHash implements AuthCodeHashGeneratorInterface
 {
 
-    /**
-     * @var string
-     */
-    protected $defaultAlgo = 'sha1';
-
-
-    /**
-     * @return string
-     */
-    public function getDefaultAlgo()
-    {
-        return $this->defaultAlgo;
-    }
-
-
-    /**
-     * @param string $defaultAlgo
-     */
-    public function setDefaultAlgo($defaultAlgo)
-    {
-        $this->defaultAlgo = $defaultAlgo;
-    }
-
 
     /**
      * {@inheritdoc}
@@ -39,12 +16,8 @@ class AuthCodeHashGenerator extends PhpHash implements AuthCodeHashGeneratorInte
      */
     public function generateAuthCodeHash(Session $session, $salt, $algo = null)
     {
-        if (null === $algo) {
-            $algo = $this->defaultAlgo;
-        }
-        
         $data = $session->getId() . $session->getCreateTime()->getTimestamp();
         
-        return $this->generateHash($algo, $data, $salt);
+        return $this->generateHash($data, $salt, $algo);
     }
 }

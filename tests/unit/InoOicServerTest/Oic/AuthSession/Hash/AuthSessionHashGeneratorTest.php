@@ -9,7 +9,7 @@ class AuthSessionHashGeneratorTest extends \PHPUnit_Framework_TestCase
 {
 
 
-    public function testGenerateHashWithImplicitAlgo()
+    public function testGenerateAuthSessionHash()
     {
         $algo = 'sha123';
         $time = time();
@@ -35,11 +35,11 @@ class AuthSessionHashGeneratorTest extends \PHPUnit_Framework_TestCase
         
         $generator->expects($this->once())
             ->method('generateHash')
-            ->with($algo, $data, $salt)
+            ->with($data, $salt, $algo)
             ->will($this->returnValue($hash));
         
         $generator->setDefaultAlgo($algo);
         
-        $this->assertSame($hash, $generator->generateAuthSessionHash($authStatus, $salt));
+        $this->assertSame($hash, $generator->generateAuthSessionHash($authStatus, $salt, $algo));
     }
 }

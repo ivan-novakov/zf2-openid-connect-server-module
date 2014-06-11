@@ -9,7 +9,7 @@ class AuthCodeHashGenerator extends \PHPUnit_Framework_TestCase
 {
 
 
-    public function testGenerateAuthCodeWithImplicitAlgo()
+    public function testGenerateAuthCodeHash()
     {
         $sessionId = '123abc';
         $salt = 'secret';
@@ -29,10 +29,10 @@ class AuthCodeHashGenerator extends \PHPUnit_Framework_TestCase
             ->getMock();
         $generator->expects($this->once())
             ->method('generateHash')
-            ->with($algo, $data, $salt)
+            ->with($data, $salt, $algo)
             ->will($this->returnValue($hash));
         $generator->setDefaultAlgo($algo);
-        
-        $this->assertSame($hash, $generator->generateAuthCodeHash($session, $salt));
+
+        $this->assertSame($hash, $generator->generateAuthCodeHash($session, $salt, $algo));
     }
 }
