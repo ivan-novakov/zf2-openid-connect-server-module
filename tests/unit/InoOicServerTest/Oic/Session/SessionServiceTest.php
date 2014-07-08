@@ -42,6 +42,22 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testFetchSession()
+    {
+        $sessionId = '456zxc';
+        $session = $this->createSessionMock();
+        
+        $mapper = $this->createSessionMapperMock();
+        $mapper->expects($this->once())
+            ->method('fetch')
+            ->with($sessionId)
+            ->will($this->returnValue($session));
+        $this->service->setSessionMapper($mapper);
+        
+        $this->assertSame($session, $this->service->fetchSession($sessionId));
+    }
+
+
     public function testFetchSessionByAuthSession()
     {
         $authSessionId = '123asd';

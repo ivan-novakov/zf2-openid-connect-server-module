@@ -118,6 +118,11 @@ class SessionService
     {
         $this->getSessionMapper()->save($session);
     }
+    
+    public function fetchSession($id)
+    {
+        return $this->getSessionMapper()->fetch($id);
+    }
 
 
     public function fetchSessionByCode(AuthCode $authCode)

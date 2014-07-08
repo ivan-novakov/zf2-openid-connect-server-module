@@ -21,6 +21,15 @@ interface MapperInterface
 
 
     /**
+     * Retrieves the session by its ID.
+     * 
+     * @param string $id
+     * @return Session|null
+     */
+    public function fetch($id);
+
+
+    /**
      * Retrieves the session by the associated authorization code.
      * 
      * @param string $authCode

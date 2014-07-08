@@ -15,6 +15,9 @@ interface SessionServiceInterface
     public function createSession(AuthSession $authSession, $nonce = null);
 
 
+    public function fetchSession($id);
+
+
     public function saveSession(Session $session);
 
 
