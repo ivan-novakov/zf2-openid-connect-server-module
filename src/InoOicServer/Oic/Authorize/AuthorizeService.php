@@ -2,6 +2,9 @@
 
 namespace InoOicServer\Oic\Authorize;
 
+use InoOicServer\Oic\AuthSession\AuthSession;
+use InoOicServer\Oic\Session\Session;
+use InoOicServer\Oic\Client\Client;
 use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 use InoOicServer\Oic\AuthSession\AuthSessionServiceInterface;
 use InoOicServer\Oic\Client\ClientServiceInterface;
@@ -164,33 +167,21 @@ class AuthorizeService
         // save client to context
         // ?? is it necessary?
         
-        // check if there is active/valid authentication session
-        if ($authSessionId = $request->getSessionId()) {
-            /*
-            $authSession = $this->getAuthSessionService()->fetchSession($authSessionId);
+        // check if there is active/valid session
+        $session = $this->fetchSessionFromRequest($request);
+        if ($session) {
+            // check for auth code and create new if non-existent
+            $authCode = $this->getAuthCodeService()->initAuthCodeFromSession($session, $client, $request->getScope());
             
-            // if true, check if there is valid session bound to the authn session to be reused or create new one
-            // and create authorization code and return response
-            if ($authSession) {
-                $sessionService = $this->getSessionService();
-                $session = $sessionService->fetchSessionByAuthSession($authSession);
-                if (! $session) {
-                    $session = $sessionService->createSession($authSession, $request->getNonce());
-                    $sessionService->saveSession($session);
-                }
-                
-                // check for auth code and create new if non-existent
-                $authCodeService = $this->getAuthCodeService();
-                $authCode = $authCodeService->fetchAuthCodeBySession($session, $client, $request->getScope());
-                if (! $authCode) {
-                    $authCode = $authCodeService->createAuthCode($session, $client, $request->getScope());
-                }
-                
-                $authCodeService->saveAuthCode($authCode);
-                
-                // create and return response with the code
-            }
-            */
+            // create and return response with the code
+        }
+        
+        // check if there is active/valid auth session
+        $authSession = $this->fetchAuthSessionFromRequest($request);
+        if ($authSession) {
+            $authCode = $this->initAuthCodeFromAuthSession($authSession, $client, $request);
+            
+            // create and return response with the code
         }
         
         // otherwise redirect to authentication
@@ -210,5 +201,34 @@ class AuthorizeService
         // if a valid code exists for the user and the client, reuse it
         // or create a new one
         // create and return the corresponding Authorize\Response
+    }
+
+
+    public function initAuthCodeFromAuthSession(AuthSession $authSession, Client $client, AuthorizeRequest $request)
+    {
+        $session = $this->getSessionService()->initSessionFromAuthSession($authSession, $request->getNonce());
+        $authCode = $this->getAuthCodeService()->initAuthCodeFromSession($session, $client, $request->getScope());
+        
+        return $authCode;
+    }
+
+
+    public function fetchAuthSessionFromRequest(AuthorizeRequest $request)
+    {
+        if ($authSessionId = $request->getAuthenticationSessionId()) {
+            return $this->getAuthSessionService()->fetchSession($authSessionId);
+        }
+        
+        return null;
+    }
+
+
+    public function fetchSessionFromRequest(AuthorizeRequest $request)
+    {
+        if ($sessionId = $request->getSessionId()) {
+            return $this->getSessionService()->fetchSession($sessionId);
+        }
+        
+        return null;
     }
 }

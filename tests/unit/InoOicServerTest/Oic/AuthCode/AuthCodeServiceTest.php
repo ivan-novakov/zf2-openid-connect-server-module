@@ -139,6 +139,63 @@ class AuthCodeServiceTest extends \PHPUnit_Framework_TestCase
         
         $this->assertTrue($this->service->deleteAuthCode($authCode));
     }
+
+
+    public function testInitAuthCodeFromSessionWithNewAuthCode()
+    {
+        $authCode = $this->createAuthCodeMock();
+        $session = $this->createSessionMock();
+        $client = $this->createClientMock();
+        $scope = 'foo';
+        
+        $service = $this->getMockBuilder('InoOicServer\Oic\AuthCode\AuthCodeService')
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+            'fetchAuthCodeBySession',
+            'createAuthCode',
+            'saveAuthCode'
+        ))
+            ->getMock();
+        
+        $service->expects($this->once())
+            ->method('fetchAuthCodeBySession')
+            ->with($session, $client, $scope)
+            ->will($this->returnValue(null));
+        
+        $service->expects($this->once())
+            ->method('createAuthCode')
+            ->with($session, $client, $scope)
+            ->will($this->returnValue($authCode));
+        
+        $service->expects($this->once())
+            ->method('saveAuthCode')
+            ->with($authCode);
+        
+        $this->assertSame($authCode, $service->initAuthCodeFromSession($session, $client, $scope));
+    }
+
+
+    public function testInitAuthCodeFromSessionWithExistingAuthCode()
+    {
+        $authCode = $this->createAuthCodeMock();
+        $session = $this->createSessionMock();
+        $client = $this->createClientMock();
+        $scope = 'foo';
+        
+        $service = $this->getMockBuilder('InoOicServer\Oic\AuthCode\AuthCodeService')
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+            'fetchAuthCodeBySession'
+        ))
+            ->getMock();
+        
+        $service->expects($this->once())
+            ->method('fetchAuthCodeBySession')
+            ->with($session, $client, $scope)
+            ->will($this->returnValue($authCode));
+        
+        $this->assertSame($authCode, $service->initAuthCodeFromSession($session, $client, $scope));
+    }
     
     /*
      * 

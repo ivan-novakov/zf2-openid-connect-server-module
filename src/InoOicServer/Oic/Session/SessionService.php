@@ -19,7 +19,7 @@ use InoOicServer\Oic\User\UserInterface;
  * - "session_age" (string, DateInterval compatible) - period of time, the session will be valid
  * - "auth_session_salt" (string) - a secret string to be used as a salt in the default token generator. 
  */
-class SessionService
+class SessionService implements SessionServiceInterface
 {
     
     use OptionsTrait;
@@ -118,7 +118,8 @@ class SessionService
     {
         $this->getSessionMapper()->save($session);
     }
-    
+
+
     public function fetchSession($id)
     {
         return $this->getSessionMapper()->fetch($id);
@@ -146,5 +147,21 @@ class SessionService
     public function fetchSessionByAuthSession(AuthSession $authSession)
     {
         return $this->getSessionMapper()->fetchByAuthSessionId($authSession->getId());
+    }
+
+
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\Session\SessionServiceInterface::initSessionFromAuthSession()
+     */
+    public function initSessionFromAuthSession(AuthSession $authSession, $nonce = null)
+    {
+        $session = $this->fetchSessionByAuthSession($authSession);
+        if (! $session) {
+            $session = $this->createSession($authSession, $nonce);
+            $this->saveSession($session);
+        }
+        
+        return $session;
     }
 }

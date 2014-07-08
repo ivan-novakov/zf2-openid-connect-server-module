@@ -54,4 +54,16 @@ interface AuthCodeServiceInterface
      * @param AuthCode $authCode
      */
     public function deleteAuthCode(AuthCode $authCode);
+
+
+    /**
+     * Creates a new authentication code for the provided session or re-uses a previously
+     * created and still valid one.
+     *
+     * @param Session $session
+     * @param Client $client
+     * @param string $scope
+     * @return AuthCode
+     */
+    public function initAuthCodeFromSession(Session $session, Client $client, $scope = null);
 }

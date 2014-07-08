@@ -145,4 +145,20 @@ class AuthCodeService implements AuthCodeServiceInterface
         
         return true;
     }
+
+
+    /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::initAuthCodeFromSession()
+     */
+    public function initAuthCodeFromSession(Session $session, Client $client, $scope = null)
+    {
+        $authCode = $this->fetchAuthCodeBySession($session, $client, $scope);
+        if (! $authCode) {
+            $authCode = $this->createAuthCode($session, $client, $scope);
+            $this->saveAuthCode($authCode);
+        }
+        
+        return $authCode;
+    }
 }

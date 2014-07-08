@@ -31,4 +31,14 @@ interface SessionServiceInterface
 
 
     public function fetchSessionByAuthSession(AuthSession $authSession);
+
+
+    /**
+     * Creates a new session based on the auth session or re-uses an existing valid session.
+     * 
+     * @param AuthSession $authSession
+     * @param string $nonce
+     * @return Session
+     */
+    public function initSessionFromAuthSession(AuthSession $authSession, $nonce = null);
 }

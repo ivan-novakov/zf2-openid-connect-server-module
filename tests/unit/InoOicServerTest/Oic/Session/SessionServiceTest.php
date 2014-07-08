@@ -77,6 +77,61 @@ class SessionServiceTest extends \PHPUnit_Framework_TestCase
         
         $this->assertSame($session, $this->service->fetchSessionByAuthSession($authSession));
     }
+
+
+    public function testInitSessionFromAuthSessionWithNewSession()
+    {
+        $session = $this->createSessionMock();
+        $authSession = $this->createAuthSessionMock();
+        $nonce = 'foo';
+        
+        $service = $this->getMockBuilder('InoOicServer\Oic\Session\SessionService')
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+            'fetchSessionByAuthSession',
+            'createSession',
+            'saveSession'
+        ))
+            ->getMock();
+        
+        $service->expects($this->once())
+            ->method('fetchSessionByAuthSession')
+            ->with($authSession)
+            ->will($this->returnValue(null));
+        
+        $service->expects($this->once())
+            ->method('createSession')
+            ->with($authSession, $nonce)
+            ->will($this->returnValue($session));
+        
+        $service->expects($this->once())
+            ->method('saveSession')
+            ->with($session);
+        
+        $this->assertSame($session, $service->initSessionFromAuthSession($authSession, $nonce));
+    }
+
+
+    public function testInitSessionFromAuthSessionWithExistingSession()
+    {
+        $session = $this->createSessionMock();
+        $authSession = $this->createAuthSessionMock();
+        $nonce = 'foo';
+        
+        $service = $this->getMockBuilder('InoOicServer\Oic\Session\SessionService')
+            ->disableOriginalConstructor()
+            ->setMethods(array(
+            'fetchSessionByAuthSession'
+        ))
+            ->getMock();
+        
+        $service->expects($this->once())
+            ->method('fetchSessionByAuthSession')
+            ->with($authSession)
+            ->will($this->returnValue($session));
+        
+        $this->assertSame($session, $service->initSessionFromAuthSession($authSession, $nonce));
+    }
     
     /*
      * 
