@@ -35,24 +35,50 @@ class Result
     protected $redirect;
 
 
+    /**
+     * Constructs a response result.
+     * 
+     * @param AuthorizeResponse $response
+     * @return Result
+     */
     static public function constructResponseResult(AuthorizeResponse $response)
     {
         return new self(self::TYPE_RESPONSE, $response);
     }
 
 
+    /**
+     * Constructs an error result.
+     * 
+     * @param Error $error
+     * @return Result
+     */
     static public function constructErrorResult(Error $error)
     {
         return new self(self::TYPE_ERROR, null, $error);
     }
 
 
+    /**
+     * Constructs a redirect result.
+     * 
+     * @param Redirect $redirect
+     * @return Result
+     */
     static public function constructRedirectResult(Redirect $redirect)
     {
         return new self(self::TYPE_REDIRECT, null, null, $redirect);
     }
 
 
+    /**
+     * Protected constructor.
+     * 
+     * @param string $type
+     * @param AuthorizeResponse $response
+     * @param Error $error
+     * @param Redirect $redirect
+     */
     protected function __construct($type, AuthorizeResponse $response = null, Error $error = null, Redirect $redirect = null)
     {
         $this->type = $type;
