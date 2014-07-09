@@ -11,23 +11,12 @@ class ResultTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructResponseResult()
     {
-        $response = $this->getMock('InoOicServer\Oic\Authorize\AuthorizeResponse');
+        $response = $this->getMock('InoOicServer\Oic\Authorize\Response\ResponseInterface');
         $result = Result::constructResponseResult($response);
         
         $this->assertInstanceOf('InoOicServer\Oic\Authorize\Result', $result);
         $this->assertSame(Result::TYPE_RESPONSE, $result->getType());
         $this->assertSame($response, $result->getResponse());
-    }
-
-
-    public function testConstructErrorResult()
-    {
-        $error = $this->getMock('InoOicServer\Oic\Error');
-        $result = Result::constructErrorResult($error);
-        
-        $this->assertInstanceOf('InoOicServer\Oic\Authorize\Result', $result);
-        $this->assertSame(Result::TYPE_ERROR, $result->getType());
-        $this->assertSame($error, $result->getError());
     }
 
 

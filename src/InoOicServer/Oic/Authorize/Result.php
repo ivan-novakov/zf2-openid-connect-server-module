@@ -3,14 +3,13 @@
 namespace InoOicServer\Oic\Authorize;
 
 use InoOicServer\Oic\Error;
+use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 
 
 class Result
 {
 
     const TYPE_RESPONSE = 'response';
-
-    const TYPE_ERROR = 'error';
 
     const TYPE_REDIRECT = 'redirect';
 
@@ -20,14 +19,9 @@ class Result
     protected $type;
 
     /**
-     * @var AuthorizeResponse
+     * @var ResponseInterface
      */
     protected $response;
-
-    /**
-     * @var Error
-     */
-    protected $error;
 
     /**
      * @var Redirect
@@ -38,24 +32,12 @@ class Result
     /**
      * Constructs a response result.
      * 
-     * @param AuthorizeResponse $response
+     * @param ResponseInterface $response
      * @return Result
      */
-    static public function constructResponseResult(AuthorizeResponse $response)
+    static public function constructResponseResult(ResponseInterface $response)
     {
         return new self(self::TYPE_RESPONSE, $response);
-    }
-
-
-    /**
-     * Constructs an error result.
-     * 
-     * @param Error $error
-     * @return Result
-     */
-    static public function constructErrorResult(Error $error)
-    {
-        return new self(self::TYPE_ERROR, null, $error);
     }
 
 
@@ -67,7 +49,7 @@ class Result
      */
     static public function constructRedirectResult(Redirect $redirect)
     {
-        return new self(self::TYPE_REDIRECT, null, null, $redirect);
+        return new self(self::TYPE_REDIRECT, null, $redirect);
     }
 
 
@@ -75,20 +57,16 @@ class Result
      * Protected constructor.
      * 
      * @param string $type
-     * @param AuthorizeResponse $response
+     * @param ResponseInterface $response
      * @param Error $error
      * @param Redirect $redirect
      */
-    protected function __construct($type, AuthorizeResponse $response = null, Error $error = null, Redirect $redirect = null)
+    protected function __construct($type, ResponseInterface $response = null, Redirect $redirect = null)
     {
         $this->type = $type;
         
         if (null !== $response) {
             $this->response = $response;
-        }
-        
-        if (null !== $error) {
-            $this->error = $error;
         }
         
         if (null !== $redirect) {
@@ -107,20 +85,11 @@ class Result
 
 
     /**
-     * @return AuthorizeResponse
+     * @return ResponseInterface
      */
     public function getResponse()
     {
         return $this->response;
-    }
-
-
-    /**
-     * @return Error
-     */
-    public function getError()
-    {
-        return $this->error;
     }
 
 
