@@ -1,20 +1,25 @@
 <?php
 
-namespace InoOicServer\Oic\Authorize;
+namespace InoOicServer\Oic\Authorize\Response;
 
 
-class AuthorizeResponse
+class AuthorizeResponse implements ResponseInterface
 {
 
     /**
      * @var string
      */
-    protected $code;
+    protected $redirectUri;
 
     /**
      * @var string
      */
     protected $state;
+
+    /**
+     * @var string
+     */
+    protected $code;
 
     /**
      * @var string
@@ -25,6 +30,24 @@ class AuthorizeResponse
      * @var string
      */
     protected $authSessionId;
+
+
+    /**
+     * @return string
+     */
+    public function getRedirectUri()
+    {
+        return $this->redirectUri;
+    }
+
+
+    /**
+     * @param string $redirectUri
+     */
+    public function setRedirectUri($redirectUri)
+    {
+        $this->redirectUri = $redirectUri;
+    }
 
 
     /**
