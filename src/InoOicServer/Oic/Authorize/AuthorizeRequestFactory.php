@@ -26,7 +26,8 @@ class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
      * @var array
      */
     protected $defaultOptions = array(
-        self::OPT_AUTH_COOKIE_NAME => 'oic_auth'
+        self::OPT_AUTH_COOKIE_NAME => 'oic_auth',
+        self::OPT_SESSION_COOKIE_NAME => 'oic_session'
     );
 
     /**

@@ -3,10 +3,69 @@
 namespace InoOicServer\Mvc\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use InoOicServer\Oic\Authorize\AuthorizeService;
 
 
 class AuthorizeController extends AbstractActionController
 {
+
+    /**
+     * @var HttpServiceInterface
+     */
+    protected $httpService;
+
+    /**
+     * @var AuthorizeService
+     */
+    protected $authorizeService;
+
+
+    /**
+     * Constructor.
+     * 
+     * @param HttpServiceInterface $httpService
+     */
+    public function __construct(HttpServiceInterface $httpService, AuthorizeService $authorizeService)
+    {
+        $this->setHttpService($httpService);
+        $this->setAuthorizeService($authorizeService);
+    }
+
+
+    /**
+     * @return HttpServiceInterface
+     */
+    public function getHttpService()
+    {
+        return $this->httpService;
+    }
+
+
+    /**
+     * @param HttpServiceInterface $httpService
+     */
+    public function setHttpService(HttpServiceInterface $httpService)
+    {
+        $this->httpService = $httpService;
+    }
+
+
+    /**
+     * @return AuthorizeService
+     */
+    public function getAuthorizeService()
+    {
+        return $this->authorizeService;
+    }
+
+
+    /**
+     * @param AuthorizeService $authorizeService
+     */
+    public function setAuthorizeService(AuthorizeService $authorizeService)
+    {
+        $this->authorizeService = $authorizeService;
+    }
 
 
     public function authorizeAction()
@@ -49,6 +108,5 @@ class AuthorizeController extends AbstractActionController
         $httpResponse = $this->getHttpResponseFactory($reponse);
         return $httpResponse;
         */
-        
     }
 }

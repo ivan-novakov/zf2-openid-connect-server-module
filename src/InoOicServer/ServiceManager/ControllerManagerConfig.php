@@ -11,18 +11,12 @@ class ControllerManagerConfig extends Config
 {
 
 
-    /*
-    public function getAbstractFactories()
-    {
-        return array(
-            'InoOicServer\Authentication\Controller\ControllerAbstractFactory'
-        );
-    }
-    */
+
 
     public function getFactories()
     {
         return array(
+            /*
             'InoOicServer\IndexController' => function (ControllerManager $controllerManager)
             {
                 $controller = new Controller\IndexController();
@@ -37,7 +31,7 @@ class ControllerManagerConfig extends Config
                 $controller->setServerInfo($sm->get('InoOicServer\ServerInfo'));
                 return $controller;
             },
-            
+            */
             'InoOicServer\AuthorizeController' => function (ControllerManager $controllerManager)
             {
                 $sm = $controllerManager->getServiceLocator();
@@ -47,6 +41,7 @@ class ControllerManagerConfig extends Config
                 return $controller;
             },
             
+            /*
             'InoOicServer\TokenController' => function (ControllerManager $controllerManager)
             {
                 $sm = $controllerManager->getServiceLocator();
@@ -64,6 +59,7 @@ class ControllerManagerConfig extends Config
                 
                 return $controller;
             }
+            */
         );
     }
 }
