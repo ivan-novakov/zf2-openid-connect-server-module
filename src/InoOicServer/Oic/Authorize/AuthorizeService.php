@@ -188,6 +188,10 @@ class AuthorizeService
     {
         // identify and validate client (application)
         $client = $this->getClientService()->fetchClient($request->getClientId(), $request->getRedirectUri());
+        if (! $client) {
+            // client error
+            return $this->createClientErrorResult('invalid_request', 'Client not found');
+        }
         
         // create new Authorize\Context
         $contextService = $this->getContextService();
@@ -286,19 +290,29 @@ class AuthorizeService
     }
 
 
-    public function createClientErrorResult(Error $error)
+    public function createRedirectToAuthenticationResult()
     {
-        $response = $this->getResponseFactory()->createClientErrorResponse($error);
-        $result = Result::constructResponseResult($response);
+        $redirect = new Redirect(Redirect::TO_AUTHENTICATION);
+        $result = Result::constructRedirectResult($redirect);
         
         return $result;
     }
 
 
-    public function createRedirectToAuthenticationResult()
+    public function createClientErrorResult($message, $description = null)
     {
-        $redirect = new Redirect(Redirect::TO_AUTHENTICATION);
-        $result = Result::constructRedirectResult($redirect);
+        $error = new Error();
+        $error->setMessage($message);
+        $error->setDescription($description);
+        
+        return $this->createClientErrorResultFromError($error);
+    }
+
+
+    public function createClientErrorResultFromError(Error $error)
+    {
+        $response = $this->getResponseFactory()->createClientErrorResponse($error);
+        $result = Result::constructResponseResult($response);
         
         return $result;
     }
