@@ -11,6 +11,13 @@ use InoOicServer\Oic\Client\ClientServiceInterface;
 use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
 use InoOicServer\Oic\Session\SessionServiceInterface;
 use InoOicServer\Oic\AuthCode\AuthCodeServiceInterface;
+use InoOicServer\Oic\AuthCode\AuthCode;
+use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
+use InoOicServer\Oic\Error;
+use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
+use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
+use InoOicServer\Oic\Authorize\Response\ResponseFactoryInterface;
+use InoOicServer\Oic\Authorize\Response\ResponseFactory;
 
 
 class AuthorizeService
@@ -41,6 +48,11 @@ class AuthorizeService
      */
     protected $authCodeService;
 
+    /**
+     * @var ResponseFactoryInterface
+     */
+    protected $responseFactory;
+
 
     /**
      * Constructor.
@@ -50,9 +62,7 @@ class AuthorizeService
      * @param SessionService $sessionService
      * @param AuthCodeService $authCodeService
      */
-    public function __construct(ClientServiceInterface $clientService, ContextServiceInterface $contextService, 
-        AuthSessionServiceInterface $authSessionService, SessionServiceInterface $sessionService, 
-        AuthCodeServiceInterface $authCodeService)
+    public function __construct(ClientServiceInterface $clientService, ContextServiceInterface $contextService, AuthSessionServiceInterface $authSessionService, SessionServiceInterface $sessionService, AuthCodeServiceInterface $authCodeService)
     {
         $this->setClientService($clientService);
         $this->setContextService($contextService);
@@ -152,6 +162,28 @@ class AuthorizeService
     }
 
 
+    /**
+     * @return ResponseFactoryInterface
+     */
+    public function getResponseFactory()
+    {
+        if (! $this->responseFactory instanceof ResponseFactoryInterface) {
+            $this->responseFactory = new ResponseFactory();
+        }
+        
+        return $this->responseFactory;
+    }
+
+
+    /**
+     * @param ResponseFactoryInterface $responseFactory
+     */
+    public function setResponseFactory(ResponseFactoryInterface $responseFactory)
+    {
+        $this->responseFactory = $responseFactory;
+    }
+
+
     public function processRequest(AuthorizeRequest $request)
     {
         // identify and validate client (application)
@@ -174,6 +206,7 @@ class AuthorizeService
             $authCode = $this->getAuthCodeService()->initAuthCodeFromSession($session, $client, $request->getScope());
             
             // create and return response with the code
+            return $this->createResponseResult($authCode, $request, $session);
         }
         
         // check if there is active/valid auth session
@@ -182,9 +215,11 @@ class AuthorizeService
             $authCode = $this->initAuthCodeFromAuthSession($authSession, $client, $request);
             
             // create and return response with the code
+            return $this->createResponseResult($authCode, $request, $session);
         }
         
         // otherwise redirect to authentication
+        return $this->createRedirectToAuthenticationResult();
     }
 
 
@@ -230,5 +265,41 @@ class AuthorizeService
         }
         
         return null;
+    }
+
+
+    public function createResponseResult(AuthCode $authCode, AuthorizeRequest $request, Session $session)
+    {
+        $response = $this->getResponseFactory()->createAuthorizeResponse($authCode, $request, $session);
+        $result = Result::constructResponseResult($response);
+        
+        return $result;
+    }
+
+
+    public function createAuthorizeErrorResult(Error $error, AuthorizeRequest $request)
+    {
+        $response = $this->getResponseFactory()->createAuthorizeErrorResponse($error, $request);
+        $result = Result::constructResponseResult($response);
+        
+        return $result;
+    }
+
+
+    public function createClientErrorResult(Error $error)
+    {
+        $response = $this->getResponseFactory()->createClientErrorResponse($error);
+        $result = Result::constructResponseResult($response);
+        
+        return $result;
+    }
+
+
+    public function createRedirectToAuthenticationResult()
+    {
+        $redirect = new Redirect(Redirect::TO_AUTHENTICATION);
+        $result = Result::constructRedirectResult($redirect);
+        
+        return $result;
     }
 }
