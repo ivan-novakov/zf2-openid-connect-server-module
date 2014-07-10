@@ -17,6 +17,18 @@ class OptionsTraitTest extends \PHPUnit_Framework_TestCase
     }
 
 
+    public function testSetDefaultOptions()
+    {
+        $defaultOptions = array(
+            'foo1' => 'bar1',
+            'foo2' => 'bar2'
+        );
+        
+        $this->trait->setDefaultOptions($defaultOptions);
+        $this->assertSame($defaultOptions, $this->trait->getDefaultOptions());
+    }
+
+
     public function testSetOptionsWithInvalidArgument()
     {
         $this->setExpectedException('Zend\Stdlib\Exception\InvalidArgumentException', 'Options must be an array or Traversable');
@@ -53,11 +65,12 @@ class OptionsTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testSetOptionsWithDefaultOptions()
     {
-        $this->trait->defaultOptions = array(
+        $defaultOptions = array(
             'foo1' => 'bar1',
             'foo2' => 'bar2',
             'foo3' => 'bar3'
         );
+        $this->trait->setDefaultOptions($defaultOptions);
         
         $options = array(
             'foo2' => 'bar21'

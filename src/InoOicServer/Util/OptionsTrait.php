@@ -16,6 +16,11 @@ trait OptionsTrait
      */
     protected $options;
 
+    /**
+     * @var array
+     */
+    protected $defaultOptions;
+
 
     public function setOptions($options)
     {
@@ -49,5 +54,23 @@ trait OptionsTrait
     protected function createOptions(array $options = array())
     {
         return new Options($options);
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultOptions()
+    {
+        return $this->defaultOptions;
+    }
+
+
+    /**
+     * @param array $defaultOptions
+     */
+    public function setDefaultOptions(array $defaultOptions)
+    {
+        $this->defaultOptions = $defaultOptions;
     }
 }
