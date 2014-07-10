@@ -2,6 +2,8 @@
 
 namespace InoOicServerTest\Oic\Authorize\Http;
 
+use InoOicServer\Oic\Error;
+use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
 use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\Http\HttpService;
 
@@ -17,7 +19,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->service = new HttpService();
+        $this->service = new HttpService(array());
     }
 
 
@@ -37,13 +39,24 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
     }
 
 
-    public function testCreateHttpResponse()
+    public function testCreateHttpResponseWithClientError()
     {
-        $result = $this->getMockBuilder('InoOicServer\Oic\Authorize\Result')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $message = 'error_message';
+        $description = 'error_description';
+        
+        $error = new Error();
+        $error->setMessage($message);
+        $error->setDescription($description);
+        
+        $response = new ClientErrorResponse();
+        $response->setError($error);
+        
+        $result = Result::constructResponseResult($response);
         $httpResponse = $this->service->createHttpResponse($result);
         
         $this->assertInstanceOf('Zend\Http\Response', $httpResponse);
+        $this->assertSame(400, $httpResponse->getStatusCode());
+        $this->assertRegExp('/' . $message . '/', $httpResponse->getContent());
+        $this->assertRegExp('/' . $description . '/', $httpResponse->getContent());
     }
 }

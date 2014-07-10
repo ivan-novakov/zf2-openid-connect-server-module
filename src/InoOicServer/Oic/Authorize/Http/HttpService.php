@@ -11,10 +11,13 @@ use InoOicServer\Oic\Authorize\Redirect;
 use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactoryInterface;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
+use InoOicServer\Util\OptionsTrait;
 
 
 class HttpService implements HttpServiceInterface
 {
+    
+    use OptionsTrait;
 
     /**
      * @var AuthorizeRequestFactoryInterface
@@ -26,6 +29,18 @@ class HttpService implements HttpServiceInterface
         'InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse' => 'createHttpResponseFromAuthorizeError',
         'InoOicServer\Oic\Authorize\Response\AuthorizeResponse' => 'createHttpResponseFromAuthorizeResponse'
     );
+
+    protected $redirectHandlers = array(
+        Redirect::TO_AUTHENTICATION => 'createHttpResponseFromRedirectToAuthentication',
+        Redirect::TO_RESPONSE => 'createHttpResponseFromRedirectToResponse',
+        Redirect::TO_URL => 'createHttpResponseFromRedirectToUrl'
+    );
+
+
+    public function __construct(array $options)
+    {
+        $this->setOptions($options);
+    }
 
 
     /**
@@ -50,12 +65,20 @@ class HttpService implements HttpServiceInterface
     }
 
 
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createAuthorizeRequest()
+     */
     public function createAuthorizeRequest(Http\Request $httpRequest)
     {
         return $this->getAuthorizeRequestFactory()->createRequest($httpRequest);
     }
 
 
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createHttpResponse()
+     */
     public function createHttpResponse(Result $result)
     {
         if ($result->getType() === Result::TYPE_REDIRECT) {
@@ -72,6 +95,33 @@ class HttpService implements HttpServiceInterface
 
 
     public function createHttpResponseFromRedirect(Redirect $redirect)
+    {
+        $redirectType = $redirect->getType();
+        if (! isset($this->redirectHandlers[$redirectType])) {
+            throw new \RuntimeException(sprintf("Unknown redirect type '%s'", $redirectType));
+        }
+        
+        $redirectHandler = $this->redirectHandlers[$redirectType];
+        if (! method_exists($this, $redirectHandler)) {
+            throw new \RuntimeException(sprintf("Non-existent redirect handler '%s' for redirect type '%s", $redirectHandler, $redirectType));
+        }
+        
+        return call_user_func(array(
+            $this,
+            $redirectHandler
+        ), $redirect);
+    }
+
+
+    public function createHttpResponseFromRedirectToAuthentication(Redirect $redirect)
+    {}
+
+
+    public function createHttpResponseFromRedirectToResponse(Redirect $redirect)
+    {}
+
+
+    public function createHttpResponseFromRedirectToUrl(Redirect $redirect)
     {}
 
 
