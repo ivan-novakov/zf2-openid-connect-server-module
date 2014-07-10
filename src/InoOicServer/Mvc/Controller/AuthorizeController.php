@@ -71,28 +71,14 @@ class AuthorizeController extends AbstractActionController
 
     public function authorizeAction()
     {
-        // create authorize request from http request (request factory)
-        /*
-        $request = $this->getAuthorizeRequestFactory($httpRequest);
-        */
+        $httpService = $this->getHttpService();
+        $httpRequest = $this->getRequest();
         
-        // process authorize request (via authorize service)
-        /*
-        $response = $this->getAuthorizeService()->processRequest($request);
-        */
+        $authorizeRequest = $httpService->createAuthorizeRequest($this->getRequest());
+        $result = $this->getAuthorizeService()->processRequest($authorizeRequest);
         
-        // handle result, which can be one of these (http response factory)
-        // - redirect to response endpoint (if there is valid context)
-        // - redirect to authentication
-        // - error, client known - error redirect to client
-        // - error, client not known - show HTML message directly
-        /*
-        $httpResponse = $this->getHttpResponseFactory($reponse);
+        $httpResponse = $httpService->createHttpResponse($result);
         return $httpResponse;
-        */
-        $response = new \Zend\Http\Response();
-        $response->setStatusCode(501);
-        return $response;
     }
 
 
