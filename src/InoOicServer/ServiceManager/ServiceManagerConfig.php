@@ -12,6 +12,9 @@ use InoOicServer\Oic\Authorize\Context\SessionStorage;
 use InoOicServer\Oic\AuthSession\AuthSessionService;
 use InoOicServer\Oic\Session\SessionService;
 use InoOicServer\Oic\AuthCode\AuthCodeService;
+use InoOicServer\Oic\AuthCode;
+use InoOicServer\Oic\Session;
+use InoOicServer\Oic\AuthSession;
 
 
 class ServiceManagerConfig extends Config
@@ -22,7 +25,11 @@ class ServiceManagerConfig extends Config
     {
         return array(
             'Zend\Session\Container' => function ($sm)
-            {},
+            {
+                $container = new \Zend\Session\Container();
+                
+                return $container;
+            },
             
             'InoOicServer\Oic\Authorize\Http\HttpService' => function ($sm)
             {
@@ -68,7 +75,11 @@ class ServiceManagerConfig extends Config
             },
             
             'InoOicServer\Oic\AuthSession\Mapper' => function ($sm)
-            {},
+            {
+                $mapper = new AuthSession\Mapper\DbMapper();
+                
+                return $mapper;
+            },
             
             'InoOicServer\Oic\AuthSession\AuthSessionService' => function ($sm)
             {
@@ -85,7 +96,11 @@ class ServiceManagerConfig extends Config
             },
             
             'InoOicServer\Oic\Session\Mapper' => function ($sm)
-            {},
+            {
+                $mapper = new Session\Mapper\DbMapper();
+                
+                return $mapper;
+            },
             
             'InoOicServer\Oic\Session\SessionService' => function ($sm)
             {
@@ -102,7 +117,11 @@ class ServiceManagerConfig extends Config
             },
             
             'InoOicServer\Oic\AuthCode\Mapper' => function ($sm)
-            {},
+            {
+                $mapper = new AuthCode\Mapper\DbMapper();
+                
+                return $mapper;
+            },
             
             'InoOicServer\Oic\AuthCode\AuthCodeService' => function ($sm)
             {

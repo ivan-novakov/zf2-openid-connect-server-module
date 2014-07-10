@@ -10,7 +10,8 @@ use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ControllerProviderInterface;
 
 
-class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface, ControllerProviderInterface
+class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface, 
+    ControllerProviderInterface
 {
 
 
@@ -51,18 +52,17 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
                 return;
             }
             
-            //$service = $services->get('InoOicServer\ErrorHandler');
+            // $service = $services->get('InoOicServer\ErrorHandler');
             if ($exception) {
-                //$service->logException($exception);
-                _dump($exception);
+                // $service->logException($exception);
+                _dump(sprintf("[%s] %s\n%s", get_class($exception), $exception->getMessage(), $exception->getTraceAsString()));
             }
             
             if ($error) {
-                //$service->logError('Dispatch ERROR: ' . $error);
+                // $service->logError('Dispatch ERROR: ' . $error);
                 _dump('Dispatch ERROR: ' . $error);
             }
         });
-        
     }
 
 
@@ -78,8 +78,3 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
     }
 }
 
-
-function _dump($value)
-{
-    error_log(print_r($value, true));
-}

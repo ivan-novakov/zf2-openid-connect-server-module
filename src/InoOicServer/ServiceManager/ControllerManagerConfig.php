@@ -33,6 +33,7 @@ class ControllerManagerConfig extends Config
             'InoOicServer\Mvc\Controller\AuthorizeController' => function (ControllerManager $controllerManager)
             {
                 $sm = $controllerManager->getServiceLocator();
+                
                 $authorizeService = $sm->get('InoOicServer\Oic\Authorize\AuthorizeService');
                 $httpService = $sm->get('InoOicServer\Oic\Authorize\Http\HttpService');
                 

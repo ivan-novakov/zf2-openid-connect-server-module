@@ -3,6 +3,7 @@
 namespace InoOicServer\Mvc\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
+use InoOicServer\Oic\Authorize\Http\HttpServiceInterface;
 use InoOicServer\Oic\Authorize\AuthorizeService;
 
 
@@ -89,7 +90,9 @@ class AuthorizeController extends AbstractActionController
         $httpResponse = $this->getHttpResponseFactory($reponse);
         return $httpResponse;
         */
-        return $this->getResponse();
+        $response = new \Zend\Http\Response();
+        $response->setStatusCode(501);
+        return $response;
     }
 
 
