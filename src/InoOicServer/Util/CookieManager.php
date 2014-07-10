@@ -21,7 +21,9 @@ class CookieManager
         $value = null;
         $cookieHeader = $httpRequest->getCookie();
         if ($cookieHeader instanceof Http\Header\Cookie) {
-            $value = $cookieHeader->offsetGet($name);
+            if ($cookieHeader->offsetExists($name)) {
+                $value = $cookieHeader->offsetGet($name);
+            }
         }
         
         return $value;
