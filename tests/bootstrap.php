@@ -7,7 +7,7 @@ define('TESTS_FILES_DIR', TESTS_ROOT . '_files/');
 
 $autoload = null;
 $moduleAutoload = __DIR__ . '/../vendor/autoload.php';
-$appAutoload = __DIR__ . '/../../../vendor/autoload.php';
+$appAutoload = __DIR__ . '/../../../autoload.php';
 
 if (file_exists($moduleAutoload)) {
     $autoload = $moduleAutoload;
