@@ -35,7 +35,7 @@ return array(
                         'options' => array(
                             'route' => '/authorize-response',
                             'defaults' => array(
-                                'controller' => 'InoOicServer\AuthorizeController',
+                                'controller' => 'InoOicServer\Mvc\Controller\AuthorizeController',
                                 'action' => 'response'
                             )
                         )
@@ -47,7 +47,7 @@ return array(
                         'options' => array(
                             'route' => '/token',
                             'defaults' => array(
-                                'controller' => 'InoOicServer\TokenController',
+                                'controller' => 'InoOicServer\Mvc\Controller\TokenController',
                                 'action' => 'index'
                             )
                         )
@@ -59,7 +59,7 @@ return array(
                         'options' => array(
                             'route' => '/userinfo',
                             'defaults' => array(
-                                'controller' => 'InoOicServer\UserinfoController',
+                                'controller' => 'InoOicServer\Mvc\Controller\UserinfoController',
                                 'action' => 'index'
                             )
                         )
@@ -69,9 +69,9 @@ return array(
                         'type' => 'segment',
                         'may_terminate' => true,
                         'options' => array(
-                            'route' => '/authn/:controller[/:action]',
+                            'route' => '/authn/:controller/authenticate',
                             'constraints' => array(
-                                'controller' => '[a-zA-Z][a-zA-Z0-9_-]+'
+                                'controller' => '[a-z][a-z0-9_-]+'
                             ),
                             'defaults' => array(
                                 'action' => 'authenticate'
@@ -83,7 +83,20 @@ return array(
         )
     ),
     
+    'controllers' => array(
+        'aliases' => array(
+            'dummy' => 'InoOicServer\Oic\Authentication\Controller\DummyController',
+            'basic' => 'InoOicServer\Oic\Authentication\Controller\BasicAuthController'
+        )
+    ),
+    
     'oic_server' => array(
+        'user_authentication_manager' => array(
+            'method' => 'dummy',
+            'auth_route' => 'oic/authentication',
+            'return_route' => 'oic/authorize-response-endpoint'
+        ),
+        
         'client_mapper' => array(
             'file' => __DIR__ . '/data/clients.php'
         ),

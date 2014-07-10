@@ -37,7 +37,7 @@ class HttpService implements HttpServiceInterface
     );
 
 
-    public function __construct(array $options)
+    public function __construct(array $options = array())
     {
         $this->setOptions($options);
     }

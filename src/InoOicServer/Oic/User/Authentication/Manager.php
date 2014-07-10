@@ -77,11 +77,17 @@ class Manager
             throw new MissingOptionException(self::OPT_AUTH_ROUTE);
         }
         
-        return $this->getRouter()->assemble(array(
+        $router = $this->getRouter();
+        $path = $router->assemble(array(
             'controller' => $methodName
         ), array(
             'name' => $authRoute
         ));
+        
+        $baseUrl = $router->getRequestUri();
+        $baseUrl->setPath($path);
+        
+        return $baseUrl->toString();
     }
 
 
