@@ -2,6 +2,8 @@
 
 namespace InoOicServer\Oic\Authorize\Http;
 
+use InoOicServer\Oic\Authorize\Result;
+use Zend\Http;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactoryInterface;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 
@@ -44,5 +46,10 @@ class HttpService implements HttpServiceInterface
 
 
     public function createHttpResponse(Result $result)
-    {}
+    {
+        $httpResponse = new Http\Response();
+        $httpResponse->setStatusCode(501);
+        
+        return $httpResponse;
+    }
 }
