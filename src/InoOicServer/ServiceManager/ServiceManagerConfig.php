@@ -48,7 +48,7 @@ class ServiceManagerConfig extends Config
                 $clientMapper = $sm->get('InoOicServer\Oic\Client\Mapper');
                 $clientService = new ClientService($clientMapper);
                 
-                return $clientS;
+                return $clientService;
             },
             
             'InoOicServer\Oic\Authorize\Context\Storage' => function ($sm)
@@ -77,6 +77,7 @@ class ServiceManagerConfig extends Config
                     throw new Exception\MissingConfigException('oic_server/auth_session_service');
                 }
                 
+                $authSessionMapper = $sm->get('InoOicServer\Oic\AuthSession\Mapper');
                 $options = $config['oic_server']['auth_session_service'];
                 $authSessionService = new AuthSessionService($authSessionMapper, $options);
                 

@@ -11,8 +11,6 @@ class ControllerManagerConfig extends Config
 {
 
 
-
-
     public function getFactories()
     {
         return array(
@@ -32,11 +30,13 @@ class ControllerManagerConfig extends Config
                 return $controller;
             },
             */
-            'InoOicServer\AuthorizeController' => function (ControllerManager $controllerManager)
+            'InoOicServer\Mvc\Controller\AuthorizeController' => function (ControllerManager $controllerManager)
             {
                 $sm = $controllerManager->getServiceLocator();
+                $authorizeService = $sm->get('InoOicServer\Oic\Authorize\AuthorizeService');
+                $httpService = $sm->get('InoOicServer\Oic\Authorize\Http\HttpService');
                 
-                $controller = new Controller\AuthorizeController();
+                $controller = new Controller\AuthorizeController($httpService, $authorizeService);
                 
                 return $controller;
             },
