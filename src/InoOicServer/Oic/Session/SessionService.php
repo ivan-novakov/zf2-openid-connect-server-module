@@ -3,12 +3,10 @@
 namespace InoOicServer\Oic\Session;
 
 use InoOicServer\Util\OptionsTrait;
-use InoOicServer\Oic\Authorize\Request\Request;
 use InoOicServer\Oic\AccessToken\AccessToken;
 use InoOicServer\Oic\AuthCode\AuthCode;
 use InoOicServer\Oic\Session\Mapper\MapperInterface;
 use InoOicServer\Oic\AuthSession\AuthSession;
-use InoOicServer\Oic\Authorize\AuthorizeRequest;
 use InoOicServer\Oic\User\UserInterface;
 
 

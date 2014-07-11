@@ -2,22 +2,19 @@
 
 namespace InoOicServer\Oic\Authorize;
 
+use InoOicServer\Oic\Error;
 use InoOicServer\Oic\AuthSession\AuthSession;
-use InoOicServer\Oic\Session\Session;
-use InoOicServer\Oic\Client\Client;
-use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 use InoOicServer\Oic\AuthSession\AuthSessionServiceInterface;
+use InoOicServer\Oic\Client\Client;
 use InoOicServer\Oic\Client\ClientServiceInterface;
-use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
+use InoOicServer\Oic\Session\Session;
 use InoOicServer\Oic\Session\SessionServiceInterface;
 use InoOicServer\Oic\AuthCode\AuthCodeServiceInterface;
 use InoOicServer\Oic\AuthCode\AuthCode;
-use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
-use InoOicServer\Oic\Error;
-use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
-use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
+use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 use InoOicServer\Oic\Authorize\Response\ResponseFactoryInterface;
 use InoOicServer\Oic\Authorize\Response\ResponseFactory;
+use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
 
 
 class AuthorizeService

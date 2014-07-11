@@ -3,7 +3,6 @@
 namespace InoOicServerTest\Oic\Session;
 
 use DateTime;
-use Zend\Stdlib\ArrayObject;
 use InoOicServer\Oic\Session\Session;
 
 
@@ -21,7 +20,6 @@ class SessionTest extends \PHPUnit_Framework_TestCase
         $expirationTime = '2014-01-31';
         $authTime = '2014-01-01';
         $authMethod = 'dummy';
-
         
         $session = new Session();
         $session->setId($id);

@@ -18,7 +18,7 @@ interface ValidatorInterface
      * @param Authorize\Context $context
      * @return boolean
      */
-    public function isValid(Authorize\Context $context);
+    public function isValid(Authorize\Context\Context $context);
 
 
     /**

@@ -3,7 +3,6 @@
 namespace InoOicServer\Oic\Authorize\Context;
 
 use Zend\Session;
-use InoOicServer\Oic\Authorize;
 
 
 /**
