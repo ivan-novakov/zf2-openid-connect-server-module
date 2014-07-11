@@ -6,6 +6,7 @@ use InoOicServer\Oic\Error;
 use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
 use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\Http\HttpService;
+use InoOicServer\Oic\Authorize\Redirect;
 
 
 class HttpServiceTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +20,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->service = new HttpService(array());
+        $this->service = new HttpService(array(), $this->createAuthenticationManagerMock());
     }
 
 
@@ -58,5 +59,69 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(400, $httpResponse->getStatusCode());
         $this->assertRegExp('/' . $message . '/', $httpResponse->getContent());
         $this->assertRegExp('/' . $description . '/', $httpResponse->getContent());
+    }
+
+
+    public function testCreateHttpResponseFromRedirectToAuthentication()
+    {
+        $authUrl = 'https://auth/url';
+        $redirect = new Redirect(Redirect::TO_AUTHENTICATION);
+        
+        $authManager = $this->createAuthenticationManagerMock();
+        $authManager->expects($this->once())
+            ->method('getAuthenticationUrl')
+            ->will($this->returnValue($authUrl));
+        $this->service->setAuthenticationManager($authManager);
+        
+        $httpResponse = $this->service->createHttpResponseFromRedirectToAuthentication($redirect);
+        $this->assertSame(302, $httpResponse->getStatusCode());
+        $this->assertSame($authUrl, $httpResponse->getHeaders()
+            ->get('Location')
+            ->getUri());
+    }
+
+
+    public function testCreateHttpResponseFromRedirectToResponse()
+    {
+        $returnUrl = 'https://response/url';
+        $redirect = new Redirect(Redirect::TO_RESPONSE);
+        
+        $authManager = $this->createAuthenticationManagerMock();
+        $authManager->expects($this->once())
+            ->method('getReturnUrl')
+            ->will($this->returnValue($returnUrl));
+        $this->service->setAuthenticationManager($authManager);
+        
+        $httpResponse = $this->service->createHttpResponseFromRedirectToResponse($redirect);
+        $this->assertSame(302, $httpResponse->getStatusCode());
+        $this->assertSame($returnUrl, $httpResponse->getHeaders()
+            ->get('Location')
+            ->getUri());
+    }
+
+
+    public function testCreateHttpResponseFromRedirectToUrl()
+    {
+        $url = 'https://custom/url';
+        $redirect = new Redirect(Redirect::TO_URL);
+        $redirect->setUrl($url);
+        
+        $httpResponse = $this->service->createHttpResponseFromRedirectToUrl($redirect);
+        $this->assertSame(302, $httpResponse->getStatusCode());
+        $this->assertSame($url, $httpResponse->getHeaders()
+            ->get('Location')
+            ->getUri());
+    }
+    
+    /*
+     *
+     */
+    protected function createAuthenticationManagerMock()
+    {
+        $manager = $this->getMockBuilder('InoOicServer\Oic\User\Authentication\Manager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        
+        return $manager;
     }
 }

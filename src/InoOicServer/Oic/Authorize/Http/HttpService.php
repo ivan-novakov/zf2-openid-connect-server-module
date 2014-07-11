@@ -12,6 +12,7 @@ use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactoryInterface;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 use InoOicServer\Util\OptionsTrait;
+use InoOicServer\Oic\User\Authentication\Manager;
 
 
 class HttpService implements HttpServiceInterface
@@ -24,12 +25,23 @@ class HttpService implements HttpServiceInterface
      */
     protected $authorizeRequestFactory;
 
+    /**
+     * @var Manager
+     */
+    protected $authenticationManager;
+
+    /**
+     * @var array
+     */
     protected $responseHandlers = array(
         'InoOicServer\Oic\Authorize\Response\ClientErrorResponse' => 'createHttpResponseFromClientError',
         'InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse' => 'createHttpResponseFromAuthorizeError',
         'InoOicServer\Oic\Authorize\Response\AuthorizeResponse' => 'createHttpResponseFromAuthorizeResponse'
     );
 
+    /**
+     * @var array
+     */
     protected $redirectHandlers = array(
         Redirect::TO_AUTHENTICATION => 'createHttpResponseFromRedirectToAuthentication',
         Redirect::TO_RESPONSE => 'createHttpResponseFromRedirectToResponse',
@@ -37,9 +49,16 @@ class HttpService implements HttpServiceInterface
     );
 
 
-    public function __construct(array $options = array())
+    /**
+     * Constructor.
+     * 
+     * @param array $options
+     * @param Manager $authenticationManager
+     */
+    public function __construct(array $options = array(), Manager $authenticationManager)
     {
         $this->setOptions($options);
+        $this->setAuthenticationManager($authenticationManager);
     }
 
 
@@ -66,6 +85,24 @@ class HttpService implements HttpServiceInterface
 
 
     /**
+     * @return Manager
+     */
+    public function getAuthenticationManager()
+    {
+        return $this->authenticationManager;
+    }
+
+
+    /**
+     * @param Manager $authenticationManager
+     */
+    public function setAuthenticationManager(Manager $authenticationManager)
+    {
+        $this->authenticationManager = $authenticationManager;
+    }
+
+
+    /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createAuthorizeRequest()
      */
@@ -86,10 +123,7 @@ class HttpService implements HttpServiceInterface
         }
         
         $httpResponse = $this->createHttpResponseFromResponse($result->getResponse());
-        /*
-        $httpResponse = new Http\Response();
-        $httpResponse->setStatusCode(400);
-        */
+        
         return $httpResponse;
     }
 
@@ -114,15 +148,30 @@ class HttpService implements HttpServiceInterface
 
 
     public function createHttpResponseFromRedirectToAuthentication(Redirect $redirect)
-    {}
+    {
+        $redirectUrl = $this->getAuthenticationManager()->getAuthenticationUrl();
+        $response = $this->createRedirectHttpResponse($redirectUrl);
+        
+        return $response;
+    }
 
 
     public function createHttpResponseFromRedirectToResponse(Redirect $redirect)
-    {}
+    {
+        $redirectUrl = $this->getAuthenticationManager()->getReturnUrl();
+        $response = $this->createRedirectHttpResponse($redirectUrl);
+        
+        return $response;
+    }
 
 
     public function createHttpResponseFromRedirectToUrl(Redirect $redirect)
-    {}
+    {
+        $redirectUrl = $redirect->getUrl();
+        $response = $this->createRedirectHttpResponse($redirectUrl);
+        
+        return $response;
+    }
 
 
     public function createHttpResponseFromResponse(ResponseInterface $response)
@@ -162,4 +211,17 @@ class HttpService implements HttpServiceInterface
 
     public function createHttpResponseFromAuthorizeResponse(AuthorizeResponse $authorizeResponse)
     {}
+
+
+    protected function createRedirectHttpResponse($redirectUrl, $statusCode = 302)
+    {
+        $locationHeader = new Http\Header\Location();
+        $locationHeader->setUri($redirectUrl);
+        
+        $response = new Http\Response();
+        $response->getHeaders()->addHeader($locationHeader);
+        $response->setStatusCode($statusCode);
+        
+        return $response;
+    }
 }
