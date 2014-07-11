@@ -2,6 +2,7 @@
 
 namespace InoOicServer\ServiceManager;
 
+use InoOicServer\Util\UrlHelper;
 use Zend\ServiceManager\Config;
 use InoOicServer\Oic\Authorize\Http\HttpService;
 use InoOicServer\Oic\Authorize\AuthorizeService;
@@ -15,6 +16,7 @@ use InoOicServer\Oic\AuthCode\AuthCodeService;
 use InoOicServer\Oic\AuthCode;
 use InoOicServer\Oic\Session;
 use InoOicServer\Oic\AuthSession;
+use InoOicServer\Oic\User;
 
 
 class ServiceManagerConfig extends Config
@@ -24,11 +26,32 @@ class ServiceManagerConfig extends Config
     public function getFactories()
     {
         return array(
+            
             'Zend\Session\Container' => function ($sm)
             {
                 $container = new \Zend\Session\Container();
                 
                 return $container;
+            },
+            
+            'InoOicServer\Util\UrlHelper' => function ($sm)
+            {
+                $urlHelper = new UrlHelper($sm->get('Router'));
+                
+                return $urlHelper;
+            },
+            
+            'InoOicServer\Oic\User\Authentication\Manager' => function ($sm)
+            {
+                $config = $sm->get('Config');
+                if (! isset($config['oic_server']['user_authentication_manager']) || ! is_array($config['oic_server']['user_authentication_manager'])) {
+                    throw new Exception\MissingConfigException('oic_server/user_authentication_manager');
+                }
+                
+                $options = $config['oic_server']['user_authentication_manager'];
+                $urlHelper = $sm->get('InoOicServer\Util\UrlHelper');
+                
+                $manager = new User\Authentication\Manager($options, $urlHelper);
             },
             
             'InoOicServer\Oic\Authorize\Http\HttpService' => function ($sm)

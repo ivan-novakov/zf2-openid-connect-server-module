@@ -2,8 +2,8 @@
 
 namespace InoOicServer\Oic\User\Authentication;
 
+use InoOicServer\Util\UrlHelper;
 use InoOicServer\Exception\MissingOptionException;
-use Zend\Mvc\Router\Http\TreeRouteStack;
 use InoOicServer\Util\OptionsTrait;
 
 
@@ -19,32 +19,32 @@ class Manager
     const OPT_RETURN_ROUTE = 'return_route';
 
     /**
-     * @var TreeRouteStack
+     * @var UrlHelper
      */
-    protected $router;
+    protected $urlHelper;
 
 
-    public function __construct(array $options, TreeRouteStack $router)
+    public function __construct(array $options, UrlHelper $urlHelper)
     {
         $this->setOptions($options);
     }
 
 
     /**
-     * @return TreeRouteStack
+     * @return UrlHelper
      */
-    public function getRouter()
+    public function getUrlHelper()
     {
-        return $this->router;
+        return $this->urlHelper;
     }
 
 
     /**
-     * @param TreeRouteStack $router
+     * @param UrlHelper $urlHelper
      */
-    public function setRouter(TreeRouteStack $router)
+    public function setUrlHelper(UrlHelper $urlHelper)
     {
-        $this->router = $router;
+        $this->urlHelper = $urlHelper;
     }
 
 
@@ -77,17 +77,9 @@ class Manager
             throw new MissingOptionException(self::OPT_AUTH_ROUTE);
         }
         
-        $router = $this->getRouter();
-        $path = $router->assemble(array(
+        return $this->getUrlHelper()->createUrlStringFromRoute($authRoute, array(
             'controller' => $methodName
-        ), array(
-            'name' => $authRoute
         ));
-        
-        $baseUrl = $router->getRequestUri();
-        $baseUrl->setPath($path);
-        
-        return $baseUrl->toString();
     }
 
 
@@ -104,8 +96,6 @@ class Manager
             throw new MissingOptionException(self::OPT_RETURN_ROUTE);
         }
         
-        return $this->getRouter()->assemble(array(), array(
-            'name' => $returnRoute
-        ));
+        return $this->getUrlHelper()->createUrlStringFromRoute($returnRoute);
     }
 }

@@ -16,7 +16,7 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->manager = new Manager(array(), $this->createRouterMock());
+        $this->manager = new Manager(array(), $this->createUrlHelperMock());
     }
 
 
@@ -53,25 +53,22 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAuthenticationUrl()
     {
-        return;
         $method = 'foo';
         $authRoute = 'bar';
         
         $params = array(
             'controller' => $method
         );
-        $options = array(
-            'name' => $authRoute
-        );
         
         $url = 'https://auth/url';
         
-        $router = $this->createRouterMock();
-        $router->expects($this->once())
-            ->method('assemble')
-            ->with($params, $options)
+        $urlHelper = $this->createUrlHelperMock();
+        $urlHelper->expects($this->once())
+            ->method('createUrlStringFromRoute')
+            ->with($authRoute, $params)
             ->will($this->returnValue($url));
-        $this->manager->setRouter($router);
+        $this->manager->setUrlHelper($urlHelper);
+        
         $this->manager->setOptions(array(
             Manager::OPT_METHOD => $method,
             Manager::OPT_AUTH_ROUTE => $authRoute
@@ -98,13 +95,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
         );
         $url = 'https://return/url';
         
-        $router = $this->createRouterMock();
-        $router->expects($this->once())
-            ->method('assemble')
-            ->with($params, $options)
+        $urlHelper = $this->createUrlHelperMock();
+        $urlHelper->expects($this->once())
+            ->method('createUrlStringFromRoute')
+            ->with($returnRoute)
             ->will($this->returnValue($url));
+        $this->manager->setUrlHelper($urlHelper);
         
-        $this->manager->setRouter($router);
         $this->manager->setOptions(array(
             Manager::OPT_RETURN_ROUTE => $returnRoute
         ));
@@ -116,10 +113,12 @@ class ManagerTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createRouterMock()
+    protected function createUrlHelperMock()
     {
-        $router = $this->getMockBuilder('Zend\Mvc\Router\Http\TreeRouteStack')->getMock();
+        $urlHelper = $this->getMockBuilder('InoOicServer\Util\UrlHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
         
-        return $router;
+        return $urlHelper;
     }
 }

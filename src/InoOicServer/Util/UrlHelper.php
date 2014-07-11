@@ -44,14 +44,13 @@ class UrlHelper
 
 
     /**
-     * Assembles a full URL based on the provided route name and parameters.
+     * Creates an Uri object based on the route name and the provided parameters.
      * 
      * @param string $routeName
      * @param array $params
-     * @param boolean $returnAsString
-     * @return string|\Zend\Uri\Http
+     * @return \Zend\Uri\Http
      */
-    public function createUrlFromRoute($routeName, array $params = array(), $returnAsString = false)
+    public function createUriFromRoute($routeName, array $params = array())
     {
         $options = array(
             'name' => $routeName
@@ -64,10 +63,19 @@ class UrlHelper
         $uri = $router->getRequestUri();
         $uri->setPath($path);
         
-        if ($returnAsString) {
-            return $uri->toString();
-        }
-        
         return $uri;
+    }
+
+
+    /**
+     * Assembles a full URL string based on the provided route name and parameters.
+     * 
+     * @param string $routeName
+     * @param array $params
+     * @return string
+     */
+    public function createUrlStringFromRoute($routeName, array $params = array())
+    {
+        return $this->createUriFromRoute($routeName, $params)->toString();
     }
 }
