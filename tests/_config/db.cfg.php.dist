@@ -1,0 +1,10 @@
+<?php
+return array(
+    'adapter' => array(
+        'driver' => 'Pdo_Mysql',
+        'hostname' => 'localhost',
+        'database' => 'oicserver_test',
+        'username' => 'oicadmin',
+        'password' => 'xxx'
+    )
+);

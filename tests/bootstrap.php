@@ -1,8 +1,7 @@
 <?php
-
-define('TESTS_ROOT', dirname(__FILE__) . '/');
+define('TESTS_ROOT', __DIR__ . '/');
 define('TMP_DIR', TESTS_ROOT . 'tmp/');
-define('TESTS_CONFIG_FILE', TESTS_ROOT . '_files/tests.config.php');
+define('TESTS_CONFIG_DIR', TESTS_ROOT . '_config/');
 define('TESTS_FILES_DIR', TESTS_ROOT . '_files/');
 
 $autoload = null;

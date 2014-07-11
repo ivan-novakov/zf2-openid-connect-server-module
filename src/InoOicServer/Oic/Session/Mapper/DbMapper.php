@@ -3,9 +3,10 @@
 namespace InoOicServer\Oic\Session\Mapper;
 
 use InoOicServer\Oic\Session\Session;
+use InoOicServer\Db\AbstractMapper;
 
 
-class DbMapper implements MapperInterface
+class DbMapper extends AbstractMapper implements MapperInterface
 {
 
 

@@ -30,6 +30,7 @@
     },
 
     "require-dev" : {
+        "zendframework/zend-config" : "~2.3",
         "phpunit/phpunit" : "~4.1",
         "phpunit/dbunit" : "~1.3"
     },
@@ -45,7 +46,7 @@
 
     "autoload-dev" : {
         "psr-4" : {
-            "InoOicServerTest\\" : "tests/src/"
+            "InoOicServer\\Test\\" : "tests/src/"
         }
     }
 
