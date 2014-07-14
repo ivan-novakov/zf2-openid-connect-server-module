@@ -4,6 +4,6 @@
 composer.lock
 vendor/
 tmp/
-doc/auth_server_session_storage.mwb.bak
+doc/data_model.mwb.bak
 doc/object_model_2.dia.autosave
 tests/_config/db.cfg.php

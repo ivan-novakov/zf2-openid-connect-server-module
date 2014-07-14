@@ -4,12 +4,12 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 
 -- -----------------------------------------------------
--- Table `oic_server`.`auth_session`
+-- Table `auth_session`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `oic_server`.`auth_session` ;
+DROP TABLE IF EXISTS `auth_session` ;
 
-CREATE TABLE IF NOT EXISTS `oic_server`.`auth_session` (
-  `id` VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS `auth_session` (
+  `id` VARCHAR(64) NOT NULL,
   `method` VARCHAR(45) NOT NULL,
   `create_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
@@ -20,13 +20,13 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `oic_server`.`session`
+-- Table `session`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `oic_server`.`session` ;
+DROP TABLE IF EXISTS `session` ;
 
-CREATE TABLE IF NOT EXISTS `oic_server`.`session` (
-  `id` VARCHAR(32) NOT NULL,
-  `auth_session_id` VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS `session` (
+  `id` VARCHAR(64) NOT NULL,
+  `auth_session_id` VARCHAR(64) NOT NULL,
   `create_time` DATETIME NOT NULL,
   `modify_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
@@ -35,65 +35,66 @@ CREATE TABLE IF NOT EXISTS `oic_server`.`session` (
   INDEX `fk_session_auth_session1_idx` (`auth_session_id` ASC),
   CONSTRAINT `fk_session_auth_session1`
     FOREIGN KEY (`auth_session_id`)
-    REFERENCES `oic_server`.`auth_session` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `auth_session` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `oic_server`.`authorization_code`
+-- Table `authorization_code`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `oic_server`.`authorization_code` ;
+DROP TABLE IF EXISTS `authorization_code` ;
 
-CREATE TABLE IF NOT EXISTS `oic_server`.`authorization_code` (
-  `code` VARCHAR(32) NOT NULL,
-  `session_id` VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS `authorization_code` (
+  `code` VARCHAR(64) NOT NULL,
+  `session_id` VARCHAR(64) NOT NULL,
   `issue_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
-  `scope` VARCHAR(255) NOT NULL,
+  `scope` VARCHAR(255) NULL,
   PRIMARY KEY (`code`),
   INDEX `fk_authorization_code_session_idx` (`session_id` ASC),
+  UNIQUE INDEX `unique_session_client_scope` (`session_id` ASC, `client_id` ASC, `scope` ASC),
   CONSTRAINT `fk_authorization_code_session`
     FOREIGN KEY (`session_id`)
-    REFERENCES `oic_server`.`session` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `session` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `oic_server`.`access_token`
+-- Table `access_token`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `oic_server`.`access_token` ;
+DROP TABLE IF EXISTS `access_token` ;
 
-CREATE TABLE IF NOT EXISTS `oic_server`.`access_token` (
-  `token` VARCHAR(32) NOT NULL,
-  `session_id` VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS `access_token` (
+  `token` VARCHAR(64) NOT NULL,
+  `session_id` VARCHAR(64) NOT NULL,
   `issue_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
   `type` VARCHAR(32) NOT NULL DEFAULT 'bearer',
-  `scope` VARCHAR(255) NOT NULL,
+  `scope` VARCHAR(255) NULL,
   PRIMARY KEY (`token`),
   INDEX `fk_access_token_session1_idx` (`session_id` ASC),
   CONSTRAINT `fk_access_token_session1`
     FOREIGN KEY (`session_id`)
-    REFERENCES `oic_server`.`session` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `session` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `oic_server`.`refresh_token`
+-- Table `refresh_token`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `oic_server`.`refresh_token` ;
+DROP TABLE IF EXISTS `refresh_token` ;
 
-CREATE TABLE IF NOT EXISTS `oic_server`.`refresh_token` (
-  `token` VARCHAR(32) NOT NULL,
-  `access_token` VARCHAR(32) NOT NULL,
+CREATE TABLE IF NOT EXISTS `refresh_token` (
+  `token` VARCHAR(64) NOT NULL,
+  `access_token` VARCHAR(64) NOT NULL,
   `issue_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
@@ -101,9 +102,9 @@ CREATE TABLE IF NOT EXISTS `oic_server`.`refresh_token` (
   INDEX `fk_refresh_token_access_token1_idx` (`access_token` ASC),
   CONSTRAINT `fk_refresh_token_access_token1`
     FOREIGN KEY (`access_token`)
-    REFERENCES `oic_server`.`access_token` (`token`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES `access_token` (`token`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
