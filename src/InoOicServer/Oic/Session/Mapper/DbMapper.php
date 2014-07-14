@@ -39,7 +39,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
      */
     public function fetch($id)
     {
-        // $sql = new \Zend\Db\Sql\Sql($this->getDbAdapter());
         $select = $this->getSql()->select();
         $select->from('session');
         $select->where('id = :id');

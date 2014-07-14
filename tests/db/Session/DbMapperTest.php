@@ -1,13 +1,13 @@
 <?php
 
-namespace InoOicServerTest\Db;
+namespace InoOicServerTest\Db\Session;
 
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
 use InoOicServer\Test\DbUnit\ArrayDataSet;
 use InoOicServer\Oic\Session\Mapper\DbMapper;
 
 
-class SessionMapperTest extends AbstractDatabaseTestCase
+class DbMapperTest extends AbstractDatabaseTestCase
 {
 
     /**
