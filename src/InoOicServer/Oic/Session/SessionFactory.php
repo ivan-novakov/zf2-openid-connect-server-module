@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Oic\Session;
 
+use InoOicServer\Oic\EntityFactoryInterface;
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\AuthSession;
 use InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface;
@@ -10,7 +11,7 @@ use InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface;
 /**
  * OIC session factory.
  */
-class SessionFactory extends AbstractSessionFactory implements SessionFactoryInterface
+class SessionFactory extends AbstractSessionFactory implements SessionFactoryInterface, EntityFactoryInterface
 {
 
     /**
@@ -48,7 +49,7 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
         $createTime = $dateTimeUtil->createDateTime();
         $expirationTime = $dateTimeUtil->createExpireDateTime($createTime, $age);
         
-        $session = new Session();
+        $session = $this->createEmptyEntity();
         
         $sessionId = $this->getHashGenerator()->generateSessionHash($authSession, $salt);
         
@@ -64,5 +65,15 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
         $session = $this->getHydrator()->hydrate($sessionData, $session);
         
         return $session;
+    }
+
+
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\EntityFactoryInterface::createEmptyEntity()
+     */
+    public function createEmptyEntity()
+    {
+        return new Session();
     }
 }
