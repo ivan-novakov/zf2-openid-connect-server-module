@@ -5,7 +5,7 @@ namespace InoOicServer\Db;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Sql;
 use Zend\Stdlib\Hydrator\HydratorInterface;
-use Zend\Db\Adapter\Adapter as DbAdapter;
+use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use InoOicServer\Oic\EntityFactoryInterface;
 
 
@@ -113,6 +113,15 @@ abstract class AbstractMapper
     }
 
 
+    /**
+     * Executes a query expecting one or zero results. In case of a result, creates a new entity
+     * and hydrates it with tha data.
+     * 
+     * @param Select $select
+     * @param array $params
+     * @throws Exception\InvalidResultException
+     * @return \InoOicServer\Oic\EntityInterface|null
+     */
     public function executeSingleEntityQuery(Select $select, array $params = array())
     {
         $results = $this->executeSelect($select, $params);
@@ -122,7 +131,7 @@ abstract class AbstractMapper
         }
         
         if ($results->count() > 1) {
-            throw new \RuntimeException(sprintf("Expected only one record, %d records has been returned", $results->count()));
+            throw new Exception\InvalidResultException(sprintf("Expected only one record, %d records has been returned", $results->count()));
         }
         
         $data = $results->current();
