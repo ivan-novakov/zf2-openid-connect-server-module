@@ -29,7 +29,7 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         
         $session = new Session();
         $session->setId($sessionId);
-        $session->setAuthenticationSessionId($authSessionId);
+        $session->setAuthSessionId($authSessionId);
         
         $factory = new ResponseFactory();
         

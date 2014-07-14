@@ -30,12 +30,7 @@ class Session
     /**
      * @var string
      */
-    protected $authenticationSessionId;
-
-    /**
-     * @var UserInterface
-     */
-    protected $user;
+    protected $authSessionId;
 
     /**
      * @var DateTime
@@ -55,12 +50,7 @@ class Session
     /**
      * @var string
      */
-    protected $authenticationMethod;
-
-    /**
-     * @var DateTime
-     */
-    protected $authenticationTime;
+    protected $nonce;
 
 
     /**
@@ -84,36 +74,18 @@ class Session
     /**
      * @return string
      */
-    public function getAuthenticationSessionId()
+    public function getAuthSessionId()
     {
-        return $this->authenticationSessionId;
+        return $this->authSessionId;
     }
 
 
     /**
-     * @param string $authenticationSessionId
+     * @param string $authSessionId
      */
-    public function setAuthenticationSessionId($authenticationSessionId)
+    public function setAuthSessionId($authSessionId)
     {
-        $this->authenticationSessionId = $authenticationSessionId;
-    }
-
-
-    /**
-     * @return UserInterface
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
-
-
-    /**
-     * @param UserInterface $user
-     */
-    public function setUser(UserInterface $user)
-    {
-        $this->user = $user;
+        $this->authSessionId = $authSessionId;
     }
 
 
@@ -174,35 +146,17 @@ class Session
     /**
      * @return string
      */
-    public function getAuthenticationMethod()
+    public function getNonce()
     {
-        return $this->authenticationMethod;
+        return $this->nonce;
     }
 
 
     /**
-     * @param string $authenticationMethod
+     * @param string $nonce
      */
-    public function setAuthenticationMethod($authenticationMethod)
+    public function setNonce($nonce)
     {
-        $this->authenticationMethod = $authenticationMethod;
-    }
-
-
-    /**
-     * @return DateTime
-     */
-    public function getAuthenticationTime()
-    {
-        return $this->authenticationTime;
-    }
-
-
-    /**
-     * @param string|DateTime $authenticationTime
-     */
-    public function setAuthenticationTime($authenticationTime)
-    {
-        $this->authenticationTime = $this->convertToDateTime($authenticationTime);
+        $this->nonce = $nonce;
     }
 }

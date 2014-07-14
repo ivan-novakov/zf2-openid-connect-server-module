@@ -22,7 +22,7 @@ class ResponseFactory implements ResponseFactoryInterface
         $response->setRedirectUri($request->getRedirectUri());
         $response->setState($request->getState());
         $response->setCode($authCode->getCode());
-        $response->setAuthSessionId($session->getAuthenticationSessionId());
+        $response->setAuthSessionId($session->getAuthSessionId());
         $response->setSessionId($session->getId());
         
         return $response;
