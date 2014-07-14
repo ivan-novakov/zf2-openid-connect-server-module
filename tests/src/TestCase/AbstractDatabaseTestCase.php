@@ -29,9 +29,26 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
     }
 
 
+    /**
+     * Workaround for https://github.com/sebastianbergmann/dbunit/issues/37.
+     * 
+     * @see https://github.com/sebastianbergmann/dbunit/issues/37#issuecomment-31069778
+     * @return \PHPUnit_Extensions_Database_Operation
+     */
+    protected function getSetUpOperation()
+    {
+        return new \PHPUnit_Extensions_Database_Operation_Composite(array(
+            \PHPUnit_Extensions_Database_Operation_Factory::DELETE_ALL(),
+            \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
+        ));
+    }
+
+
     protected function getDbAdapter()
     {
-        return new Db\Adapter\Adapter($this->getDbConfig()->get('adapter')->toArray());
+        return new Db\Adapter\Adapter($this->getDbConfig()
+            ->get('adapter')
+            ->toArray());
     }
 
 
