@@ -3,11 +3,12 @@
 namespace InoOicServer\Oic\AuthSession;
 
 use DateTime;
+use InoOicServer\Oic\EntityInterface;
 use InoOicServer\Oic\User\UserInterface;
 use InoOicServer\Util\ConvertToDateTimeTrait;
 
 
-class AuthSession
+class AuthSession implements EntityInterface
 {
     
     use ConvertToDateTimeTrait;

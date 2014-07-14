@@ -3,6 +3,7 @@
 namespace InoOicServer\Oic\Session;
 
 use DateTime;
+use InoOicServer\Oic\EntityInterface;
 use InoOicServer\Util\ConvertToDateTimeTrait;
 use InoOicServer\Oic\User\UserInterface;
 
@@ -15,7 +16,7 @@ use InoOicServer\Oic\User\UserInterface;
  * - user data
  * 
  */
-class Session
+class Session implements EntityInterface
 {
     /**
      * Used to convert datetime values in the setters.

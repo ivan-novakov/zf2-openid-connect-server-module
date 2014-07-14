@@ -2,14 +2,15 @@
 
 namespace InoOicServer\Oic\AuthCode;
 
-use InoOicServer\Util\ConvertToDateTimeTrait;
 use DateTime;
+use InoOicServer\Oic\EntityInterface;
+use InoOicServer\Util\ConvertToDateTimeTrait;
 
 
 /**
  * The OIC authentication code entity.
  */
-class AuthCode
+class AuthCode implements EntityInterface
 {
     
     use ConvertToDateTimeTrait;

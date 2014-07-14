@@ -2,11 +2,13 @@
 
 namespace InoOicServer\Oic\Client;
 
+use InoOicServer\Oic\EntityInterface;
+
 
 /**
  * Client (application) entity.
  */
-class Client
+class Client implements EntityInterface
 {
 
     /**

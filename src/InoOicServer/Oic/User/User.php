@@ -2,10 +2,11 @@
 
 namespace InoOicServer\Oic\User;
 
+use InoOicServer\Oic\EntityInterface;
 use InoOicServer\Oic\User\UserInterface;
 
 
-class User implements UserInterface
+class User implements UserInterface, EntityInterface
 {
 
     /**
