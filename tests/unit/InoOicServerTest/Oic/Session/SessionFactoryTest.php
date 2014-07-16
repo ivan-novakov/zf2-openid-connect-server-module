@@ -53,6 +53,12 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
         
         $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
     }
+
+
+    public function testCreateEmptyEntity()
+    {
+        $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $this->factory->createEmptyEntity());
+    }
     
     /*
      * 

@@ -10,6 +10,7 @@ use InoOicServer\Oic\Session\SessionFactory;
 use InoOicServer\Oic\EntityFactoryInterface;
 use InoOicServer\Oic\Session\Session;
 use InoOicServer\Db\AbstractMapper;
+use InoOicServer\Oic\EntityInterface;
 
 
 /**
@@ -40,6 +41,12 @@ class DbMapper extends AbstractMapper implements MapperInterface
     }
 
 
+    public function existsEntity($sessionId)
+    {
+        return (null !== $this->fetch($sessionId));
+    }
+
+
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\Session\Mapper\MapperInterface::save()
@@ -47,23 +54,9 @@ class DbMapper extends AbstractMapper implements MapperInterface
     public function save(Session $session)
     {
         $sessionData = $this->getHydrator()->extract($session);
+        //$sessionData = $this->convertDateTimeValues($sessionData);
         
-        $sessionData['create_time'] = $this->toDbDateTimeString($sessionData['create_time']);
-        $sessionData['modify_time'] = $this->toDbDateTimeString($sessionData['modify_time']);
-        $sessionData['expiration_time'] = $this->toDbDateTimeString($sessionData['expiration_time']);
-        
-        if ($this->fetch($session->getId())) {
-            $sqlObject = $this->getSql()->update();
-            $sqlObject->table('session');
-            $sqlObject->set($sessionData);
-        } else {
-            $sqlObject = $this->getSql()->insert();
-            $sqlObject->into('session');
-            $sqlObject->values($sessionData);
-        }
-        
-        $statement = $this->getSql()->prepareStatementForSqlObject($sqlObject);
-        $statement->execute();
+        $this->createOrUpdateEntity($session->getId(), 'session', $sessionData);
     }
 
 

@@ -8,6 +8,7 @@ use Zend\Db\Sql\Sql;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use InoOicServer\Oic\EntityFactoryInterface;
+use InoOicServer\Oic\EntityInterface;
 
 
 abstract class AbstractMapper
@@ -115,6 +116,15 @@ abstract class AbstractMapper
 
 
     /**
+     * Returns true if an entity with the provided identifier exists in the storage.
+     * 
+     * @param mixed $identifier
+     * @return boolean
+     */
+    abstract public function existsEntity($identifier);
+
+
+    /**
      * Executes a query expecting one or zero results. In case of a result, creates a new entity
      * and hydrates it with tha data.
      * 
@@ -152,14 +162,19 @@ abstract class AbstractMapper
     }
 
 
-    /**
-     * Converts a DateTime object into datetime string suitable for database insertion.
-     * 
-     * @param DateTime $dateTime
-     * @return string
-     */
-    public function toDbDateTimeString(DateTime $dateTime)
+    protected function createOrUpdateEntity($entityIdentifier, $entityTable, array $entityData)
     {
-        return $dateTime->format('Y-m-d H:i:s');
+        if ($this->existsEntity($entityIdentifier)) {
+            $sqlObject = $this->getSql()->update();
+            $sqlObject->table($entityTable);
+            $sqlObject->set($entityData);
+        } else {
+            $sqlObject = $this->getSql()->insert();
+            $sqlObject->into($entityTable);
+            $sqlObject->values($entityData);
+        }
+        
+        $statement = $this->getSql()->prepareStatementForSqlObject($sqlObject);
+        $statement->execute();
     }
 }

@@ -13,14 +13,12 @@ class DbMapperTest extends AbstractDatabaseTestCase
 {
 
     /**
-     * @var 
+     * @var DbMapper
      */
     protected $mapper;
 
-    protected $rawTableData = array();
 
-
-    protected function getDataSet()
+    protected function getRawTableData()
     {
         $this->rawTableData = array(
             'auth_session' => array(
@@ -73,9 +71,8 @@ class DbMapperTest extends AbstractDatabaseTestCase
                 )
             )
         );
-        $dataSet = $this->createArrayDataSet($this->rawTableData);
         
-        return $dataSet;
+        return $this->rawTableData;
     }
 
 
@@ -222,9 +219,9 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
         $this->assertSame('dummy_session_id', $session->getId());
         $this->assertSame('dummy_auth_session_id', $session->getAuthSessionId());
-        $this->assertEquals(new \DateTime('2014-07-10 10:00:01'), $session->getCreateTime());
-        $this->assertEquals(new \DateTime('2014-07-10 10:00:10'), $session->getModifyTime());
-        $this->assertEquals(new \DateTime('2014-07-10 11:00:10'), $session->getExpirationTime());
+        $this->assertEquals('2014-07-10 10:00:01', $this->toDbDateTimeString($session->getCreateTime()));
+        $this->assertEquals('2014-07-10 10:00:10', $this->toDbDateTimeString($session->getModifyTime()));
+        $this->assertEquals('2014-07-10 11:00:10', $this->toDbDateTimeString($session->getExpirationTime()));
         $this->assertSame('dummy_nonce', $session->getNonce());
     }
 }

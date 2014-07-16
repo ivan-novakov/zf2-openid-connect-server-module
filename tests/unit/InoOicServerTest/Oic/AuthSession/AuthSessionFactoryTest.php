@@ -88,6 +88,12 @@ class AuthSessionFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new \DateTime('2014-06-05 10:02:00'), $authSession->getExpirationTime());
         $this->assertSame($user, $authSession->getUser());
     }
+
+
+    public function testCreateEmptyEntity()
+    {
+        $this->assertInstanceOf('InoOicServer\Oic\AuthSession\AuthSession', $this->factory->createEmptyEntity());
+    }
     
     /*
      * 

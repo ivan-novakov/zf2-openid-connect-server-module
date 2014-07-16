@@ -2,9 +2,9 @@
 
 namespace InoOicServer\Oic\Session;
 
-use Zend\Stdlib\Hydrator\ClassMethods;
+use InoOicServer\Oic\EntityHydrator;
 
 
-class SessionHydrator extends ClassMethods
+class SessionHydrator extends EntityHydrator
 {
 }

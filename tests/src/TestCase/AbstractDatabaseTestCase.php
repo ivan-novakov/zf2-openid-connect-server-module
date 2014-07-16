@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Test\TestCase;
 
+use DateTime;
 use Zend\Db;
 use Zend\Config\Config;
 use InoOicServer\Test\DbUnit\ArrayDataSet;
@@ -16,6 +17,8 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
 
     protected $dbConfig;
 
+    protected $rawTableData;
+
 
     final public function getConnection()
     {
@@ -27,6 +30,28 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
         }
         
         return $this->conn;
+    }
+
+
+    public function getDataSet()
+    {
+        return $this->createArrayDataSet($this->getRawTableData());
+    }
+
+
+    protected function getRawTableData()
+    {
+        if (null === $this->rawTableData) {
+            $this->rawTableData = $this->createRawTableData();
+        }
+        
+        return $this->rawTableData;
+    }
+
+
+    protected function createRawTableData()
+    {
+        return array();
     }
 
 
@@ -83,5 +108,11 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
         }
         
         return $this->dbConfig;
+    }
+
+
+    protected function toDbDateTimeString(DateTime $dateTime)
+    {
+        return $dateTime->format('Y-m-d H:i:s');
     }
 }

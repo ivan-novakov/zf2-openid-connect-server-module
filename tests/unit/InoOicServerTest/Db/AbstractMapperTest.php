@@ -96,13 +96,6 @@ class AbstractMapperTest extends \PHPUnit_Framework_TestCase
         
         $mapper->executeSingleEntityQuery($select, $params);
     }
-
-
-    public function testToDbDateTimeString()
-    {
-        $dtString = '2010-05-06 07:08:09';
-        $this->assertSame($dtString, $this->mapper->toDbDateTimeString(new \DateTime($dtString)));
-    }
     
     /*
      * 

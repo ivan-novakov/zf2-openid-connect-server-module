@@ -34,6 +34,16 @@ class AuthSession implements EntityInterface
     protected $expirationTime;
 
     /**
+     * @var string
+     */
+    protected $userId;
+
+    /**
+     * @var string
+     */
+    protected $userData;
+
+    /**
      * @var UserInterface
      */
     protected $user;
@@ -112,6 +122,38 @@ class AuthSession implements EntityInterface
 
 
     /**
+     * @return string
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+	/**
+     * @param string $userId
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+    }
+
+	/**
+     * @return string
+     */
+    public function getUserData()
+    {
+        return $this->userData;
+    }
+
+	/**
+     * @param string $userData
+     */
+    public function setUserData($userData)
+    {
+        $this->userData = $userData;
+    }
+
+	/**
      * @return UserInterface
      */
     public function getUser()

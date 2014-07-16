@@ -7,9 +7,10 @@ use InoOicServer\Oic\User\UserInterface;
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGeneratorInterface;
 use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGenerator;
+use InoOicServer\Oic\EntityFactoryInterface;
 
 
-class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface
+class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface, EntityFactoryInterface
 {
 
     /**
@@ -59,7 +60,7 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         
         $authSessionId = $this->getHashGenerator()->generateAuthSessionHash($authStatus, $salt);
         
-        $authSession = new AuthSession();
+        $authSession = $this->createEmptyEntity();
         $authSession->setId($authSessionId);
         $authSession->setMethod($authStatus->getMethod());
         
@@ -69,5 +70,15 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         $authSession->setUser($user);
         
         return $authSession;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Oic\EntityFactoryInterface::createEmptyEntity()
+     */
+    public function createEmptyEntity()
+    {
+        return new AuthSession();
     }
 }
