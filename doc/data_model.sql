@@ -72,7 +72,7 @@ DROP TABLE IF EXISTS `access_token` ;
 CREATE TABLE IF NOT EXISTS `access_token` (
   `token` VARCHAR(64) NOT NULL,
   `session_id` VARCHAR(64) NOT NULL,
-  `issue_time` DATETIME NOT NULL,
+  `create_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
   `type` VARCHAR(32) NOT NULL DEFAULT 'bearer',
@@ -95,7 +95,7 @@ DROP TABLE IF EXISTS `refresh_token` ;
 CREATE TABLE IF NOT EXISTS `refresh_token` (
   `token` VARCHAR(64) NOT NULL,
   `access_token` VARCHAR(64) NOT NULL,
-  `issue_time` DATETIME NOT NULL,
+  `create_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`token`),
