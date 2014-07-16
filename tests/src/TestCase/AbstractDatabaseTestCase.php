@@ -4,6 +4,7 @@ namespace InoOicServer\Test\TestCase;
 
 use Zend\Db;
 use Zend\Config\Config;
+use InoOicServer\Test\DbUnit\ArrayDataSet;
 
 
 abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_TestCase
@@ -41,6 +42,12 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
             \PHPUnit_Extensions_Database_Operation_Factory::DELETE_ALL(),
             \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
         ));
+    }
+
+
+    protected function createArrayDataSet(array $data)
+    {
+        return new ArrayDataSet($data);
     }
 
 

@@ -5,6 +5,8 @@ namespace InoOicServerTest\Db\Session;
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
 use InoOicServer\Test\DbUnit\ArrayDataSet;
 use InoOicServer\Oic\Session\Mapper\DbMapper;
+use InoOicServer\Oic\Session\Session;
+use Zend\Stdlib\Hydrator\ClassMethods;
 
 
 class DbMapperTest extends AbstractDatabaseTestCase
@@ -15,10 +17,12 @@ class DbMapperTest extends AbstractDatabaseTestCase
      */
     protected $mapper;
 
+    protected $rawTableData = array();
+
 
     protected function getDataSet()
     {
-        $dataSet = new ArrayDataSet(array(
+        $this->rawTableData = array(
             'auth_session' => array(
                 array(
                     'id' => 'dummy_auth_session_id',
@@ -27,6 +31,14 @@ class DbMapperTest extends AbstractDatabaseTestCase
                     'expiration_time' => '2014-07-10 11:00:00',
                     'user_id' => 'testuser',
                     'user_data' => 'fake_user_data'
+                ),
+                array(
+                    'id' => 'dummy_new_auth_session_id',
+                    'method' => 'dummy_auth',
+                    'create_time' => '2014-07-11 09:00:00',
+                    'expiration_time' => '2014-07-11 10:00:00',
+                    'user_id' => 'otheruser',
+                    'user_data' => 'other_fake_user_data'
                 )
             ),
             'session' => array(
@@ -48,8 +60,20 @@ class DbMapperTest extends AbstractDatabaseTestCase
                     'client_id' => 'dummy_client_id',
                     'scope' => 'dummy scope'
                 )
+            ),
+            'access_token' => array(
+                array(
+                    'token' => 'dummy_access_token',
+                    'session_id' => 'dummy_session_id',
+                    'create_time' => '2014-07-10 10:00:03',
+                    'expiration_time' => '2014-07-10 12:00:03',
+                    'client_id' => 'dummy_client_id',
+                    'type' => 'foo',
+                    'scope' => 'dummy scope'
+                )
             )
-        ));
+        );
+        $dataSet = $this->createArrayDataSet($this->rawTableData);
         
         return $dataSet;
     }
@@ -59,6 +83,63 @@ class DbMapperTest extends AbstractDatabaseTestCase
     {
         parent::setUp();
         $this->mapper = new DbMapper($this->getDbAdapter());
+    }
+
+
+    public function testSaveNewSession()
+    {
+        $sessionData = array(
+            'id' => 'new_dummy_session_id',
+            'auth_session_id' => 'dummy_new_auth_session_id',
+            'create_time' => '2014-07-11 09:10:00',
+            'modify_time' => '2014-07-11 09:10:00',
+            'expiration_time' => '2014-07-11 10:10:00',
+            'nonce' => 'other_dummy_nonce'
+        );
+        
+        $session = new Session();
+        $hydrator = new ClassMethods();
+        $session = $hydrator->hydrate($sessionData, $session);
+        
+        $this->mapper->save($session);
+        
+        $queryTable = $this->getConnection()->createQueryTable('session', sprintf("SELECT * FROM session", $sessionData['id']));
+        $expectedTable = $this->createArrayDataSet(array(
+            'session' => array(
+                $this->rawTableData['session'][0],
+                $sessionData
+            )
+        ))->getTable('session');
+        
+        $this->assertTablesEqual($expectedTable, $queryTable);
+    }
+
+
+    public function testSaveExistingSession()
+    {
+        $sessionData = array(
+            'id' => 'dummy_session_id',
+            'auth_session_id' => 'dummy_new_auth_session_id',
+            'create_time' => '2014-07-11 09:10:00',
+            'modify_time' => '2014-07-11 09:10:00',
+            'expiration_time' => '2014-07-11 10:10:00',
+            'nonce' => 'other_dummy_nonce'
+        );
+        
+        $session = new Session();
+        $hydrator = new ClassMethods();
+        $session = $hydrator->hydrate($sessionData, $session);
+        
+        $this->mapper->save($session);
+        
+        $queryTable = $this->getConnection()->createQueryTable('session', sprintf("SELECT * FROM session", $sessionData['id']));
+        $expectedTable = $this->createArrayDataSet(array(
+            'session' => array(
+                $sessionData
+            )
+        ))->getTable('session');
+        
+        $this->assertTablesEqual($expectedTable, $queryTable);
     }
 
 
@@ -90,11 +171,60 @@ class DbMapperTest extends AbstractDatabaseTestCase
     }
 
 
+    public function testFetchByAccessToken()
+    {
+        $token = 'dummy_access_token';
+        $session = $this->mapper->fetchByAccessToken($token);
+        
+        $this->assertValidSession($session);
+    }
+
+
+    public function testFetchByAcessTokenNotFound()
+    {
+        $this->assertNull($this->mapper->fetchByAccessToken('non_existent_token'));
+    }
+
+
+    public function testFetchByUserId()
+    {
+        $userId = 'testuser';
+        $session = $this->mapper->fetchByUserId($userId);
+        
+        $this->assertValidSession($session);
+    }
+
+
+    public function testFetchByUserIdNotFound()
+    {
+        $this->assertNull($this->mapper->fetchByUserId('non_existent_user_id'));
+    }
+
+
+    public function testFetchByAuthSessionId()
+    {
+        $authSessionId = 'dummy_auth_session_id';
+        $session = $this->mapper->fetchByAuthSessionId($authSessionId);
+        
+        $this->assertValidSession($session);
+    }
+
+
+    public function testFetchByAuthSessionIdNotFound()
+    {
+        $this->assertNull($this->mapper->fetchByAuthSessionId('non_existent_auth_session_id'));
+    }
+    
+    // --------------------------------
     protected function assertValidSession($session)
     {
+        /* @var $session \InoOicServer\Oic\Session\Session */
         $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
         $this->assertSame('dummy_session_id', $session->getId());
         $this->assertSame('dummy_auth_session_id', $session->getAuthSessionId());
         $this->assertEquals(new \DateTime('2014-07-10 10:00:01'), $session->getCreateTime());
+        $this->assertEquals(new \DateTime('2014-07-10 10:00:10'), $session->getModifyTime());
+        $this->assertEquals(new \DateTime('2014-07-10 11:00:10'), $session->getExpirationTime());
+        $this->assertSame('dummy_nonce', $session->getNonce());
     }
 }
