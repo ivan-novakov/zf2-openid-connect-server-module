@@ -46,7 +46,6 @@ class AuthCodeFactory extends AbstractSessionFactory implements AuthCodeFactoryI
      */
     public function createAuthCode(Session $session, Client $client, $age, $salt, $scope = null)
     {
-        $authCode = new AuthCode();
         $authCodeHash = $this->getHashGenerator()->generateAuthCodeHash($session, $salt);
         
         $dateTimeUtil = $this->getDateTimeUtil();
@@ -62,8 +61,16 @@ class AuthCodeFactory extends AbstractSessionFactory implements AuthCodeFactoryI
             'scope' => $scope
         );
         
-        $authCode = $this->getHydrator()->hydrate($data, $authCode);
-        
-        return $authCode;
+        return $this->createEntityFromData($data);
+    }
+
+
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\EntityFactoryInterface::createEmptyEntity()
+     */
+    public function createEmptyEntity()
+    {
+        return new AuthCode();
     }
 }

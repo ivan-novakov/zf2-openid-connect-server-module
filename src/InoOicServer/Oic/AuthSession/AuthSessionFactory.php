@@ -10,7 +10,7 @@ use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGenerator;
 use InoOicServer\Oic\EntityFactoryInterface;
 
 
-class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface, EntityFactoryInterface
+class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface
 {
 
     /**
@@ -57,19 +57,19 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         }
         
         $createTime = $authStatus->getTime();
+        $expirationTime = $this->getDateTimeUtil()->createExpireDateTime($createTime, 'PT' . $age . 'S');
         
         $authSessionId = $this->getHashGenerator()->generateAuthSessionHash($authStatus, $salt);
         
-        $authSession = $this->createEmptyEntity();
-        $authSession->setId($authSessionId);
-        $authSession->setMethod($authStatus->getMethod());
+        $authSessionData = array(
+            'id' => $authSessionId,
+            'method' => $authStatus->getMethod(),
+            'create_time' => $createTime,
+            'expiration_time' => $expirationTime,
+            'user' => $user
+        );
         
-        $authSession->setCreateTime($createTime);
-        $authSession->setExpirationTime($this->getDateTimeUtil()
-            ->createExpireDateTime($createTime, 'PT' . $age . 'S'));
-        $authSession->setUser($user);
-        
-        return $authSession;
+        return $this->createEntityFromData($authSessionData);
     }
 
 

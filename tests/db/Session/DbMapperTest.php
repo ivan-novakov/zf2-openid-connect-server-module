@@ -3,10 +3,8 @@
 namespace InoOicServerTest\Db\Session;
 
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
-use InoOicServer\Test\DbUnit\ArrayDataSet;
 use InoOicServer\Oic\Session\Mapper\DbMapper;
 use InoOicServer\Oic\Session\Session;
-use Zend\Stdlib\Hydrator\ClassMethods;
 
 
 class DbMapperTest extends AbstractDatabaseTestCase
@@ -94,10 +92,7 @@ class DbMapperTest extends AbstractDatabaseTestCase
             'nonce' => 'other_dummy_nonce'
         );
         
-        $session = new Session();
-        $hydrator = new ClassMethods();
-        $session = $hydrator->hydrate($sessionData, $session);
-        
+        $session = $this->mapper->getHydrator()->hydrate($sessionData, new Session());
         $this->mapper->save($session);
         
         $queryTable = $this->getConnection()->createQueryTable('session', sprintf("SELECT * FROM session", $sessionData['id']));
@@ -123,9 +118,7 @@ class DbMapperTest extends AbstractDatabaseTestCase
             'nonce' => 'other_dummy_nonce'
         );
         
-        $session = new Session();
-        $hydrator = new ClassMethods();
-        $session = $hydrator->hydrate($sessionData, $session);
+        $session = $this->mapper->getHydrator()->hydrate($sessionData, new Session());
         
         $this->mapper->save($session);
         

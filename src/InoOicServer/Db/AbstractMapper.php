@@ -125,6 +125,19 @@ abstract class AbstractMapper
 
 
     /**
+     * Creates a new entity instance and hydrates it with the provided data.
+     * 
+     * @param array $entityData
+     * @return EntityInterface
+     */
+    public function createEntityFromData(array $entityData)
+    {
+        return $this->getHydrator()->hydrate($entityData, $this->getFactory()
+            ->createEmptyEntity());
+    }
+
+
+    /**
      * Executes a query expecting one or zero results. In case of a result, creates a new entity
      * and hydrates it with tha data.
      * 
@@ -145,9 +158,7 @@ abstract class AbstractMapper
             throw new Exception\InvalidResultException(sprintf("Expected only one record, %d records has been returned", $results->count()));
         }
         
-        $data = $results->current();
-        $entity = $this->getHydrator()->hydrate($data, $this->getFactory()
-            ->createEmptyEntity());
+        $entity = $this->createEntityFromData($results->current());
         
         return $entity;
     }

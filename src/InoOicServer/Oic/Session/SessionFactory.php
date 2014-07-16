@@ -11,7 +11,7 @@ use InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface;
 /**
  * OIC session factory.
  */
-class SessionFactory extends AbstractSessionFactory implements SessionFactoryInterface, EntityFactoryInterface
+class SessionFactory extends AbstractSessionFactory implements SessionFactoryInterface
 {
 
     /**
@@ -49,8 +49,6 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
         $createTime = $dateTimeUtil->createDateTime();
         $expirationTime = $dateTimeUtil->createExpireDateTime($createTime, $age);
         
-        $session = $this->createEmptyEntity();
-        
         $sessionId = $this->getHashGenerator()->generateSessionHash($authSession, $salt);
         
         $sessionData = array(
@@ -62,9 +60,7 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
             'nonce' => $nonce
         );
         
-        $session = $this->getHydrator()->hydrate($sessionData, $session);
-        
-        return $session;
+        return $this->createEntityFromData($sessionData);
     }
 
 
