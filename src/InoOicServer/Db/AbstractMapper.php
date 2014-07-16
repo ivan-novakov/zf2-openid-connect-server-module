@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Db;
 
+use DateTime;
 use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Sql;
 use Zend\Stdlib\Hydrator\HydratorInterface;
@@ -148,5 +149,17 @@ abstract class AbstractMapper
         $results = $statement->execute($params);
         
         return $results;
+    }
+
+
+    /**
+     * Converts a DateTime object into datetime string suitable for database insertion.
+     * 
+     * @param DateTime $dateTime
+     * @return string
+     */
+    public function toDbDateTimeString(DateTime $dateTime)
+    {
+        return $dateTime->format('Y-m-d H:i:s');
     }
 }
