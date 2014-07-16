@@ -49,7 +49,7 @@ DROP TABLE IF EXISTS `authorization_code` ;
 CREATE TABLE IF NOT EXISTS `authorization_code` (
   `code` VARCHAR(64) NOT NULL,
   `session_id` VARCHAR(64) NOT NULL,
-  `issue_time` DATETIME NOT NULL,
+  `create_time` DATETIME NOT NULL,
   `expiration_time` DATETIME NOT NULL,
   `client_id` VARCHAR(255) NOT NULL,
   `scope` VARCHAR(255) NULL,
