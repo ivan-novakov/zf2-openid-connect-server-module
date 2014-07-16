@@ -50,7 +50,15 @@ class DbMapper extends AbstractMapper implements MapperInterface
 
 
     public function fetchByCode($authCode)
-    {}
+    {
+        $select = $this->getSql()->select();
+        $select->from('session')->join('authorization_code', 'session.id = authorization_code.session_id', array());
+        $select->where('authorization_code.code = :code');
+        
+        return $this->executeSingleEntityQuery($select, array(
+            'code' => $authCode
+        ));
+    }
 
 
     public function fetchByAccessToken($accessToken)
