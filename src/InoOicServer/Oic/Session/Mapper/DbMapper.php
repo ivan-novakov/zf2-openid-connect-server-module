@@ -2,6 +2,7 @@
 
 namespace InoOicServer\Oic\Session\Mapper;
 
+use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Oic\Session\SessionHydrator;
@@ -21,11 +22,11 @@ class DbMapper extends AbstractMapper implements MapperInterface
     /**
      * Constructor.
      * 
-     * @param unknown $dbAdapter
+     * @param DbAdapter $dbAdapter
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct($dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
     {
         if (null === $factory) {
             $factory = new SessionFactory();
