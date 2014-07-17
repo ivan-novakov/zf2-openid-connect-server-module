@@ -1,24 +1,19 @@
 <?php
-
 namespace InoOicServer\Oic\Session\Mapper;
 
 use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use Zend\Stdlib\Hydrator\HydratorInterface;
-use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Oic\Session\SessionHydrator;
 use InoOicServer\Oic\Session\SessionFactory;
 use InoOicServer\Oic\EntityFactoryInterface;
 use InoOicServer\Oic\Session\Session;
 use InoOicServer\Db\AbstractMapper;
-use InoOicServer\Oic\EntityInterface;
-
 
 /**
  * Session database mapper.
  */
 class DbMapper extends AbstractMapper implements MapperInterface
 {
-
 
     /**
      * Constructor.
@@ -27,8 +22,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null,
-        HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
     {
         if (null === $hydrator) {
             $hydrator = new SessionHydrator();
@@ -42,7 +36,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Db\AbstractMapper::existsEntity()
@@ -51,7 +44,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
     {
         return (null !== $this->fetch($sessionId));
     }
-
 
     /**
      * {@inheritdoc}
@@ -63,7 +55,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
 
         $this->createOrUpdateEntity($session->getId(), 'session', $sessionData);
     }
-
 
     /**
      * {@inhertidoc}
@@ -80,7 +71,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         ));
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\Session\Mapper\MapperInterface::fetchByCode()
@@ -95,7 +85,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
             'code' => $authCode
         ));
     }
-
 
     /**
      * {@inheritdoc}
@@ -112,7 +101,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         ));
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\Session\Mapper\MapperInterface::fetchByUserId()
@@ -128,7 +116,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         ));
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\Session\Mapper\MapperInterface::fetchByAuthSessionId()
@@ -139,9 +126,8 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select->from('session')->join('auth_session', 'session.auth_session_id = auth_session.id', array());
         $select->where('auth_session.id = :auth_session_id');
 
-        return $this->executeSingleEntityQuery($select,
-            array(
-                'auth_session_id' => $authSessionId
-            ));
+        return $this->executeSingleEntityQuery($select, array(
+            'auth_session_id' => $authSessionId
+        ));
     }
 }

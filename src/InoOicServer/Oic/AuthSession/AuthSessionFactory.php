@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer\Oic\AuthSession;
 
 use InoOicServer\Oic\User;
@@ -7,8 +6,6 @@ use InoOicServer\Oic\User\UserInterface;
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGeneratorInterface;
 use InoOicServer\Oic\AuthSession\Hash\AuthSessionHashGenerator;
-use InoOicServer\Oic\EntityFactoryInterface;
-
 
 class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFactoryInterface
 {
@@ -18,7 +15,6 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
      */
     protected $hashGenerator;
 
-
     /**
      * @return AuthSessionHashGeneratorInterface
      */
@@ -27,10 +23,9 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         if (! $this->hashGenerator instanceof AuthSessionHashGeneratorInterface) {
             $this->hashGenerator = new AuthSessionHashGenerator();
         }
-        
+
         return $this->hashGenerator;
     }
-
 
     /**
      * @param AuthSessionHashGeneratorInterface $hashGenerator
@@ -39,7 +34,6 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
     {
         $this->hashGenerator = $hashGenerator;
     }
-
 
     /**
      * {@inheritdoc}
@@ -50,17 +44,17 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
         if (! $authStatus->isAuthenticated()) {
             throw new Exception\UnauthenticatedUserException('Unauthenticated user - cannot create auth session');
         }
-        
+
         $user = $authStatus->getIdentity();
         if (! $user instanceof UserInterface) {
             throw new Exception\UnknownIdentityException('Missing user identity in authentication status');
         }
-        
+
         $createTime = $authStatus->getTime();
         $expirationTime = $this->getDateTimeUtil()->createExpireDateTime($createTime, 'PT' . $age . 'S');
-        
+
         $authSessionId = $this->getHashGenerator()->generateAuthSessionHash($authStatus, $salt);
-        
+
         $authSessionData = array(
             'id' => $authSessionId,
             'method' => $authStatus->getMethod(),
@@ -68,10 +62,9 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
             'expiration_time' => $expirationTime,
             'user' => $user
         );
-        
+
         return $this->createEntityFromData($authSessionData);
     }
-
 
     /**
      * {@inheritdoc}

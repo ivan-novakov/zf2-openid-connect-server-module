@@ -1,18 +1,16 @@
 <?php
-
 namespace InoOicServer\Oic\AuthSession\Mapper;
 
+use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use InoOicServer\Oic\AuthSession\AuthSession;
 use InoOicServer\Oic\AuthSession\AuthSessionFactory;
 use InoOicServer\Oic\AuthSession\AuthSessionHydrator;
 use InoOicServer\Db\AbstractMapper;
-use InoOicServer\Oic\EntityInterface;
-
+use InoOicServer\Oic\EntityFactoryInterface;
 
 class DbMapper extends AbstractMapper implements MapperInterface
 {
-
 
     /**
      * Constructor.
@@ -21,8 +19,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null,
-        HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
     {
         if (null === $hydrator) {
             $hydrator = new AuthSessionHydrator();
@@ -36,7 +33,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Db\AbstractMapper::existsEntity()
@@ -45,7 +41,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
     {
         return (null !== $this->fetch($authSessionId));
     }
-
 
     /**
      * {@inheritdoc}
@@ -57,7 +52,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
 
         $this->createOrUpdateEntity($authSession->getId(), 'auth_session', $authSessionData);
     }
-
 
     /**
      * {@inheritdoc}

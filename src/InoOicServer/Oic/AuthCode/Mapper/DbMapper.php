@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer\Oic\AuthCode\Mapper;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
@@ -10,10 +9,8 @@ use InoOicServer\Oic\EntityFactoryInterface;
 use InoOicServer\Oic\AuthCode\AuthCodeFactory;
 use InoOicServer\Oic\AuthCode\AuthCodeHydrator;
 
-
 class DbMapper extends AbstractMapper implements MapperInterface
 {
-
 
     /**
      * Constructor.
@@ -22,8 +19,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null,
-        HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
     {
         if (null === $hydrator) {
             $hydrator = new AuthCodeHydrator();
@@ -37,7 +33,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Db\AbstractMapper::existsEntity()
@@ -46,7 +41,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
     {
         return (null !== $this->fetch($code));
     }
-
 
     /**
      * {@inheritdoc}
@@ -57,7 +51,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $authCodeData = $this->getHydrator()->extract($authCode);
         $this->createOrUpdateEntity($authCode->getCode(), 'authorization_code', $authCodeData);
     }
-
 
     /**
      * {@inheritdoc}
@@ -74,7 +67,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         ));
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthCode\Mapper\MapperInterface::fetchBySession()
@@ -88,13 +80,11 @@ class DbMapper extends AbstractMapper implements MapperInterface
             'client_id = :client_id'
         ));
 
-        return $this->executeSingleEntityQuery($select,
-            array(
-                'session_id' => $sessionId,
-                'client_id' => $clientId
-            ));
+        return $this->executeSingleEntityQuery($select, array(
+            'session_id' => $sessionId,
+            'client_id' => $clientId
+        ));
     }
-
 
     public function delete($code)
     {}

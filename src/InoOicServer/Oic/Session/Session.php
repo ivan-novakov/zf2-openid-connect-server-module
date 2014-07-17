@@ -1,20 +1,17 @@
 <?php
-
 namespace InoOicServer\Oic\Session;
 
 use DateTime;
 use InoOicServer\Oic\EntityInterface;
 use InoOicServer\Util\ConvertToDateTimeTrait;
-use InoOicServer\Oic\User\UserInterface;
-
 
 /**
  * The OIC session entity.
- * 
+ *
  * Holds user data for a period of time:
  * - user authentication
  * - user data
- * 
+ *
  */
 class Session implements EntityInterface
 {
@@ -53,7 +50,6 @@ class Session implements EntityInterface
      */
     protected $nonce;
 
-
     /**
      * @return string
      */
@@ -61,7 +57,6 @@ class Session implements EntityInterface
     {
         return $this->id;
     }
-
 
     /**
      * @param string $id
@@ -71,7 +66,6 @@ class Session implements EntityInterface
         $this->id = $id;
     }
 
-
     /**
      * @return string
      */
@@ -79,7 +73,6 @@ class Session implements EntityInterface
     {
         return $this->authSessionId;
     }
-
 
     /**
      * @param string $authSessionId
@@ -89,7 +82,6 @@ class Session implements EntityInterface
         $this->authSessionId = $authSessionId;
     }
 
-
     /**
      * @return DateTime
      */
@@ -97,7 +89,6 @@ class Session implements EntityInterface
     {
         return $this->createTime;
     }
-
 
     /**
      * @param string|DateTime $createTime
@@ -107,7 +98,6 @@ class Session implements EntityInterface
         $this->createTime = $this->convertToDateTime($createTime);
     }
 
-
     /**
      * @return DateTime
      */
@@ -115,7 +105,6 @@ class Session implements EntityInterface
     {
         return $this->modifyTime;
     }
-
 
     /**
      * @param string|DateTime $modifyTime
@@ -125,7 +114,6 @@ class Session implements EntityInterface
         $this->modifyTime = $this->convertToDateTime($modifyTime);
     }
 
-
     /**
      * @return DateTime
      */
@@ -133,7 +121,6 @@ class Session implements EntityInterface
     {
         return $this->expirationTime;
     }
-
 
     /**
      * @param string|DateTime $expirationTime
@@ -143,7 +130,6 @@ class Session implements EntityInterface
         $this->expirationTime = $this->convertToDateTime($expirationTime);
     }
 
-
     /**
      * @return string
      */
@@ -151,7 +137,6 @@ class Session implements EntityInterface
     {
         return $this->nonce;
     }
-
 
     /**
      * @param string $nonce

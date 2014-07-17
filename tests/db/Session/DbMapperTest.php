@@ -1,11 +1,8 @@
 <?php
-
 namespace InoOicServerTest\Db\Session;
 
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
 use InoOicServer\Oic\Session\Mapper\DbMapper;
-use InoOicServer\Oic\Session\Session;
-
 
 class DbMapperTest extends AbstractDatabaseTestCase
 {
@@ -15,13 +12,11 @@ class DbMapperTest extends AbstractDatabaseTestCase
      */
     protected $mapper;
 
-
     public function setUp()
     {
         parent::setUp();
         $this->mapper = new DbMapper($this->getDbAdapter());
     }
-
 
     public function testSaveNewSession()
     {
@@ -38,18 +33,16 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->mapper->save($session);
 
         $queryTable = $this->getConnection()->createQueryTable('session', 'SELECT * FROM session');
-        $expectedTable = $this->createArrayDataSet(
-            array(
-                'session' => array(
-                    $this->getRawTableData('session', 0),
-                    $sessionData
-                )
-            ))
+        $expectedTable = $this->createArrayDataSet(array(
+            'session' => array(
+                $this->getRawTableData('session', 0),
+                $sessionData
+            )
+        ))
             ->getTable('session');
 
         $this->assertTablesEqual($expectedTable, $queryTable);
     }
-
 
     public function testSaveExistingSession()
     {
@@ -66,16 +59,14 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->mapper->save($session);
 
         $queryTable = $this->getConnection()->createQueryTable('session', 'SELECT * FROM session');
-        $expectedTable = $this->createArrayDataSet(
-            array(
-                'session' => array(
-                    $sessionData
-                )
-            ))->getTable('session');
+        $expectedTable = $this->createArrayDataSet(array(
+            'session' => array(
+                $sessionData
+            )
+        ))->getTable('session');
 
         $this->assertTablesEqual($expectedTable, $queryTable);
     }
-
 
     public function testFetch()
     {
@@ -83,12 +74,10 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertValidSession($session);
     }
 
-
     public function testFetchNotFound()
     {
         $this->assertNull($this->mapper->fetch('non_existent_id'));
     }
-
 
     public function testFetchByCode()
     {
@@ -98,12 +87,10 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertValidSession($session);
     }
 
-
     public function testFetchByCodeNotFound()
     {
         $this->assertNull($this->mapper->fetchByCode('non_existent_code'));
     }
-
 
     public function testFetchByAccessToken()
     {
@@ -113,12 +100,10 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertValidSession($session);
     }
 
-
     public function testFetchByAcessTokenNotFound()
     {
         $this->assertNull($this->mapper->fetchByAccessToken('non_existent_token'));
     }
-
 
     public function testFetchByUserId()
     {
@@ -128,12 +113,10 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertValidSession($session);
     }
 
-
     public function testFetchByUserIdNotFound()
     {
         $this->assertNull($this->mapper->fetchByUserId('non_existent_user_id'));
     }
-
 
     public function testFetchByAuthSessionId()
     {
@@ -142,7 +125,6 @@ class DbMapperTest extends AbstractDatabaseTestCase
 
         $this->assertValidSession($session);
     }
-
 
     public function testFetchByAuthSessionIdNotFound()
     {
@@ -161,7 +143,6 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertEquals('2014-07-10 11:00:10', $this->toDbDateTimeString($session->getExpirationTime()));
         $this->assertSame('dummy_nonce', $session->getNonce());
     }
-
 
     protected function createRawTableData()
     {

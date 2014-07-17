@@ -3,8 +3,6 @@ namespace InoOicServerTest\Db\AuthSession;
 
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
 use InoOicServer\Oic\AuthSession\Mapper\DbMapper;
-use InoOicServer\Oic\AuthSession\AuthSessionHydrator;
-use InoOicServer\Oic\AuthSession\AuthSession;
 
 class DbMapperTest extends AbstractDatabaseTestCase
 {
