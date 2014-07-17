@@ -23,7 +23,7 @@ abstract class AbstractEntityFactory implements EntityFactoryInterface
         if (! $this->hydrator instanceof HydratorInterface) {
             $this->hydrator = new ClassMethods();
         }
-        
+
         return $this->hydrator;
     }
 

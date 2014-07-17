@@ -16,21 +16,23 @@ class DbMapper extends AbstractMapper implements MapperInterface
 
     /**
      * Constructor.
-     * 
+     *
      * @param DbAdapter $dbAdapter
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null,
+        HydratorInterface $hydrator = null)
     {
-        if (null === $factory) {
-            $factory = new AuthSessionFactory();
-        }
-        
         if (null === $hydrator) {
             $hydrator = new AuthSessionHydrator();
         }
-        
+
+        if (null === $factory) {
+            $factory = new AuthSessionFactory();
+            $factory->setHydrator($hydrator);
+        }
+
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
@@ -52,7 +54,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
     public function save(AuthSession $authSession)
     {
         $authSessionData = $this->getHydrator()->extract($authSession);
-        
+
         $this->createOrUpdateEntity($authSession->getId(), 'auth_session', $authSessionData);
     }
 
@@ -66,7 +68,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('auth_session');
         $select->where('id = :id');
-        
+
         return $this->executeSingleEntityQuery($select, array(
             'id' => $id
         ));

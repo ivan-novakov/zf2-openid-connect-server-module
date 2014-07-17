@@ -22,25 +22,31 @@ class DbMapper extends AbstractMapper implements MapperInterface
 
     /**
      * Constructor.
-     * 
+     *
      * @param DbAdapter $dbAdapter
      * @param EntityFactoryInterface $factory
      * @param HydratorInterface $hydrator
      */
-    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null, HydratorInterface $hydrator = null)
+    public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory = null,
+        HydratorInterface $hydrator = null)
     {
-        if (null === $factory) {
-            $factory = new SessionFactory();
-        }
-        
         if (null === $hydrator) {
             $hydrator = new SessionHydrator();
         }
-        
+
+        if (null === $factory) {
+            $factory = new SessionFactory();
+            $factory->setHydrator($hydrator);
+        }
+
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
 
+    /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Db\AbstractMapper::existsEntity()
+     */
     public function existsEntity($sessionId)
     {
         return (null !== $this->fetch($sessionId));
@@ -54,8 +60,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
     public function save(Session $session)
     {
         $sessionData = $this->getHydrator()->extract($session);
-        //$sessionData = $this->convertDateTimeValues($sessionData);
-        
+
         $this->createOrUpdateEntity($session->getId(), 'session', $sessionData);
     }
 
@@ -69,7 +74,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('session');
         $select->where('id = :id');
-        
+
         return $this->executeSingleEntityQuery($select, array(
             'id' => $id
         ));
@@ -85,7 +90,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('session')->join('authorization_code', 'session.id = authorization_code.session_id', array());
         $select->where('authorization_code.code = :code');
-        
+
         return $this->executeSingleEntityQuery($select, array(
             'code' => $authCode
         ));
@@ -101,7 +106,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('session')->join('access_token', 'id = session_id', array());
         $select->where('token = :token');
-        
+
         return $this->executeSingleEntityQuery($select, array(
             'token' => $accessToken
         ));
@@ -117,7 +122,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('session')->join('auth_session', 'session.auth_session_id = auth_session.id', array());
         $select->where('user_id = :user_id');
-        
+
         return $this->executeSingleEntityQuery($select, array(
             'user_id' => $userId
         ));
@@ -133,9 +138,10 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('session')->join('auth_session', 'session.auth_session_id = auth_session.id', array());
         $select->where('auth_session.id = :auth_session_id');
-        
-        return $this->executeSingleEntityQuery($select, array(
-            'auth_session_id' => $authSessionId
-        ));
+
+        return $this->executeSingleEntityQuery($select,
+            array(
+                'auth_session_id' => $authSessionId
+            ));
     }
 }

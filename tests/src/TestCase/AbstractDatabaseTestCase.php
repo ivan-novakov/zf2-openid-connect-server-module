@@ -28,7 +28,7 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
             }
             $this->conn = $this->createDefaultDBConnection(self::$pdo, $this->getDbName());
         }
-        
+
         return $this->conn;
     }
 
@@ -39,12 +39,27 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
     }
 
 
-    protected function getRawTableData()
+    protected function getRawTableData($tableName = null, $rowNumber = null)
     {
         if (null === $this->rawTableData) {
             $this->rawTableData = $this->createRawTableData();
         }
-        
+
+        if (null !== $tableName) {
+            if (isset($this->rawTableData[$tableName])) {
+                if (null !== $rowNumber) {
+                    if (isset($this->rawTableData[$tableName][$rowNumber])) {
+                        return $this->rawTableData[$tableName][$rowNumber];
+                    }
+
+                    return array();
+                }
+                return $this->rawTableData[$tableName];
+            }
+
+            return array();
+        }
+
         return $this->rawTableData;
     }
 
@@ -57,16 +72,17 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
 
     /**
      * Workaround for https://github.com/sebastianbergmann/dbunit/issues/37.
-     * 
+     *
      * @see https://github.com/sebastianbergmann/dbunit/issues/37#issuecomment-31069778
      * @return \PHPUnit_Extensions_Database_Operation
      */
     protected function getSetUpOperation()
     {
-        return new \PHPUnit_Extensions_Database_Operation_Composite(array(
-            \PHPUnit_Extensions_Database_Operation_Factory::DELETE_ALL(),
-            \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
-        ));
+        return new \PHPUnit_Extensions_Database_Operation_Composite(
+            array(
+                \PHPUnit_Extensions_Database_Operation_Factory::DELETE_ALL(),
+                \PHPUnit_Extensions_Database_Operation_Factory::INSERT()
+            ));
     }
 
 
@@ -106,7 +122,7 @@ abstract class AbstractDatabaseTestCase extends \PHPUnit_Extensions_Database_Tes
         if (null === $this->dbConfig) {
             $this->dbConfig = new Config(require TESTS_CONFIG_DIR . 'db.cfg.php');
         }
-        
+
         return $this->dbConfig;
     }
 

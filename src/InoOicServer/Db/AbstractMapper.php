@@ -37,7 +37,7 @@ abstract class AbstractMapper
 
     /**
      * Constructor.
-     * 
+     *
      * @param DbAdapter $dbAdapter
      */
     public function __construct(DbAdapter $dbAdapter, EntityFactoryInterface $factory, HydratorInterface $hydrator)
@@ -110,14 +110,14 @@ abstract class AbstractMapper
         if (! $this->sql instanceof Sql) {
             $this->sql = new Sql($this->getDbAdapter());
         }
-        
+
         return $this->sql;
     }
 
 
     /**
      * Returns true if an entity with the provided identifier exists in the storage.
-     * 
+     *
      * @param mixed $identifier
      * @return boolean
      */
@@ -126,21 +126,20 @@ abstract class AbstractMapper
 
     /**
      * Creates a new entity instance and hydrates it with the provided data.
-     * 
+     *
      * @param array $entityData
      * @return EntityInterface
      */
     public function createEntityFromData(array $entityData)
     {
-        return $this->getHydrator()->hydrate($entityData, $this->getFactory()
-            ->createEmptyEntity());
+        return $this->getFactory()->createEntityFromData($entityData);
     }
 
 
     /**
      * Executes a query expecting one or zero results. In case of a result, creates a new entity
      * and hydrates it with tha data.
-     * 
+     *
      * @param Select $select
      * @param array $params
      * @throws Exception\InvalidResultException
@@ -149,30 +148,45 @@ abstract class AbstractMapper
     public function executeSingleEntityQuery(Select $select, array $params = array())
     {
         $results = $this->executeSelect($select, $params);
-        
+
         if (! $results->count()) {
             return null;
         }
-        
+
         if ($results->count() > 1) {
-            throw new Exception\InvalidResultException(sprintf("Expected only one record, %d records has been returned", $results->count()));
+            throw new Exception\InvalidResultException(
+                sprintf("Expected only one record, %d records has been returned", $results->count()));
         }
-        
+
         $entity = $this->createEntityFromData($results->current());
-        
+
         return $entity;
     }
 
 
+    /**
+     * Creates a statement from the select object and executes it. Returns the result.
+     *
+     * @param Select $select
+     * @param array $params
+     * @return \Zend\Db\Adapter\Driver\ResultInterface
+     */
     public function executeSelect(Select $select, array $params = array())
     {
         $statement = $this->getSql()->prepareStatementForSqlObject($select);
         $results = $statement->execute($params);
-        
+
         return $results;
     }
 
 
+    /**
+     * Saves the data to the storage. If the entity does not exist, a new record will be created.
+     *
+     * @param unknown $entityIdentifier
+     * @param unknown $entityTable
+     * @param array $entityData
+     */
     protected function createOrUpdateEntity($entityIdentifier, $entityTable, array $entityData)
     {
         if ($this->existsEntity($entityIdentifier)) {
@@ -184,7 +198,7 @@ abstract class AbstractMapper
             $sqlObject->into($entityTable);
             $sqlObject->values($entityData);
         }
-        
+
         $statement = $this->getSql()->prepareStatementForSqlObject($sqlObject);
         $statement->execute();
     }
