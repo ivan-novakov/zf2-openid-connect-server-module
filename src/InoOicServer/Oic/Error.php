@@ -1,7 +1,5 @@
 <?php
-
 namespace InoOicServer\Oic;
-
 
 class Error
 {
@@ -9,13 +7,29 @@ class Error
     /**
      * @var string
      */
-    protected $message;
+    protected $message = 'general_error';
 
     /**
      * @var string
      */
     protected $description;
 
+    /**
+     * Constructor.
+     *
+     * @param string $message
+     * @param string $description
+     */
+    public function __construct($message = null, $description = null)
+    {
+        if (null !== $message) {
+            $this->setMessage($message);
+        }
+
+        if (null !== $description) {
+            $this->setDescription($description);
+        }
+    }
 
     /**
      * @return string
@@ -25,7 +39,6 @@ class Error
         return $this->message;
     }
 
-
     /**
      * @param string $message
      */
@@ -34,7 +47,6 @@ class Error
         $this->message = $message;
     }
 
-
     /**
      * @return string
      */
@@ -42,7 +54,6 @@ class Error
     {
         return $this->description;
     }
-
 
     /**
      * @param string $description

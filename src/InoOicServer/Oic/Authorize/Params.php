@@ -17,4 +17,8 @@ class Params
     const STATE = 'state';
 
     const NONCE = 'nonce';
+
+    const ERROR = 'error';
+
+    const ERROR_DESCRIPTION = 'error_description';
 }

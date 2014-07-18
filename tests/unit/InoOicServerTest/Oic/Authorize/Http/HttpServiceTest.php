@@ -1,12 +1,16 @@
 <?php
+
 namespace InoOicServerTest\Oic\Authorize\Http;
 
 use Zend\Http;
+use Zend\Uri;
 use InoOicServer\Oic\Error;
 use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
 use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\Http\HttpService;
 use InoOicServer\Oic\Authorize\Redirect;
+use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
+
 
 class HttpServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,10 +20,12 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
      */
     protected $service;
 
+
     public function setUp()
     {
         $this->service = new HttpService(array(), $this->createAuthenticationManagerMock());
     }
+
 
     public function testCreateAuthorizeRequest()
     {
@@ -64,6 +70,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sessionId, $request->getSessionId());
     }
 
+
     public function testCreateHttpResponseWithClientError()
     {
         $message = 'error_message';
@@ -85,6 +92,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('/' . $description . '/', $httpResponse->getContent());
     }
 
+
     public function testCreateHttpResponseFromRedirectToAuthentication()
     {
         $authUrl = 'https://auth/url';
@@ -102,6 +110,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
             ->get('Location')
             ->getUri());
     }
+
 
     public function testCreateHttpResponseFromRedirectToResponse()
     {
@@ -121,6 +130,7 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
             ->getUri());
     }
 
+
     public function testCreateHttpResponseFromRedirectToUrl()
     {
         $url = 'https://custom/url';
@@ -132,6 +142,49 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($url, $httpResponse->getHeaders()
             ->get('Location')
             ->getUri());
+    }
+
+
+    public function testCreateHttpResponseFromAuthorizeErrorResponse()
+    {
+        $redirectUri = 'https://redirect.org:1234/return/path';
+        $errorMessage = 'dummy error';
+        $errorDescription = 'dummy error desc';
+        $state = 'dummy_state';
+
+        $expectedUri = new Uri\Http($redirectUri);
+        $expectedUri->setQuery(array(
+            'error' => $errorMessage,
+            'error_description' => $errorDescription
+        ));
+
+        $response = new AuthorizeErrorResponse();
+        $response->setError(new Error($errorMessage, $errorDescription));
+        $response->setRedirectUri($redirectUri);
+        $response->setState($state);
+
+        $result = Result::constructResponseResult($response);
+
+        $httpResponse = $this->service->createHttpResponse($result);
+        /* @var $httpResponse \Zend\Http\Response */
+        $this->assertInstanceOf('Zend\Http\Response', $httpResponse);
+        $this->assertSame(302, $httpResponse->getStatusCode());
+
+        $locationHeader = $httpResponse->getHeaders()->get('Location');
+        $this->assertInstanceOf('Zend\Http\Header\Location', $locationHeader);
+
+        /* @var $locationHeader \Zend\Http\Header\Location */
+        $uri = $locationHeader->uri();
+
+        $this->assertSame('https', $uri->getScheme());
+        $this->assertSame('redirect.org', $uri->getHost());
+        $this->assertSame(1234, $uri->getPort());
+        $this->assertSame('/return/path', $uri->getPath());
+        $this->assertEquals(array(
+            'error' => $errorMessage,
+            'error_description' => $errorDescription,
+            'state' => $state
+        ), $uri->getQueryAsArray());
     }
 
     /*
