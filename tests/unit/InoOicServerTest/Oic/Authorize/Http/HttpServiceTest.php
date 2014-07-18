@@ -10,6 +10,7 @@ use InoOicServer\Oic\Authorize\Result;
 use InoOicServer\Oic\Authorize\Http\HttpService;
 use InoOicServer\Oic\Authorize\Redirect;
 use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
+use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
 
 
 class HttpServiceTest extends \PHPUnit_Framework_TestCase
@@ -104,7 +105,9 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($authUrl));
         $this->service->setAuthenticationManager($authManager);
 
-        $httpResponse = $this->service->createHttpResponseFromRedirectToAuthentication($redirect);
+        $result = Result::constructRedirectResult($redirect);
+        $httpResponse = $this->service->createHttpResponse($result);
+
         $this->assertSame(302, $httpResponse->getStatusCode());
         $this->assertSame($authUrl, $httpResponse->getHeaders()
             ->get('Location')
@@ -123,7 +126,9 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($returnUrl));
         $this->service->setAuthenticationManager($authManager);
 
-        $httpResponse = $this->service->createHttpResponseFromRedirectToResponse($redirect);
+        $result = Result::constructRedirectResult($redirect);
+        $httpResponse = $this->service->createHttpResponse($result);
+
         $this->assertSame(302, $httpResponse->getStatusCode());
         $this->assertSame($returnUrl, $httpResponse->getHeaders()
             ->get('Location')
@@ -137,7 +142,9 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
         $redirect = new Redirect(Redirect::TO_URL);
         $redirect->setUrl($url);
 
-        $httpResponse = $this->service->createHttpResponseFromRedirectToUrl($redirect);
+        $result = Result::constructRedirectResult($redirect);
+        $httpResponse = $this->service->createHttpResponse($result);
+
         $this->assertSame(302, $httpResponse->getStatusCode());
         $this->assertSame($url, $httpResponse->getHeaders()
             ->get('Location')
@@ -185,6 +192,62 @@ class HttpServiceTest extends \PHPUnit_Framework_TestCase
             'error_description' => $errorDescription,
             'state' => $state
         ), $uri->getQueryAsArray());
+    }
+
+
+    public function testCreateHttpResponseFromAuthorizeResponse()
+    {
+        $redirectUri = 'https://redirect.org:1234/return/path';
+        $code = 'dummy_code';
+        $state = 'dummy_state';
+        $sessionId = 'dummy_session';
+        $authSessionId = 'dummy_auth_session';
+
+        $sessionCookieName = 'session_cookie';
+        $authSessionCookieName = 'auth_session_cookie';
+        $this->service->setOptions(array(
+            HttpService::OPT_SESSION_COOKIE_NAME => $sessionCookieName,
+            HttpService::OPT_AUTH_COOKIE_NAME => $authSessionCookieName
+        ));
+
+        $response = new AuthorizeResponse();
+        $response->setCode($code);
+        $response->setRedirectUri($redirectUri);
+        $response->setState($state);
+        $response->setSessionId($sessionId);
+        $response->setAuthSessionId($authSessionId);
+
+        $result = Result::constructResponseResult($response);
+
+        $httpResponse = $this->service->createHttpResponse($result);
+        /* @var $httpResponse \Zend\Http\Response */
+        $this->assertInstanceOf('Zend\Http\Response', $httpResponse);
+        $this->assertSame(302, $httpResponse->getStatusCode());
+
+        $locationHeader = $httpResponse->getHeaders()->get('Location');
+        $this->assertInstanceOf('Zend\Http\Header\Location', $locationHeader);
+
+        /* @var $locationHeader \Zend\Http\Header\Location */
+        $uri = $locationHeader->uri();
+        $this->assertSame('https', $uri->getScheme());
+        $this->assertSame('redirect.org', $uri->getHost());
+        $this->assertSame(1234, $uri->getPort());
+        $this->assertSame('/return/path', $uri->getPath());
+        $this->assertEquals(array(
+            'code' => $code,
+            'state' => $state
+        ), $uri->getQueryAsArray());
+
+        $setCookies = $httpResponse->getCookie();
+        $cookieData = array();
+        foreach ($setCookies as $setCookie) {
+            $cookieData[$setCookie->getName()] = $setCookie->getValue();
+            $this->assertTrue($setCookie->isSecure());
+            $this->assertTrue($setCookie->isHttponly());
+        }
+
+        $this->assertSame($cookieData[$sessionCookieName], $sessionId);
+        $this->assertSame($cookieData[$authSessionCookieName], $authSessionId);
     }
 
     /*

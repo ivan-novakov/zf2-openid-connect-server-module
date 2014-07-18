@@ -21,4 +21,6 @@ class Params
     const ERROR = 'error';
 
     const ERROR_DESCRIPTION = 'error_description';
+
+    const CODE = 'code';
 }
