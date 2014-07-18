@@ -1,8 +1,10 @@
 <?php
+
 namespace InoOicServerTest\Db\AuthSession;
 
 use InoOicServer\Test\TestCase\AbstractDatabaseTestCase;
 use InoOicServer\Oic\AuthSession\Mapper\DbMapper;
+
 
 class DbMapperTest extends AbstractDatabaseTestCase
 {
@@ -13,11 +15,13 @@ class DbMapperTest extends AbstractDatabaseTestCase
      */
     protected $mapper;
 
+
     public function setUp()
     {
         parent::setUp();
         $this->mapper = new DbMapper($this->getDbAdapter());
     }
+
 
     public function testSaveNewAuthSession()
     {
@@ -35,7 +39,6 @@ class DbMapperTest extends AbstractDatabaseTestCase
 
         $queryTable = $this->getConnection()->createQueryTable('auth_session', 'SELECT * FROM auth_session');
 
-        $rawTableData = $this->getRawTableData();
         $expectedTable = $this->createArrayDataSet(array(
             'auth_session' => array(
                 $this->getRawTableData('auth_session', 0),
@@ -46,6 +49,7 @@ class DbMapperTest extends AbstractDatabaseTestCase
 
         $this->assertTablesEqual($expectedTable, $queryTable);
     }
+
 
     public function testSaveExistingAuthSession()
     {
@@ -73,6 +77,7 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertTablesEqual($expectedTable, $queryTable);
     }
 
+
     public function testFetch()
     {
         $id = 'dummy_auth_session_id';
@@ -89,9 +94,23 @@ class DbMapperTest extends AbstractDatabaseTestCase
         $this->assertSame($expectedData['user_data'], $authSession->getUserData());
     }
 
+
     public function testFetchNotFound()
     {
         $this->assertNull($this->mapper->fetch('non_existent_auth_session_id'));
+    }
+
+
+    public function testDelete()
+    {
+        $id = 'dummy_auth_session_id';
+
+        $this->assertSame(1, $this->getConnection()
+            ->getRowCount('auth_session'));
+        $this->mapper->delete($id);
+
+        $this->assertSame(0, $this->getConnection()
+            ->getRowCount('auth_session'));
     }
 
     // ------------------------

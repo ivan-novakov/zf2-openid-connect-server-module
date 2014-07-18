@@ -1,4 +1,5 @@
 <?php
+
 namespace InoOicServer\Oic\AuthSession\Mapper;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
@@ -9,8 +10,10 @@ use InoOicServer\Oic\AuthSession\AuthSessionHydrator;
 use InoOicServer\Db\AbstractMapper;
 use InoOicServer\Oic\EntityFactoryInterface;
 
+
 class DbMapper extends AbstractMapper implements MapperInterface
 {
+
 
     /**
      * Constructor.
@@ -33,6 +36,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
 
+
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Db\AbstractMapper::existsEntity()
@@ -41,6 +45,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
     {
         return (null !== $this->fetch($authSessionId));
     }
+
 
     /**
      * {@inheritdoc}
@@ -53,6 +58,7 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $this->createOrUpdateEntity($authSession->getId(), 'auth_session', $authSessionData);
     }
 
+
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthSession\Mapper\MapperInterface::fetch()
@@ -64,6 +70,18 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select->where('id = :id');
 
         return $this->executeSingleEntityQuery($select, array(
+            'id' => $id
+        ));
+    }
+
+
+    public function delete($id)
+    {
+        $delete = $this->getSql()->delete();
+        $delete->from('auth_session');
+        $delete->where('id = :id');
+
+        $this->executeSqlObject($delete, array(
             'id' => $id
         ));
     }

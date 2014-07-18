@@ -20,4 +20,10 @@ interface MapperInterface
      * @return AuthSession|null
      */
     public function fetch($id);
+
+
+    /**
+     * @param string $id
+     */
+    public function delete($id);
 }

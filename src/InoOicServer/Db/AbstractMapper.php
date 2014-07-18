@@ -9,6 +9,7 @@ use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Db\Adapter\AdapterInterface as DbAdapter;
 use InoOicServer\Oic\EntityFactoryInterface;
 use InoOicServer\Oic\EntityInterface;
+use Zend\Db\Sql\PreparableSqlInterface;
 
 
 abstract class AbstractMapper
@@ -154,8 +155,7 @@ abstract class AbstractMapper
         }
 
         if ($results->count() > 1) {
-            throw new Exception\InvalidResultException(
-                sprintf("Expected only one record, %d records has been returned", $results->count()));
+            throw new Exception\InvalidResultException(sprintf("Expected only one record, %d records has been returned", $results->count()));
         }
 
         $entity = $this->createEntityFromData($results->current());
@@ -199,7 +199,13 @@ abstract class AbstractMapper
             $sqlObject->values($entityData);
         }
 
+        $this->executeSqlObject($sqlObject);
+    }
+
+
+    protected function executeSqlObject(PreparableSqlInterface $sqlObject, array $params = array())
+    {
         $statement = $this->getSql()->prepareStatementForSqlObject($sqlObject);
-        $statement->execute();
+        $statement->execute($params);
     }
 }
