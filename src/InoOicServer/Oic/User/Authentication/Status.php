@@ -1,11 +1,9 @@
 <?php
-
 namespace InoOicServer\Oic\User\Authentication;
 
 use DateTime;
 use InoOicServer\Oic\User\UserInterface;
 use InoOicServer\Util\ConvertToDateTimeTrait;
-
 
 /**
  * Authentication status - tracks user's authentication information.
@@ -17,7 +15,7 @@ class Status
     /**
      * @var boolean
      */
-    protected $authenticated;
+    protected $authenticated = false;
 
     /**
      * @var string
@@ -39,7 +37,6 @@ class Status
      */
     protected $error;
 
-
     /**
      * @return boolean
      */
@@ -47,7 +44,6 @@ class Status
     {
         return $this->authenticated;
     }
-
 
     /**
      * @param boolean $authenticated
@@ -57,7 +53,6 @@ class Status
         $this->authenticated = (bool) $authenticated;
     }
 
-
     /**
      * @return string
      */
@@ -65,7 +60,6 @@ class Status
     {
         return $this->method;
     }
-
 
     /**
      * @param string $method
@@ -75,7 +69,6 @@ class Status
         $this->method = $method;
     }
 
-
     /**
      * @return DateTime
      */
@@ -83,7 +76,6 @@ class Status
     {
         return $this->time;
     }
-
 
     /**
      * @param string|DateTime $time
@@ -93,7 +85,6 @@ class Status
         $this->time = $this->convertToDateTime($time);
     }
 
-
     /**
      * @return UserInterface
      */
@@ -101,7 +92,6 @@ class Status
     {
         return $this->identity;
     }
-
 
     /**
      * @param UserInterface $identity
@@ -111,7 +101,6 @@ class Status
         $this->identity = $identity;
     }
 
-
     /**
      * @return Error
      */
@@ -119,7 +108,6 @@ class Status
     {
         return $this->error;
     }
-
 
     /**
      * @param Error $error
