@@ -1,22 +1,22 @@
 <?php
 return array(
-    
+
     'router' => array(
         'routes' => array(
             'oic' => array(
                 'type' => 'Literal',
                 'may_terminate' => true,
                 'options' => array(
-                    
+
                     'route' => '/oic',
                     'defaults' => array(
                         'controller' => 'InoOicServer\Mvc\Controller\OicIndexController',
                         'action' => 'index'
                     )
                 ),
-                
+
                 'child_routes' => array(
-                    
+
                     'authorize-endpoint' => array(
                         'type' => 'Literal',
                         'may_terminate' => true,
@@ -28,7 +28,7 @@ return array(
                             )
                         )
                     ),
-                    
+
                     'authorize-response-endpoint' => array(
                         'type' => 'Literal',
                         'may_terminate' => true,
@@ -40,7 +40,7 @@ return array(
                             )
                         )
                     ),
-                    
+
                     'token-endpoint' => array(
                         'type' => 'Literal',
                         'may_terminate' => true,
@@ -52,7 +52,7 @@ return array(
                             )
                         )
                     ),
-                    
+
                     'userinfo-endpoint' => array(
                         'type' => 'Literal',
                         'may_terminate' => true,
@@ -64,7 +64,7 @@ return array(
                             )
                         )
                     ),
-                    
+
                     'authentication' => array(
                         'type' => 'segment',
                         'may_terminate' => true,
@@ -82,38 +82,51 @@ return array(
             )
         )
     ),
-    
+
     'controllers' => array(
         'aliases' => array(
             'dummy' => 'InoOicServer\Oic\Authentication\Controller\DummyController',
             'basic' => 'InoOicServer\Oic\Authentication\Controller\BasicAuthController'
         )
     ),
-    
+
     'oic_server' => array(
+
+        'db' => array(
+            'adapter' => array(
+                'driver' => 'Pdo_Mysql',
+                'hostname' => 'localhost',
+                'database' => 'oicserver',
+                'username' => 'oicadmin',
+                'password' => 'xxx'
+            )
+        ),
+
         'user_authentication_manager' => array(
             'method' => 'dummy',
             'auth_route' => 'oic/authentication',
             'return_route' => 'oic/authorize-response-endpoint'
         ),
-        
+
         'client_mapper' => array(
             'file' => __DIR__ . '/data/clients.php'
         ),
-        
+
         'auth_session_service' => array(
             'salt' => 'auth session salt',
             'age' => 1800
         ),
-        
+
         'session_service' => array(
             'salt' => 'session salt',
             'age' => 3600
         ),
-        
+
         'auth_code_service' => array(
             'salt' => 'auth code salt',
             'age' => 7200
-        )
+        ),
+
+        'authorize_http_service' => array()
     )
 );
