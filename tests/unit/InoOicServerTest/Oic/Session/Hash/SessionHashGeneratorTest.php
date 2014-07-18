@@ -17,11 +17,11 @@ class SessionHashGeneratorTest extends \PHPUnit_Framework_TestCase
         $salt = 'secret';
         $hash = 'generated_hash';
         $data = $authSessionId . $time;
-        
+
         $authSession = new AuthSession();
         $authSession->setId($authSessionId);
         $authSession->setCreateTime(new \DateTime('@' . $time));
-        
+
         $generator = $this->getMockBuilder('InoOicServer\Oic\Session\Hash\SessionHashGenerator')
             ->setMethods(array(
             'generateHash'
@@ -29,10 +29,10 @@ class SessionHashGeneratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $generator->expects($this->once())
             ->method('generateHash')
-            ->with($algo, $data, $salt)
+            ->with($data, $salt, $algo)
             ->will($this->returnValue($hash));
-        
+
         $generator->setDefaultAlgo($algo);
-        $this->assertSame($hash, $generator->generateSessionHash($authSession, $salt));
+        $this->assertSame($hash, $generator->generateSessionHash($authSession, $salt, $algo));
     }
 }

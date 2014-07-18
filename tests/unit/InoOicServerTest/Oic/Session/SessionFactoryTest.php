@@ -1,21 +1,17 @@
 <?php
-
 namespace InoOicServerTest\Oic\Session;
 
 use InoOicServer\Oic\Session\SessionFactory;
-
 
 class SessionFactoryTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $factory;
 
-
     public function setUp()
     {
         $this->factory = new SessionFactory($this->createHashGeneratorMock());
     }
-
 
     public function testCreateSession()
     {
@@ -26,12 +22,12 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
         $nonce = 'secretnonce';
         $createTime = new \DateTime('2014-06-06 14:00:00');
         $expirationTime = new \DateTime('2014-06-06 15:00:00');
-        
+
         $authSession = $this->getMock('InoOicServer\Oic\AuthSession\AuthSession');
         $authSession->expects($this->once())
             ->method('getId')
             ->will($this->returnValue($authSessionId));
-        
+
         $dateTimeUtil = $this->getMock('InoOicServer\Util\DateTimeUtil');
         $dateTimeUtil->expects($this->once())
             ->method('createDateTime')
@@ -41,32 +37,36 @@ class SessionFactoryTest extends \PHPUnit_Framework_TestCase
             ->with($createTime, $age)
             ->will($this->returnValue($expirationTime));
         $this->factory->setDateTimeUtil($dateTimeUtil);
-        
+
         $hashGenerator = $this->createHashGeneratorMock();
         $hashGenerator->expects($this->once())
             ->method('generateSessionHash')
             ->with($authSession, $salt)
             ->will($this->returnValue($sessionId));
         $this->factory->setHashGenerator($hashGenerator);
-        
-        $session = $this->factory->createSession($authSession, $age, $salt, $nonce);
-        
-        $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
-    }
 
+        $session = $this->factory->createSession($authSession, $age, $salt, $nonce);
+
+        $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $session);
+        $this->assertSame($sessionId, $session->getId());
+        $this->assertSame($authSessionId, $session->getAuthSessionId());
+        $this->assertSame($createTime, $session->getCreateTime());
+        $this->assertSame($expirationTime, $session->getExpirationTime());
+        $this->assertSame($nonce, $session->getNonce());
+    }
 
     public function testCreateEmptyEntity()
     {
         $this->assertInstanceOf('InoOicServer\Oic\Session\Session', $this->factory->createEmptyEntity());
     }
-    
+
     /*
-     * 
+     *
      */
     protected function createHashGeneratorMock()
     {
         $hashGenerator = $this->getMock('InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface');
-        
+
         return $hashGenerator;
     }
 }

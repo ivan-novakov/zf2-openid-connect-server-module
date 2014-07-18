@@ -14,6 +14,7 @@ use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 use InoOicServer\Oic\Authorize\Response\ResponseFactoryInterface;
 use InoOicServer\Oic\Authorize\Response\ResponseFactory;
 use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
+use InoOicServer\Oic\User\UserInterface;
 
 class AuthorizeService
 {
@@ -167,6 +168,8 @@ class AuthorizeService
 
     public function processRequest(AuthorizeRequest $request)
     {
+        // FIXME - perform request validation
+
         // FIXME - move client validation to client service
 
         // identify and validate client (application)
@@ -223,16 +226,72 @@ class AuthorizeService
     public function processResponse(ResponseInterface $response = null)
     {
         // check context
-        // check client and request from context
-        // check authorize request (from context), if there is active/valid (authentication) session,
-        // if true, check for existing auth. code and create it if missing, then skip to create response
-        // otherwise check user authentication and:
+        $contextService = $this->getContextService();
+        $context = $contextService->loadContext();
+        if (! $context) {
+            // client error
+            return $this->createClientErrorResult('invalid_request', 'Missing context');
+        }
+
+        $contextService->clearContext();
+
+        // get request from context
+        $request = $context->getAuthorizeRequest();
+        if (! $request) {
+            // client error
+            return $this->createClientErrorResult('invalid_request', 'Wrong context');
+        }
+
+        // resolve client from request
+        $client = $this->getClientService()->fetchClient($request->getClientId());
+        if (! $client) {
+            // client error
+            return $this->createClientErrorResult('invalid_request', 'Client not found');
+        }
+
+        // check authentication status
+        $authStatus = $context->getAuthStatus();
+        if (! $authStatus) {
+            // authorize error
+            return $this->__createAuthorizeErrorResult('invalid_request', 'Missing authentication info', $request);
+        }
+
+        if (! $authStatus->isAuthenticated()) {
+            // authorize error
+            return $this->__createAuthorizeErrorResult('invalid_request', 'User not authenticated', $request);
+        }
+
+        $user = $authStatus->getIdentity();
+        if (! $user instanceof UserInterface) {
+            // authorize error
+            return $this->__createAuthorizeErrorResult('invalid_request', 'Invalid user identity', $request);
+        }
+
+        // check for existing auth session
+        // fetch auth session by user/method
+
+        // create new auth session
+        $authSession = $this->getAuthSessionService()->createSession($authStatus);
+        $this->getAuthSessionService()->saveSession($authSession);
+
         // if a valid session exists for the user, reuse it
-        // or create new session
+        $session = $this->getSessionService()->fetchSessionByUser($user);
+        if (! $session) {
+            $session = $this->getSessionService()->createSession($authSession);
+            $this->getSessionService()->saveSession($session);
+        }
+
         // check for auth. code and:
+        $authCode = $this->getAuthCodeService()->fetchAuthCodeBySession($session, $client);
         // if a valid code exists for the user and the client, reuse it
         // or create a new one
+        if (! $authCode) {
+            $authCode = $this->getAuthCodeService()->createAuthCode($session, $client);
+            $this->getAuthCodeService()->saveAuthCode($authCode);
+        }
+
         // create and return the corresponding Authorize\Response
+        return $this->createResponseResult($authCode, $request, $session);
     }
 
     public function initAuthCodeFromAuthSession(AuthSession $authSession, Client $client, AuthorizeRequest $request)
@@ -267,6 +326,15 @@ class AuthorizeService
         $result = Result::constructResponseResult($response);
 
         return $result;
+    }
+
+    protected function __createAuthorizeErrorResult($message, $description, $request)
+    {
+        $error = new Error();
+        $error->setMessage($message);
+        $error->setDescription($description);
+
+        return $this->createAuthorizeErrorResult($error, $request);
     }
 
     public function createAuthorizeErrorResult(Error $error, AuthorizeRequest $request)

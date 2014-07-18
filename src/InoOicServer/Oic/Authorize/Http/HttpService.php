@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer\Oic\Authorize\Http;
 
 use Zend\Http;
@@ -14,10 +13,9 @@ use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\User\Authentication\Manager;
 
-
 class HttpService implements HttpServiceInterface
 {
-    
+
     use OptionsTrait;
 
     /**
@@ -48,10 +46,9 @@ class HttpService implements HttpServiceInterface
         Redirect::TO_URL => 'createHttpResponseFromRedirectToUrl'
     );
 
-
     /**
      * Constructor.
-     * 
+     *
      * @param array $options
      * @param Manager $authenticationManager
      */
@@ -61,7 +58,6 @@ class HttpService implements HttpServiceInterface
         $this->setAuthenticationManager($authenticationManager);
     }
 
-
     /**
      * @return AuthorizeRequestFactoryInterface
      */
@@ -70,10 +66,9 @@ class HttpService implements HttpServiceInterface
         if (! $this->authorizeRequestFactory instanceof AuthorizeRequestFactoryInterface) {
             $this->authorizeRequestFactory = new AuthorizeRequestFactory();
         }
-        
+
         return $this->authorizeRequestFactory;
     }
-
 
     /**
      * @param AuthorizeRequestFactoryInterface $authorizeRequestFactory
@@ -83,7 +78,6 @@ class HttpService implements HttpServiceInterface
         $this->authorizeRequestFactory = $authorizeRequestFactory;
     }
 
-
     /**
      * @return Manager
      */
@@ -92,7 +86,6 @@ class HttpService implements HttpServiceInterface
         return $this->authenticationManager;
     }
 
-
     /**
      * @param Manager $authenticationManager
      */
@@ -100,7 +93,6 @@ class HttpService implements HttpServiceInterface
     {
         $this->authenticationManager = $authenticationManager;
     }
-
 
     /**
      * {@inhertidoc}
@@ -111,7 +103,6 @@ class HttpService implements HttpServiceInterface
         return $this->getAuthorizeRequestFactory()->createRequest($httpRequest);
     }
 
-
     /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createHttpResponse()
@@ -121,12 +112,11 @@ class HttpService implements HttpServiceInterface
         if ($result->getType() === Result::TYPE_REDIRECT) {
             return $this->createHttpResponseFromRedirect($result->getRedirect());
         }
-        
+
         $httpResponse = $this->createHttpResponseFromResponse($result->getResponse());
-        
+
         return $httpResponse;
     }
-
 
     public function createHttpResponseFromRedirect(Redirect $redirect)
     {
@@ -134,45 +124,41 @@ class HttpService implements HttpServiceInterface
         if (! isset($this->redirectHandlers[$redirectType])) {
             throw new \RuntimeException(sprintf("Unknown redirect type '%s'", $redirectType));
         }
-        
+
         $redirectHandler = $this->redirectHandlers[$redirectType];
         if (! method_exists($this, $redirectHandler)) {
             throw new \RuntimeException(sprintf("Non-existent redirect handler '%s' for redirect type '%s", $redirectHandler, $redirectType));
         }
-        
+
         return call_user_func(array(
             $this,
             $redirectHandler
         ), $redirect);
     }
 
-
     public function createHttpResponseFromRedirectToAuthentication(Redirect $redirect)
     {
         $redirectUrl = $this->getAuthenticationManager()->getAuthenticationUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-        
+
         return $response;
     }
-
 
     public function createHttpResponseFromRedirectToResponse(Redirect $redirect)
     {
         $redirectUrl = $this->getAuthenticationManager()->getReturnUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-        
+
         return $response;
     }
-
 
     public function createHttpResponseFromRedirectToUrl(Redirect $redirect)
     {
         $redirectUrl = $redirect->getUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-        
+
         return $response;
     }
-
 
     public function createHttpResponseFromResponse(ResponseInterface $response)
     {
@@ -180,48 +166,60 @@ class HttpService implements HttpServiceInterface
         if (! isset($this->responseHandlers[$responseClass])) {
             throw new \RuntimeException(sprintf("Unknown response class '%s'", $responseClass));
         }
-        
+
         $responseHandler = $this->responseHandlers[$responseClass];
         if (! method_exists($this, $responseHandler)) {
             throw new \RuntimeException(sprintf("Non-existent response handler '%s' for response class '%s'", $responseHandler, $responseClass));
         }
-        
+
         return call_user_func(array(
             $this,
             $responseHandler
         ), $response);
     }
 
-
     public function createHttpResponseFromClientError(ClientErrorResponse $clientErrorResponse)
     {
         $error = $clientErrorResponse->getError();
-        
+
         $httpResponse = new Http\Response();
         $httpResponse->setStatusCode(400);
         $httpResponse->setContent(sprintf("Client error '%s' (%s)", $error->getMessage(), $error->getDescription()));
-        
+
         return $httpResponse;
     }
 
-
     public function createHttpResponseFromAuthorizeError(AuthorizeErrorResponse $authorizeErrorResponse)
-    {}
+    {
+        $error = $authorizeErrorResponse->getError();
+        $redirectUri = $authorizeErrorResponse->getRedirectUri();
 
+        // FIXME
+        $httpResponse = new Http\Response();
+        $httpResponse->setStatusCode(400);
+        $httpResponse->setContent(sprintf("authorize error: %s (%s) --> %s", $error->getMessage(), $error->getDescription(), $redirectUri));
+
+        return $httpResponse;
+    }
 
     public function createHttpResponseFromAuthorizeResponse(AuthorizeResponse $authorizeResponse)
-    {}
+    {
+        // FIXME
+        $httpResponse = new Http\Response();
+        $httpResponse->setContent(sprintf("code: %s --> %s", $authorizeResponse->getCode(), $authorizeResponse->getRedirectUri()));
 
+        return $httpResponse;
+    }
 
     protected function createRedirectHttpResponse($redirectUrl, $statusCode = 302)
     {
         $locationHeader = new Http\Header\Location();
         $locationHeader->setUri($redirectUrl);
-        
+
         $response = new Http\Response();
         $response->getHeaders()->addHeader($locationHeader);
         $response->setStatusCode($statusCode);
-        
+
         return $response;
     }
 }

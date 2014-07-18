@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer\ServiceManager;
 
 use InoOicServer\Oic\Authentication\Controller\DummyController;
@@ -8,10 +7,8 @@ use Zend\ServiceManager\Config;
 use Zend\Mvc\Controller\ControllerManager;
 use InoOicServer\Mvc\Controller;
 
-
 class ControllerManagerConfig extends Config
 {
-
 
     public function getFactories()
     {
@@ -44,16 +41,18 @@ class ControllerManagerConfig extends Config
                 return $controller;
             },
 
-            'InoOicServer\Oic\Authentication\Controller\BasicAuthController' => function (
-                ControllerManager $controllerManager)
+            'InoOicServer\Oic\Authentication\Controller\BasicAuthController' => function (ControllerManager $controllerManager)
             {
                 return new BasicAuthController();
             },
 
-            'InoOicServer\Oic\Authentication\Controller\DummyController' => function (
-                ControllerManager $controllerManager)
+            'InoOicServer\Oic\Authentication\Controller\DummyController' => function (ControllerManager $controllerManager)
             {
-                return new DummyController();
+                $sm = $controllerManager->getServiceLocator();
+                $contextService = $sm->get('InoOicServer\Oic\Authorize\Context\ContextService');
+                $authenticationManager = $sm->get('InoOicServer\Oic\User\Authentication\Manager');
+
+                return new DummyController($contextService, $authenticationManager);
             },
 
             /*

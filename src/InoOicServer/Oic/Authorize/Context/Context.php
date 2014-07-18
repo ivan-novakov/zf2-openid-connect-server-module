@@ -1,14 +1,12 @@
 <?php
-
 namespace InoOicServer\Oic\Authorize\Context;
 
 use DateTime;
 use InoOicServer\Oic\User;
 use InoOicServer\Oic\Authorize\AuthorizeRequest;
 
-
 /**
- * The context object carries persistent information between redirects 
+ * The context object carries persistent information between redirects
  * during the "authorize" phase.
  */
 class Context
@@ -34,9 +32,10 @@ class Context
      */
     protected $authStatus;
 
-
     /**
      * Constructor.
+     *
+     * @param DateTime $createTime
      */
     public function __construct(DateTime $createTime = null)
     {
@@ -46,7 +45,6 @@ class Context
         $this->setCreateTime($createTime);
     }
 
-
     /**
      * @return DateTime
      */
@@ -54,7 +52,6 @@ class Context
     {
         return $this->createTime;
     }
-
 
     /**
      * @param DateTime $createTime
@@ -64,7 +61,6 @@ class Context
         $this->createTime = $createTime;
     }
 
-
     /**
      * @return string
      */
@@ -72,7 +68,6 @@ class Context
     {
         return $this->uniqueId;
     }
-
 
     /**
      * @param string $uniqueId
@@ -82,7 +77,6 @@ class Context
         $this->uniqueId = $uniqueId;
     }
 
-
     /**
      * @return AuthorizeRequest
      */
@@ -90,7 +84,6 @@ class Context
     {
         return $this->authorizeRequest;
     }
-
 
     /**
      * @param AuthorizeRequest $authorizeRequest
@@ -100,7 +93,6 @@ class Context
         $this->authorizeRequest = $authorizeRequest;
     }
 
-
     /**
      * @return User\Authentication\Status
      */
@@ -108,7 +100,6 @@ class Context
     {
         return $this->authStatus;
     }
-
 
     /**
      * @param User\Authentication\Status $authStatus

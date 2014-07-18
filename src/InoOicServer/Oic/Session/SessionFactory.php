@@ -4,6 +4,7 @@ namespace InoOicServer\Oic\Session;
 use InoOicServer\Oic\AbstractSessionFactory;
 use InoOicServer\Oic\AuthSession\AuthSession;
 use InoOicServer\Oic\Session\Hash\SessionHashGeneratorInterface;
+use InoOicServer\Oic\Session\Hash\SessionHashGenerator;
 
 /**
  * OIC session factory.
@@ -21,6 +22,10 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
      */
     public function getHashGenerator()
     {
+        if (! $this->hashGenerator instanceof SessionHashGeneratorInterface) {
+            $this->hashGenerator = new SessionHashGenerator();
+        }
+
         return $this->hashGenerator;
     }
 
@@ -47,7 +52,7 @@ class SessionFactory extends AbstractSessionFactory implements SessionFactoryInt
 
         $sessionData = array(
             'id' => $sessionId,
-            'authentication_session_id' => $authSession->getId(),
+            'auth_session_id' => $authSession->getId(),
             'create_time' => $createTime,
             'modify_time' => clone $createTime,
             'expiration_time' => $expirationTime,

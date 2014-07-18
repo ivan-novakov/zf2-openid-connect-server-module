@@ -60,7 +60,11 @@ class AuthSessionFactory extends AbstractSessionFactory implements AuthSessionFa
             'method' => $authStatus->getMethod(),
             'create_time' => $createTime,
             'expiration_time' => $expirationTime,
-            'user' => $user
+            'user' => $user,
+
+            // FIXME
+            'user_id' => $user->getId(),
+            'user_data' => serialize($user)
         );
 
         return $this->createEntityFromData($authSessionData);
