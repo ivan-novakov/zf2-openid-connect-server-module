@@ -1,15 +1,13 @@
 <?php
-
 namespace InoOicServer\Oic\User\Authentication;
 
 use InoOicServer\Util\UrlHelper;
 use InoOicServer\Exception\MissingOptionException;
 use InoOicServer\Util\OptionsTrait;
 
-
 class Manager
 {
-    
+
     use OptionsTrait;
 
     const OPT_METHOD = 'method';
@@ -23,12 +21,17 @@ class Manager
      */
     protected $urlHelper;
 
-
+    /**
+     * Constructor.
+     *
+     * @param array $options
+     * @param UrlHelper $urlHelper
+     */
     public function __construct(array $options, UrlHelper $urlHelper)
     {
         $this->setOptions($options);
+        $this->setUrlHelper($urlHelper);
     }
-
 
     /**
      * @return UrlHelper
@@ -38,7 +41,6 @@ class Manager
         return $this->urlHelper;
     }
 
-
     /**
      * @param UrlHelper $urlHelper
      */
@@ -47,10 +49,9 @@ class Manager
         $this->urlHelper = $urlHelper;
     }
 
-
     /**
      * Returns the configured user authentication method.
-     * 
+     *
      * @return string
      */
     public function getAuthenticationMethod()
@@ -58,10 +59,9 @@ class Manager
         return $this->getOption(self::OPT_METHOD);
     }
 
-
     /**
      * Returns the corresponding full authentication URL.
-     * 
+     *
      * @throws MissingOptionException
      * @return string
      */
@@ -71,21 +71,20 @@ class Manager
         if (null === $methodName) {
             throw new MissingOptionException(self::OPT_METHOD);
         }
-        
+
         $authRoute = $this->getOption(self::OPT_AUTH_ROUTE);
         if (null === $authRoute) {
             throw new MissingOptionException(self::OPT_AUTH_ROUTE);
         }
-        
+
         return $this->getUrlHelper()->createUrlStringFromRoute($authRoute, array(
             'controller' => $methodName
         ));
     }
 
-
     /**
      * Returns the full URL the user will be returned to after authentication.
-     * 
+     *
      * @throws MissingOptionException
      * @return string
      */
@@ -95,7 +94,7 @@ class Manager
         if (null === $returnRoute) {
             throw new MissingOptionException(self::OPT_RETURN_ROUTE);
         }
-        
+
         return $this->getUrlHelper()->createUrlStringFromRoute($returnRoute);
     }
 }
