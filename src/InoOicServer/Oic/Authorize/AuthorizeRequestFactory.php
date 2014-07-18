@@ -1,119 +1,43 @@
 <?php
-
 namespace InoOicServer\Oic\Authorize;
 
-use Zend\Http;
 use Zend\Stdlib\Hydrator\ClassMethods;
-use InoOicServer\Util\OptionsTrait;
-use InoOicServer\Util\CookieManager;
-
+use Zend\Stdlib\Hydrator\HydratorInterface;
 
 class AuthorizeRequestFactory implements AuthorizeRequestFactoryInterface
 {
-    
-    use OptionsTrait;
-
-    const OPT_AUTH_COOKIE_NAME = 'auth_cookie_name';
-
-    const OPT_SESSION_COOKIE_NAME = 'session_cookie_name';
 
     /**
-     * @var CookieManager
+     * @var HydratorInterface
      */
-    protected $cookieManager;
+    protected $hydrator;
 
     /**
-     * @var array
+     * @return HydratorInterface
      */
-    protected $defaultOptions = array(
-        self::OPT_AUTH_COOKIE_NAME => 'oic_auth',
-        self::OPT_SESSION_COOKIE_NAME => 'oic_session'
-    );
-
-    /**
-     * @var array
-     */
-    protected $paramNames = array(
-        Params::CLIENT_ID,
-        Params::REDIRECT_URI,
-        Params::RESPONSE_TYPE,
-        Params::SCOPE,
-        Params::STATE,
-        Params::NONCE
-    );
-
-
-    /**
-     * Constructor.
-     * 
-     * @param array $options
-     */
-    public function __construct(array $options = array())
+    public function getHydrator()
     {
-        $this->setOptions($options);
-    }
-
-
-    /**
-     * @return CookieManager
-     */
-    public function getCookieManager()
-    {
-        if (! $this->cookieManager instanceof CookieManager) {
-            $this->cookieManager = new CookieManager();
+        if (! $this->hydrator instanceof HydratorInterface) {
+            $this->hydrator = new ClassMethods();
         }
-        
-        return $this->cookieManager;
-    }
 
+        return $this->hydrator;
+    }
 
     /**
-     * @param CookieManager $cookieManager
+     * @param HydratorInterface $hydrator
      */
-    public function setCookieManager(CookieManager $cookieManager)
+    public function setHydrator(HydratorInterface $hydrator)
     {
-        $this->cookieManager = $cookieManager;
+        $this->hydrator = $hydrator;
     }
-
 
     /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Request\RequestFactoryInterface::createRequest()
      */
-    public function createRequest(Http\Request $httpRequest)
+    public function createRequest(array $values)
     {
-        $request = new AuthorizeRequest();
-        $request->setHttpRequest($httpRequest);
-        
-        /*
-         * GET params
-         */
-        $params = array();
-        foreach ($this->paramNames as $paramName) {
-            $paramValue = $httpRequest->getQuery($paramName);
-            if (null !== $paramValue) {
-                $params[$paramName] = $paramValue;
-            }
-        }
-        
-        $hydrator = new ClassMethods();
-        $hydrator->hydrate($params, $request);
-        
-        /*
-         * Headers
-         */
-        $cookieManager = $this->getCookieManager();
-        
-        $sessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_SESSION_COOKIE_NAME));
-        if (null !== $sessionId) {
-            $request->setSessionId($sessionId);
-        }
-        
-        $authenticationSessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_AUTH_COOKIE_NAME));
-        if (null !== $authenticationSessionId) {
-            $request->setAuthenticationSessionId($authenticationSessionId);
-        }
-        
-        return $request;
+        return $this->getHydrator()->hydrate($values, new AuthorizeRequest());
     }
 }

@@ -2,21 +2,39 @@
 namespace InoOicServer\Oic\Authorize\Http;
 
 use Zend\Http;
+use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
 use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
 use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
 use InoOicServer\Oic\Authorize\Response\ResponseInterface;
 use InoOicServer\Oic\Authorize\Redirect;
 use InoOicServer\Oic\Authorize\Result;
+use InoOicServer\Oic\Authorize\Params;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactoryInterface;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\User\Authentication\Manager;
+use InoOicServer\Oic\Authorize\AuthorizeRequest;
+use InoOicServer\Util\CookieManager;
 
 class HttpService implements HttpServiceInterface
 {
 
     use OptionsTrait;
+
+    const OPT_AUTH_COOKIE_NAME = 'auth_cookie_name';
+
+    const OPT_SESSION_COOKIE_NAME = 'session_cookie_name';
+
+    /**
+     * @var CookieManager
+     */
+    protected $cookieManager;
+
+    /**
+     * @var Manager
+     */
+    protected $authenticationManager;
 
     /**
      * @var AuthorizeRequestFactoryInterface
@@ -24,9 +42,24 @@ class HttpService implements HttpServiceInterface
     protected $authorizeRequestFactory;
 
     /**
-     * @var Manager
+     * @var array
      */
-    protected $authenticationManager;
+    protected $defaultOptions = array(
+        self::OPT_AUTH_COOKIE_NAME => 'oic_auth',
+        self::OPT_SESSION_COOKIE_NAME => 'oic_session'
+    );
+
+    /**
+     * @var array
+    */
+    protected $paramNames = array(
+        Params::CLIENT_ID,
+        Params::REDIRECT_URI,
+        Params::RESPONSE_TYPE,
+        Params::SCOPE,
+        Params::STATE,
+        Params::NONCE
+    );
 
     /**
      * @var array
@@ -59,6 +92,42 @@ class HttpService implements HttpServiceInterface
     }
 
     /**
+     * @return Manager
+     */
+    public function getAuthenticationManager()
+    {
+        return $this->authenticationManager;
+    }
+
+    /**
+     * @param Manager $authenticationManager
+     */
+    public function setAuthenticationManager(Manager $authenticationManager)
+    {
+        $this->authenticationManager = $authenticationManager;
+    }
+
+    /**
+     * @return CookieManager
+     */
+    public function getCookieManager()
+    {
+        if (! $this->cookieManager instanceof CookieManager) {
+            $this->cookieManager = new CookieManager();
+        }
+
+        return $this->cookieManager;
+    }
+
+    /**
+     * @param CookieManager $cookieManager
+     */
+    public function setCookieManager(CookieManager $cookieManager)
+    {
+        $this->cookieManager = $cookieManager;
+    }
+
+    /**
      * @return AuthorizeRequestFactoryInterface
      */
     public function getAuthorizeRequestFactory()
@@ -79,28 +148,41 @@ class HttpService implements HttpServiceInterface
     }
 
     /**
-     * @return Manager
-     */
-    public function getAuthenticationManager()
-    {
-        return $this->authenticationManager;
-    }
-
-    /**
-     * @param Manager $authenticationManager
-     */
-    public function setAuthenticationManager(Manager $authenticationManager)
-    {
-        $this->authenticationManager = $authenticationManager;
-    }
-
-    /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createAuthorizeRequest()
      */
     public function createAuthorizeRequest(Http\Request $httpRequest)
     {
-        return $this->getAuthorizeRequestFactory()->createRequest($httpRequest);
+        $data = array(
+            'http_request' => $httpRequest
+        );
+
+        /*
+         * GET params
+         */
+        foreach ($this->paramNames as $paramName) {
+            $paramValue = $httpRequest->getQuery($paramName);
+            if (null !== $paramValue) {
+                $data[$paramName] = $paramValue;
+            }
+        }
+
+        /*
+         * Headers
+         */
+        $cookieManager = $this->getCookieManager();
+
+        $sessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_SESSION_COOKIE_NAME));
+        if (null !== $sessionId) {
+            $data['session_id'] = $sessionId;
+        }
+
+        $authenticationSessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_AUTH_COOKIE_NAME));
+        if (null !== $authenticationSessionId) {
+            $data['authentication_session_id'] = $authenticationSessionId;
+        }
+
+        return $this->getAuthorizeRequestFactory()->createRequest($data);
     }
 
     /**

@@ -1,20 +1,15 @@
 <?php
-
 namespace InoOicServer\Oic\Authorize;
 
 use Zend\Http;
 
-
 interface AuthorizeRequestFactoryInterface
 {
 
-
     /**
-     * Creates an authoriza request based on the provided
-     * HTTP request.
-     * 
-     * @param Http\Request $httpRequest
-     * @return Request
+     * Creates an authorize request entity based on the provided values.
+     *
+     * @param array $values
      */
-    public function createRequest(Http\Request $httpRequest);
+    public function createRequest(array $values);
 }

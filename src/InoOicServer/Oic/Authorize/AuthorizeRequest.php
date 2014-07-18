@@ -42,9 +42,9 @@ class AuthorizeRequest extends AbstractRequest
     protected $nonce;
 
     /**
-     * Unique ID (set as a cookie) used to associate the user with an 
+     * Unique ID (set as a cookie) used to associate the user with an
      * existing OIC session.
-     * 
+     *
      * @var string
      */
     protected $sessionId;
@@ -52,7 +52,7 @@ class AuthorizeRequest extends AbstractRequest
     /**
      * Unique ID (set as a cookie) used to associate the user agent with
      * an authentication session.
-     * 
+     *
      * @var string
      */
     protected $authenticationSessionId;
@@ -95,7 +95,7 @@ class AuthorizeRequest extends AbstractRequest
 
 
     /**
-     * @return stringunknown_type
+     * @return string
      */
     public function getState()
     {
