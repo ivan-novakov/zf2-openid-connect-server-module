@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer;
 
 use Zend\Mvc\MvcEvent;
@@ -9,16 +8,13 @@ use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\AutoloaderProviderInterface;
 use Zend\ModuleManager\Feature\ControllerProviderInterface;
 
-
-class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface, 
-    ControllerProviderInterface
+class Module implements AutoloaderProviderInterface, BootstrapListenerInterface, ServiceProviderInterface, ControllerProviderInterface
 {
-
 
     public function getAutoloaderConfig()
     {
         return array(
-            
+
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
                     // if we're in a namespace deeper than one level we need to fix the \ in the path
@@ -28,36 +24,34 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         );
     }
 
-
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
-
 
     public function onBootstrap(EventInterface $e)
     {
         $application = $e->getTarget();
         /* @var $e MvcEvent */
         $eventManager = $application->getEventManager();
-        
+
         $services = $application->getServiceManager();
-        
+
         $eventManager->attach('dispatch.error', function ($event) use($services)
         {
-            
+
             $exception = $event->getResult()->exception;
             $error = $event->getError();
             if (! $exception && ! $error) {
                 return;
             }
-            
+
             // $service = $services->get('InoOicServer\ErrorHandler');
             if ($exception) {
                 // $service->logException($exception);
                 _dump(sprintf("[%s] %s\n%s", get_class($exception), $exception->getMessage(), $exception->getTraceAsString()));
             }
-            
+
             if ($error) {
                 // $service->logError('Dispatch ERROR: ' . $error);
                 _dump('Dispatch ERROR: ' . $error);
@@ -65,12 +59,10 @@ class Module implements AutoloaderProviderInterface, BootstrapListenerInterface,
         });
     }
 
-
     public function getServiceConfig()
     {
         return new ServiceManager\ServiceManagerConfig();
     }
-
 
     public function getControllerConfig()
     {
