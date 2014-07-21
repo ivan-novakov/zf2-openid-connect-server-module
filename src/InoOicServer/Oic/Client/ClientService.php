@@ -5,6 +5,7 @@ namespace InoOicServer\Oic\Client;
 use InoOicServer\Oic\Token\TokenRequest;
 use InoOicServer\Oic\Client\Mapper\MapperInterface;
 use InoOicServer\Oic\Client\Authentication\CredentialsExtractor;
+use InoOicServer\Oic\Authorize\AuthorizeRequest;
 
 
 class ClientService implements ClientServiceInterface
@@ -23,7 +24,7 @@ class ClientService implements ClientServiceInterface
 
     /**
      * Constructor.
-     * 
+     *
      * @param MapperInterface $clientMapper
      */
     public function __construct(MapperInterface $clientMapper)
@@ -58,7 +59,7 @@ class ClientService implements ClientServiceInterface
         if (! $this->credentialsExtractor instanceof CredentialsExtractor) {
             $this->credentialsExtractor = new CredentialsExtractor();
         }
-        
+
         return $this->credentialsExtractor;
     }
 
@@ -73,6 +74,34 @@ class ClientService implements ClientServiceInterface
 
 
     /**
+     * {@inheritdoc}
+     * @see \InoOicServer\Oic\Client\ClientServiceInterface::fetchClientFromAuthorizeRequest()
+     * @throws Exception\MissingRedirectUriException
+     * @throws Exception\RedirectUriMismatchException
+     */
+    public function fetchClientFromAuthorizeRequest(AuthorizeRequest $authorizeRequest)
+    {
+        $client = $this->fetchClient($authorizeRequest->getClientId());
+        if (! $client instanceof Client) {
+            // throw new Exception\UnknownClientException(sprintf("Unknown client '%s'",
+            // $authorizeRequest->getClientId()));
+            return null;
+        }
+
+        $redirectUri = $authorizeRequest->getRedirectUri();
+        if (null === $redirectUri) {
+            throw new Exception\MissingRedirectUriException('No redirect URI in authorize request');
+        }
+
+        if (! $client->hasRedirectUri($redirectUri)) {
+            throw new Exception\RedirectUriMismatchException(sprintf("Invalid redirect URI '%s' for client '%s'", $redirectUri, $client->getId()));
+        }
+
+        return $client;
+    }
+
+
+    /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Client\ClientServiceInterface::fetchClient()
      */
@@ -82,7 +111,7 @@ class ClientService implements ClientServiceInterface
         if ($redirectUri && ! $client->hasRedirectUri($redirectUri)) {
             throw new Exception\RedirectUriMismatchException(sprintf("Client '%s' has no redirect URI '%s'", $clientId, $redirectUri));
         }
-        
+
         return $client;
     }
 
@@ -94,22 +123,22 @@ class ClientService implements ClientServiceInterface
         if (null === $credentials) {
             return null;
         }
-        
+
         // fetch client entity for the corresponding client ID
         $client = $this->getClientMapper()->getClientById($credentials->getClientId());
         if (null === $client) {
             throw new Exception\UnknownClientException(sprintf("Unkonwn client '%s'", $credentials->getClientId()));
         }
-        
+
         // authenticate client - check secret and request URI
         if ($client->getSecret() !== $credentials->getClientSecret()) {
             // invalid secret
         }
-        
+
         if (! $client->hasRedirectUri($credentials->getRedirectUri())) {
             // invalid redirect URI
         }
-        
+
         // return client
     }
 }

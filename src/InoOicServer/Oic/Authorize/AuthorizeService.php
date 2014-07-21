@@ -1,4 +1,5 @@
 <?php
+
 namespace InoOicServer\Oic\Authorize;
 
 use InoOicServer\Oic\Error;
@@ -15,6 +16,8 @@ use InoOicServer\Oic\Authorize\Response\ResponseFactoryInterface;
 use InoOicServer\Oic\Authorize\Response\ResponseFactory;
 use InoOicServer\Oic\Authorize\Context\ContextServiceInterface;
 use InoOicServer\Oic\User\UserInterface;
+use InoOicServer\Oic\Client\Exception\ClientExceptionInterface;
+
 
 class AuthorizeService
 {
@@ -49,6 +52,7 @@ class AuthorizeService
      */
     protected $responseFactory;
 
+
     /**
      * Constructor.
      *
@@ -66,6 +70,7 @@ class AuthorizeService
         $this->setAuthCodeService($authCodeService);
     }
 
+
     /**
      * @return ContextServiceInterface
      */
@@ -73,6 +78,7 @@ class AuthorizeService
     {
         return $this->contextService;
     }
+
 
     /**
      * @param ContextServiceInterface $contextService
@@ -82,6 +88,7 @@ class AuthorizeService
         $this->contextService = $contextService;
     }
 
+
     /**
      * @return ClientServiceInterface
      */
@@ -89,6 +96,7 @@ class AuthorizeService
     {
         return $this->clientService;
     }
+
 
     /**
      * @param ClientServiceInterface $clientService
@@ -98,6 +106,7 @@ class AuthorizeService
         $this->clientService = $clientService;
     }
 
+
     /**
      * @return AuthSessionServiceInterface
      */
@@ -105,6 +114,7 @@ class AuthorizeService
     {
         return $this->authSessionService;
     }
+
 
     /**
      * @param AuthSessionServiceInterface $authSession
@@ -114,6 +124,7 @@ class AuthorizeService
         $this->authSessionService = $authSessionService;
     }
 
+
     /**
      * @return SessionServiceInterface
      */
@@ -121,6 +132,7 @@ class AuthorizeService
     {
         return $this->sessionService;
     }
+
 
     /**
      * @param SessionServiceInterface $sessionService
@@ -130,6 +142,7 @@ class AuthorizeService
         $this->sessionService = $sessionService;
     }
 
+
     /**
      * @return AuthCodeServiceInterface
      */
@@ -138,6 +151,7 @@ class AuthorizeService
         return $this->authCodeService;
     }
 
+
     /**
      * @param AuthCodeServiceInterface $authCodeService
      */
@@ -145,6 +159,7 @@ class AuthorizeService
     {
         $this->authCodeService = $authCodeService;
     }
+
 
     /**
      * @return ResponseFactoryInterface
@@ -158,6 +173,7 @@ class AuthorizeService
         return $this->responseFactory;
     }
 
+
     /**
      * @param ResponseFactoryInterface $responseFactory
      */
@@ -166,6 +182,7 @@ class AuthorizeService
         $this->responseFactory = $responseFactory;
     }
 
+
     public function processRequest(AuthorizeRequest $request)
     {
         // FIXME - perform request validation
@@ -173,6 +190,7 @@ class AuthorizeService
         // FIXME - move client validation to client service
 
         // identify and validate client (application)
+        /*
         $client = $this->getClientService()->fetchClient($request->getClientId(), $request->getRedirectUri());
         if (! $client) {
             // client error
@@ -188,6 +206,12 @@ class AuthorizeService
         if (! $client->hasRedirectUri($clientRedirectUri)) {
             // client error
             return $this->createClientErrorResult('invalid_request', 'Invalid client');
+        }
+        */
+        try {
+            $client = $this->getClientService()->fetchClientFromAuthorizeRequest($request);
+        } catch (ClientExceptionInterface $e) {
+            return $this->createClientErrorResult('invalid_request', sprintf("[%s] %s", get_class($e), $e->getMessage()));
         }
 
         // create new Authorize\Context
@@ -222,6 +246,7 @@ class AuthorizeService
         // otherwise redirect to authentication
         return $this->createRedirectToAuthenticationResult();
     }
+
 
     public function processResponse(ResponseInterface $response = null)
     {
@@ -294,6 +319,7 @@ class AuthorizeService
         return $this->createResponseResult($authCode, $request, $session);
     }
 
+
     public function initAuthCodeFromAuthSession(AuthSession $authSession, Client $client, AuthorizeRequest $request)
     {
         $session = $this->getSessionService()->initSessionFromAuthSession($authSession, $request->getNonce());
@@ -301,6 +327,7 @@ class AuthorizeService
 
         return $authCode;
     }
+
 
     public function fetchAuthSessionFromRequest(AuthorizeRequest $request)
     {
@@ -311,6 +338,7 @@ class AuthorizeService
         return null;
     }
 
+
     public function fetchSessionFromRequest(AuthorizeRequest $request)
     {
         if ($sessionId = $request->getSessionId()) {
@@ -320,6 +348,7 @@ class AuthorizeService
         return null;
     }
 
+
     public function createResponseResult(AuthCode $authCode, AuthorizeRequest $request, Session $session)
     {
         $response = $this->getResponseFactory()->createAuthorizeResponse($authCode, $request, $session);
@@ -327,6 +356,7 @@ class AuthorizeService
 
         return $result;
     }
+
 
     protected function __createAuthorizeErrorResult($message, $description, $request)
     {
@@ -337,6 +367,7 @@ class AuthorizeService
         return $this->createAuthorizeErrorResult($error, $request);
     }
 
+
     public function createAuthorizeErrorResult(Error $error, AuthorizeRequest $request)
     {
         $response = $this->getResponseFactory()->createAuthorizeErrorResponse($error, $request);
@@ -344,6 +375,7 @@ class AuthorizeService
 
         return $result;
     }
+
 
     public function createRedirectToAuthenticationResult()
     {
@@ -353,6 +385,7 @@ class AuthorizeService
         return $result;
     }
 
+
     public function createClientErrorResult($message, $description = null)
     {
         $error = new Error();
@@ -361,6 +394,7 @@ class AuthorizeService
 
         return $this->createClientErrorResultFromError($error);
     }
+
 
     public function createClientErrorResultFromError(Error $error)
     {
