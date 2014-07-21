@@ -1,7 +1,6 @@
 <?php
 namespace InoOicServer\Oic\Authentication\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController;
 use InoOicServer\Oic\Authorize\AuthorizeRequest;
 use InoOicServer\Oic\Authorize\Context\Context;
 use InoOicServer\Oic\User\Authentication\Status;
@@ -18,13 +17,13 @@ class DummyController extends AbstractAuthenticationController
         if (! $context instanceof Context) {
             return $this->errorResponse('missing context');
         }
-
+        
         $authorizeRequest = $context->getAuthorizeRequest();
         if (! $authorizeRequest instanceof AuthorizeRequest) {
             // error
             return $this->errorResponse('missing request');
         }
-
+        
         // authenticate BEGIN
         $user = new User();
         $user->setId('testuser');
@@ -32,7 +31,7 @@ class DummyController extends AbstractAuthenticationController
         $user->setFirstName('Test');
         $user->setFamilyName('User');
         // authenticate END
-
+        
         return $this->validResponse($user);
     }
 
@@ -43,7 +42,7 @@ class DummyController extends AbstractAuthenticationController
         $status->setMethod('dummy');
         $status->setTime(new \DateTime());
         $status->setAuthenticated(true);
-
+        
         return $this->response($status);
     }
 
@@ -51,7 +50,7 @@ class DummyController extends AbstractAuthenticationController
     {
         $status = new Status();
         $status->setError(new Error($message, $description));
-
+        
         return $this->response($status);
     }
 
@@ -62,10 +61,10 @@ class DummyController extends AbstractAuthenticationController
         if (! $context) {
             $context = $contextService->createContext();
         }
-
+        
         $context->setAuthStatus($status);
         $this->getContextService()->saveContext($context);
-
+        
         return $this->redirectBack();
     }
 
