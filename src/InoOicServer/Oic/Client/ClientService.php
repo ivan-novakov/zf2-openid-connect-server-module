@@ -1,12 +1,10 @@
 <?php
-
 namespace InoOicServer\Oic\Client;
 
 use InoOicServer\Oic\Token\TokenRequest;
 use InoOicServer\Oic\Client\Mapper\MapperInterface;
 use InoOicServer\Oic\Client\Authentication\CredentialsExtractor;
 use InoOicServer\Oic\Authorize\AuthorizeRequest;
-
 
 class ClientService implements ClientServiceInterface
 {
@@ -21,7 +19,6 @@ class ClientService implements ClientServiceInterface
      */
     protected $credentialsExtractor;
 
-
     /**
      * Constructor.
      *
@@ -32,7 +29,6 @@ class ClientService implements ClientServiceInterface
         $this->setClientMapper($clientMapper);
     }
 
-
     /**
      * @return MapperInterface
      */
@@ -40,7 +36,6 @@ class ClientService implements ClientServiceInterface
     {
         return $this->clientMapper;
     }
-
 
     /**
      * @param MapperInterface $clientMapper
@@ -50,7 +45,6 @@ class ClientService implements ClientServiceInterface
         $this->clientMapper = $clientMapper;
     }
 
-
     /**
      * @return CredentialsExtractor
      */
@@ -59,10 +53,9 @@ class ClientService implements ClientServiceInterface
         if (! $this->credentialsExtractor instanceof CredentialsExtractor) {
             $this->credentialsExtractor = new CredentialsExtractor();
         }
-
+        
         return $this->credentialsExtractor;
     }
-
 
     /**
      * @param CredentialsExtractor $credentialsExtractor
@@ -71,7 +64,6 @@ class ClientService implements ClientServiceInterface
     {
         $this->credentialsExtractor = $credentialsExtractor;
     }
-
 
     /**
      * {@inheritdoc}
@@ -83,23 +75,20 @@ class ClientService implements ClientServiceInterface
     {
         $client = $this->fetchClient($authorizeRequest->getClientId());
         if (! $client instanceof Client) {
-            // throw new Exception\UnknownClientException(sprintf("Unknown client '%s'",
-            // $authorizeRequest->getClientId()));
-            return null;
+            throw new Exception\UnknownClientException(sprintf("Unknown client '%s'", $authorizeRequest->getClientId()));
         }
-
+        
         $redirectUri = $authorizeRequest->getRedirectUri();
         if (null === $redirectUri) {
             throw new Exception\MissingRedirectUriException('No redirect URI in authorize request');
         }
-
+        
         if (! $client->hasRedirectUri($redirectUri)) {
             throw new Exception\RedirectUriMismatchException(sprintf("Invalid redirect URI '%s' for client '%s'", $redirectUri, $client->getId()));
         }
-
+        
         return $client;
     }
-
 
     /**
      * {@inhertidoc}
@@ -111,10 +100,9 @@ class ClientService implements ClientServiceInterface
         if ($redirectUri && ! $client->hasRedirectUri($redirectUri)) {
             throw new Exception\RedirectUriMismatchException(sprintf("Client '%s' has no redirect URI '%s'", $clientId, $redirectUri));
         }
-
+        
         return $client;
     }
-
 
     public function resolveClientByTokenRequest(TokenRequest $request)
     {
@@ -123,22 +111,22 @@ class ClientService implements ClientServiceInterface
         if (null === $credentials) {
             return null;
         }
-
+        
         // fetch client entity for the corresponding client ID
         $client = $this->getClientMapper()->getClientById($credentials->getClientId());
         if (null === $client) {
             throw new Exception\UnknownClientException(sprintf("Unkonwn client '%s'", $credentials->getClientId()));
         }
-
+        
         // authenticate client - check secret and request URI
         if ($client->getSecret() !== $credentials->getClientSecret()) {
             // invalid secret
         }
-
+        
         if (! $client->hasRedirectUri($credentials->getRedirectUri())) {
             // invalid redirect URI
         }
-
+        
         // return client
     }
 }
