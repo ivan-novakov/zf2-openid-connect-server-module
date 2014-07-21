@@ -1,5 +1,4 @@
 <?php
-
 namespace InoOicServer\Oic\AuthSession\Mapper;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
@@ -10,10 +9,8 @@ use InoOicServer\Oic\AuthSession\AuthSessionHydrator;
 use InoOicServer\Db\AbstractMapper;
 use InoOicServer\Oic\EntityFactoryInterface;
 
-
 class DbMapper extends AbstractMapper implements MapperInterface
 {
-
 
     /**
      * Constructor.
@@ -27,15 +24,14 @@ class DbMapper extends AbstractMapper implements MapperInterface
         if (null === $hydrator) {
             $hydrator = new AuthSessionHydrator();
         }
-
+        
         if (null === $factory) {
             $factory = new AuthSessionFactory();
             $factory->setHydrator($hydrator);
         }
-
+        
         parent::__construct($dbAdapter, $factory, $hydrator);
     }
-
 
     /**
      * {@inheritdoc}
@@ -46,7 +42,6 @@ class DbMapper extends AbstractMapper implements MapperInterface
         return (null !== $this->fetch($authSessionId));
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthSession\Mapper\MapperInterface::save()
@@ -54,10 +49,9 @@ class DbMapper extends AbstractMapper implements MapperInterface
     public function save(AuthSession $authSession)
     {
         $authSessionData = $this->getHydrator()->extract($authSession);
-
+        
         $this->createOrUpdateEntity($authSession->getId(), 'auth_session', $authSessionData);
     }
-
 
     /**
      * {@inheritdoc}
@@ -68,19 +62,33 @@ class DbMapper extends AbstractMapper implements MapperInterface
         $select = $this->getSql()->select();
         $select->from('auth_session');
         $select->where('id = :id');
-
+        
         return $this->executeSingleEntityQuery($select, array(
             'id' => $id
         ));
     }
 
+    public function fetchByUserAndMethod($userId, $methodName)
+    {
+        $select = $this->getSql()->select();
+        $select->from('auth_session');
+        $select->where(array(
+            'user_id = :user_id',
+            'method = :method'
+        ));
+        
+        return $this->executeSingleEntityQuery($select, array(
+            'user_id' => $userId,
+            'method' => $methodName
+        ));
+    }
 
     public function delete($id)
     {
         $delete = $this->getSql()->delete();
         $delete->from('auth_session');
         $delete->where('id = :id');
-
+        
         $this->executeSqlObject($delete, array(
             'id' => $id
         ));
