@@ -369,7 +369,8 @@ class HttpService implements HttpServiceInterface
 
     protected function createSetCookieHeader($name, $value)
     {
-        $setCookie = new SetCookie($name, $value, null, null, null, true, true);
+        // FIXME
+        $setCookie = new SetCookie($name, $value, null, '/', null, false, true);
         
         return $setCookie;
     }
