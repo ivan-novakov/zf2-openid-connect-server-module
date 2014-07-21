@@ -1,86 +1,40 @@
 <?php
-
 return array(
-
     'oic_server' => array(
-    
-        'oic_server_info' => array(
-            'base_uri' => 'https://oic.server.org/authn',
-        ),
-    
-    	'oic_session_manager' => array(
-            'session_expire_interval' => 'PT1H',
-            'authorization_code_expire_interval' => 'PT5M',
-            'access_token_expire_interval' => 'PT12H',
-            'refresh_token_expire_interval' => 'PT24H'
-        ),
         
-        'session_storage' => array(
-            'type' => 'MysqlLite',
-            'options' => array(
-                
-                'session_table' => 'session',
-                'authorization_code_table' => 'authorization_code',
-                'access_token_table' => 'access_token',
-                'refresh_token_table' => 'refresh_token',
-                
-                'adapter' => array(
-                    'driver' => 'Pdo_Mysql',
-                    'host' => 'localhost',
-                    'database' => 'oic_server',
-                    'username' => 'admin',
-                    'password' => 'passwd'
-                )
+        'db' => array(
+            'adapter' => array(
+                'driver' => 'Pdo_Mysql',
+                'hostname' => 'localhost',
+                'database' => 'oicserver',
+                'username' => 'oicadmin',
+                'password' => 'xxx'
             )
         ),
         
-        'logger' => array(
-            'writers' => array(
-                'stream' => array(
-                    'options' => array(
-                        'stream' => '/data/var/log/server.log'
-                    ),
-                    'filters' => array(
-                        'priority' => 7
-                    ),
-                    'formatter' => array(
-                        'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
-                        'dateTimeFormat' => 'Y-m-d H:i:s'
-                    )
-                )
-            )
+        'user_authentication_manager' => array(
+            'method' => 'dummy',
+            'auth_route' => 'oic/authentication',
+            'return_route' => 'oic/authorize-response-endpoint'
         ),
         
-        'client_registry_storage' => array(
-            'type' => 'SingleJsonFileStorage',
-            'options' => array(
-                'json_file' => 'data/client/metadata.json'
-            )
+        'client_mapper' => array(
+            'file' => __DIR__ . '/../../data/clients.php'
         ),
         
-        'authentication_handlers' => array(
-            
-            'basic-auth' => array(
-                'class' => 'InoOicServer\Authentication\Controller\BasicAuthController',
-                'options' => array(
-                    'file' => 'data/auth/users.php'
-                )
-            )
+        'auth_session_service' => array(
+            'salt' => 'auth session salt',
+            'age' => 1800
         ),
         
-        'user_validators' => array(
-            
-            'dummy' => array(
-                'class' => '\InoOicServer\User\Validator\Dummy',
-                'options' => array(
-                    'valid' => true,
-                    'redirect_uri' => 'http://registration.example.org/'
-                )
-            )
+        'session_service' => array(
+            'salt' => 'session salt',
+            'age' => 3600
         ),
         
-        'context_authorize' => array(
-            'timeout' => 1800
-        ),
+        'auth_code_service' => array(
+            'salt' => 'auth code salt',
+            'age' => 7200
+        )
     )
 );
