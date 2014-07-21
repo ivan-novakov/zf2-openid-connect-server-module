@@ -1,10 +1,8 @@
 <?php
-
 namespace InoOicServer\Oic\Authorize\Http;
 
 use Zend\Http;
 use Zend\Uri;
-use Zend\Stdlib\Hydrator\ClassMethods;
 use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
 use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
 use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
@@ -16,14 +14,12 @@ use InoOicServer\Oic\Authorize\AuthorizeRequestFactoryInterface;
 use InoOicServer\Oic\Authorize\AuthorizeRequestFactory;
 use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\User\Authentication\Manager;
-use InoOicServer\Oic\Authorize\AuthorizeRequest;
 use InoOicServer\Util\CookieManager;
 use Zend\Http\Header\SetCookie;
 
-
 class HttpService implements HttpServiceInterface
 {
-
+    
     use OptionsTrait;
 
     const OPT_AUTH_COOKIE_NAME = 'auth_cookie_name';
@@ -83,7 +79,6 @@ class HttpService implements HttpServiceInterface
         Redirect::TO_URL => 'createHttpResponseFromRedirectToUrl'
     );
 
-
     /**
      * Constructor.
      *
@@ -96,7 +91,6 @@ class HttpService implements HttpServiceInterface
         $this->setAuthenticationManager($authenticationManager);
     }
 
-
     /**
      * @return Manager
      */
@@ -104,7 +98,6 @@ class HttpService implements HttpServiceInterface
     {
         return $this->authenticationManager;
     }
-
 
     /**
      * @param Manager $authenticationManager
@@ -114,7 +107,6 @@ class HttpService implements HttpServiceInterface
         $this->authenticationManager = $authenticationManager;
     }
 
-
     /**
      * @return CookieManager
      */
@@ -123,10 +115,9 @@ class HttpService implements HttpServiceInterface
         if (! $this->cookieManager instanceof CookieManager) {
             $this->cookieManager = new CookieManager();
         }
-
+        
         return $this->cookieManager;
     }
-
 
     /**
      * @param CookieManager $cookieManager
@@ -136,7 +127,6 @@ class HttpService implements HttpServiceInterface
         $this->cookieManager = $cookieManager;
     }
 
-
     /**
      * @return AuthorizeRequestFactoryInterface
      */
@@ -145,10 +135,9 @@ class HttpService implements HttpServiceInterface
         if (! $this->authorizeRequestFactory instanceof AuthorizeRequestFactoryInterface) {
             $this->authorizeRequestFactory = new AuthorizeRequestFactory();
         }
-
+        
         return $this->authorizeRequestFactory;
     }
-
 
     /**
      * @param AuthorizeRequestFactoryInterface $authorizeRequestFactory
@@ -157,7 +146,6 @@ class HttpService implements HttpServiceInterface
     {
         $this->authorizeRequestFactory = $authorizeRequestFactory;
     }
-
 
     /**
      * {@inhertidoc}
@@ -168,7 +156,7 @@ class HttpService implements HttpServiceInterface
         $data = array(
             'http_request' => $httpRequest
         );
-
+        
         /*
          * GET params
          */
@@ -178,25 +166,24 @@ class HttpService implements HttpServiceInterface
                 $data[$paramName] = $paramValue;
             }
         }
-
+        
         /*
          * Headers
          */
         $cookieManager = $this->getCookieManager();
-
+        
         $sessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_SESSION_COOKIE_NAME));
         if (null !== $sessionId) {
             $data['session_id'] = $sessionId;
         }
-
+        
         $authenticationSessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_AUTH_COOKIE_NAME));
         if (null !== $authenticationSessionId) {
             $data['authentication_session_id'] = $authenticationSessionId;
         }
-
+        
         return $this->getAuthorizeRequestFactory()->createRequest($data);
     }
-
 
     /**
      * {@inhertidoc}
@@ -207,12 +194,11 @@ class HttpService implements HttpServiceInterface
         if ($result->getType() === Result::TYPE_REDIRECT) {
             return $this->createHttpResponseFromRedirect($result->getRedirect());
         }
-
+        
         $httpResponse = $this->createHttpResponseFromResponse($result->getResponse());
-
+        
         return $httpResponse;
     }
-
 
     /**
      * @param Redirect $redirect
@@ -225,18 +211,17 @@ class HttpService implements HttpServiceInterface
         if (! isset($this->redirectHandlers[$redirectType])) {
             throw new \RuntimeException(sprintf("Unknown redirect type '%s'", $redirectType));
         }
-
+        
         $redirectHandler = $this->redirectHandlers[$redirectType];
         if (! method_exists($this, $redirectHandler)) {
             throw new \RuntimeException(sprintf("Non-existent redirect handler '%s' for redirect type '%s", $redirectHandler, $redirectType));
         }
-
+        
         return call_user_func(array(
             $this,
             $redirectHandler
         ), $redirect);
     }
-
 
     /**
      * @param Redirect $redirect
@@ -246,10 +231,9 @@ class HttpService implements HttpServiceInterface
     {
         $redirectUrl = $this->getAuthenticationManager()->getAuthenticationUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-
+        
         return $response;
     }
-
 
     /**
      * @param Redirect $redirect
@@ -259,10 +243,9 @@ class HttpService implements HttpServiceInterface
     {
         $redirectUrl = $this->getAuthenticationManager()->getReturnUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-
+        
         return $response;
     }
-
 
     /**
      * @param Redirect $redirect
@@ -272,10 +255,9 @@ class HttpService implements HttpServiceInterface
     {
         $redirectUrl = $redirect->getUrl();
         $response = $this->createRedirectHttpResponse($redirectUrl);
-
+        
         return $response;
     }
-
 
     /**
      * @param ResponseInterface $response
@@ -288,18 +270,17 @@ class HttpService implements HttpServiceInterface
         if (! isset($this->responseHandlers[$responseClass])) {
             throw new \RuntimeException(sprintf("Unknown response class '%s'", $responseClass));
         }
-
+        
         $responseHandler = $this->responseHandlers[$responseClass];
         if (! method_exists($this, $responseHandler)) {
             throw new \RuntimeException(sprintf("Non-existent response handler '%s' for response class '%s'", $responseHandler, $responseClass));
         }
-
+        
         return call_user_func(array(
             $this,
             $responseHandler
         ), $response);
     }
-
 
     /**
      * @param ClientErrorResponse $clientErrorResponse
@@ -308,14 +289,13 @@ class HttpService implements HttpServiceInterface
     protected function createHttpResponseFromClientError(ClientErrorResponse $clientErrorResponse)
     {
         $error = $clientErrorResponse->getError();
-
+        
         $httpResponse = new Http\Response();
         $httpResponse->setStatusCode(400);
         $httpResponse->setContent(sprintf("Client error '%s' (%s)", $error->getMessage(), $error->getDescription()));
-
+        
         return $httpResponse;
     }
-
 
     /**
      * @param AuthorizeErrorResponse $authorizeErrorResponse
@@ -325,24 +305,23 @@ class HttpService implements HttpServiceInterface
     {
         $error = $authorizeErrorResponse->getError();
         $redirectUri = $authorizeErrorResponse->getRedirectUri();
-
+        
         $httpResponse = new Http\Response();
         $httpResponse->setStatusCode(302);
-
+        
         $uri = new Uri\Http($redirectUri);
         $uri->setQuery(array(
             Params::STATE => $authorizeErrorResponse->getState(),
             Params::ERROR => $error->getMessage(),
             Params::ERROR_DESCRIPTION => $error->getDescription()
         ));
-
+        
         $httpResponse->getHeaders()->addHeaders(array(
             'Location' => $uri->toString()
         ));
-
+        
         return $httpResponse;
     }
-
 
     /**
      * @param AuthorizeResponse $authorizeResponse
@@ -353,7 +332,7 @@ class HttpService implements HttpServiceInterface
         $httpResponse = new Http\Response();
         $httpResponse->setStatusCode(302);
         $httpResponse->setContent(sprintf("code: %s --> %s", $authorizeResponse->getCode(), $authorizeResponse->getRedirectUri()));
-
+        
         $uri = new Uri\Http($authorizeResponse->getRedirectUri());
         $uri->setQuery(array(
             Params::CODE => $authorizeResponse->getCode(),
@@ -362,15 +341,14 @@ class HttpService implements HttpServiceInterface
         $httpResponse->getHeaders()->addHeaders(array(
             'Location' => $uri->toString()
         ));
-
+        
         $httpResponse->getHeaders()->addHeaders(array(
             $this->createSetCookieHeader($this->getOption(self::OPT_AUTH_COOKIE_NAME), $authorizeResponse->getAuthSessionId()),
             $this->createSetCookieHeader($this->getOption(self::OPT_SESSION_COOKIE_NAME), $authorizeResponse->getSessionId())
         ));
-
+        
         return $httpResponse;
     }
-
 
     /**
      * @param string $redirectUrl
@@ -381,19 +359,18 @@ class HttpService implements HttpServiceInterface
     {
         $locationHeader = new Http\Header\Location();
         $locationHeader->setUri($redirectUrl);
-
+        
         $response = new Http\Response();
         $response->getHeaders()->addHeader($locationHeader);
         $response->setStatusCode($statusCode);
-
+        
         return $response;
     }
-
 
     protected function createSetCookieHeader($name, $value)
     {
         $setCookie = new SetCookie($name, $value, null, null, null, true, true);
-
+        
         return $setCookie;
     }
 }
