@@ -1,21 +1,18 @@
 <?php
-
 namespace InoOicServerTest\Oic\AuthSession;
 
 use InoOicServer\Oic\AuthSession\AuthSessionService;
-
+use InoOicServer\Oic\AuthSession\AuthSession;
 
 class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $service;
 
-
     public function setUp()
     {
         $this->service = new AuthSessionService($this->createAuthSessionMapperMock());
     }
-
 
     public function testSetMapper()
     {
@@ -24,7 +21,6 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($mapper, $this->service->getAuthSessionMapper());
     }
 
-
     public function testSetFactory()
     {
         $factory = $this->createAuthSessionFactory();
@@ -32,12 +28,10 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($factory, $this->service->getAuthSessionFactory());
     }
 
-
     public function testGetImplicitFactory()
     {
         $this->assertInstanceOf('InoOicServer\Oic\AuthSession\AuthSessionFactoryInterface', $this->service->getAuthSessionFactory());
     }
-
 
     public function testCreateSession()
     {
@@ -61,12 +55,27 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($authSession, $this->service->createSession($authStatus));
     }
 
-
-    public function testSaveSession()
+    public function testSaveSessionWithExistingSession()
     {
-        $authSession = $this->createAuthSessionMock();
+        $userId = 'testuser';
+        $method = 'dummy';
+        $sessionId = '123qwe';
+        
+        $existingAuthSession = new AuthSession();
+        $existingAuthSession->setId($sessionId);
+        
+        $authSession = new AuthSession();
+        $authSession->setUserId($userId);
+        $authSession->setMethod($method);
         
         $mapper = $this->createAuthSessionMapperMock();
+        $mapper->expects($this->once())
+            ->method('fetchByUserAndMethod')
+            ->with($userId, $method)
+            ->will($this->returnValue($existingAuthSession));
+        $mapper->expects($this->once())
+            ->method('delete')
+            ->with($sessionId);
         $mapper->expects($this->once())
             ->method('save')
             ->with($authSession);
@@ -75,6 +84,27 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         $this->service->saveSession($authSession);
     }
 
+    public function testSaveSession()
+    {
+        $userId = 'testuser';
+        $method = 'dummy';
+        
+        $authSession = new AuthSession();
+        $authSession->setUserId($userId);
+        $authSession->setMethod($method);
+        
+        $mapper = $this->createAuthSessionMapperMock();
+        $mapper->expects($this->once())
+            ->method('fetchByUserAndMethod')
+            ->with($userId, $method)
+            ->will($this->returnValue(null));
+        $mapper->expects($this->once())
+            ->method('save')
+            ->with($authSession);
+        
+        $this->service->setAuthSessionMapper($mapper);
+        $this->service->saveSession($authSession);
+    }
 
     public function testFetchSession()
     {
@@ -101,14 +131,12 @@ class AuthSessionServiceTest extends \PHPUnit_Framework_TestCase
         return $mapper;
     }
 
-
     protected function createAuthSessionMock()
     {
         $authSession = $this->getMock('InoOicServer\Oic\AuthSession\AuthSession');
         
         return $authSession;
     }
-
 
     protected function createAuthSessionFactory()
     {

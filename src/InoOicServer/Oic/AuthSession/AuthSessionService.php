@@ -1,12 +1,10 @@
 <?php
-
 namespace InoOicServer\Oic\AuthSession;
 
 use InoOicServer\Util\OptionsTrait;
 use InoOicServer\Oic\User;
 use InoOicServer\Crypto\Hash\HashGeneratorInterface;
 use InoOicServer\Oic\AuthSession\Mapper\MapperInterface;
-
 
 class AuthSessionService implements AuthSessionServiceInterface
 {
@@ -41,7 +39,6 @@ class AuthSessionService implements AuthSessionServiceInterface
         self::OPT_AGE => 3600
     );
 
-
     /**
      * Constructor.
      * 
@@ -54,7 +51,6 @@ class AuthSessionService implements AuthSessionServiceInterface
         $this->setOptions($options);
     }
 
-
     /**
      * @return MapperInterface
      */
@@ -63,7 +59,6 @@ class AuthSessionService implements AuthSessionServiceInterface
         return $this->authSessionMapper;
     }
 
-
     /**
      * @param MapperInterface $authSessionMapper
      */
@@ -71,7 +66,6 @@ class AuthSessionService implements AuthSessionServiceInterface
     {
         $this->authSessionMapper = $authSessionMapper;
     }
-
 
     /**
      * @return AuthSessionFactoryInterface
@@ -85,7 +79,6 @@ class AuthSessionService implements AuthSessionServiceInterface
         return $this->authSessionFactory;
     }
 
-
     /**
      * @param AuthSessionFactoryInterface $authSessionFactory
      */
@@ -93,7 +86,6 @@ class AuthSessionService implements AuthSessionServiceInterface
     {
         $this->authSessionFactory = $authSessionFactory;
     }
-
 
     /**
      * {@inheritdoc}
@@ -107,16 +99,19 @@ class AuthSessionService implements AuthSessionServiceInterface
         return $authSession;
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthSession\AuthSessionServiceInterface::saveSession()
      */
     public function saveSession(AuthSession $authSession)
     {
-        $this->getAuthSessionMapper()->save($authSession);
+        $authSessionMapper = $this->getAuthSessionMapper();
+        if ($existingAuthSession = $authSessionMapper->fetchByUserAndMethod($authSession->getUserId(), $authSession->getMethod())) {
+            $authSessionMapper->delete($existingAuthSession->getId());
+        }
+        
+        $authSessionMapper->save($authSession);
     }
-
 
     /**
      * {@inheritdoc}

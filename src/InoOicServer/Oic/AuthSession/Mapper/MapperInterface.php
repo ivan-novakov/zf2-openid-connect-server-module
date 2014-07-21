@@ -22,6 +22,7 @@ interface MapperInterface
      * 
      * @param string $userId
      * @param string $methodName
+     * @return AuthSession|null
      */
     public function fetchByUserAndMethod($userId, $methodName);
 

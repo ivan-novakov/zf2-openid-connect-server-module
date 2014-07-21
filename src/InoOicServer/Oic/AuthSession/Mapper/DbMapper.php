@@ -68,6 +68,10 @@ class DbMapper extends AbstractMapper implements MapperInterface
         ));
     }
 
+    /**
+     * {@inhertidoc}
+     * @see \InoOicServer\Oic\AuthSession\Mapper\MapperInterface::fetchByUserAndMethod()
+     */
     public function fetchByUserAndMethod($userId, $methodName)
     {
         $select = $this->getSql()->select();
