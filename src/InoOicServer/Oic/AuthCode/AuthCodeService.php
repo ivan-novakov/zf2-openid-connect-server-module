@@ -1,11 +1,9 @@
 <?php
-
 namespace InoOicServer\Oic\AuthCode;
 
 use InoOicServer\Oic\Session\Session;
 use InoOicServer\Oic\Client\Client;
 use InoOicServer\Util\OptionsTrait;
-
 
 class AuthCodeService implements AuthCodeServiceInterface
 {
@@ -34,7 +32,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         'salt' => 'auth code default salt - change it'
     );
 
-
     /**
      * Constructor.
      * 
@@ -47,7 +44,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         $this->setOptions($options);
     }
 
-
     /**
      * @return Mapper\MapperInterface
      */
@@ -56,7 +52,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         return $this->authCodeMapper;
     }
 
-
     /**
      * @param Mapper\MapperInterface $authCodeMapper
      */
@@ -64,7 +59,6 @@ class AuthCodeService implements AuthCodeServiceInterface
     {
         $this->authCodeMapper = $authCodeMapper;
     }
-
 
     /**
      * @return AuthCodeFactoryInterface
@@ -78,7 +72,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         return $this->authCodeFactory;
     }
 
-
     /**
      * @param AuthCodeFactoryInterface $authCodeFactory
      */
@@ -86,7 +79,6 @@ class AuthCodeService implements AuthCodeServiceInterface
     {
         $this->authCodeFactory = $authCodeFactory;
     }
-
 
     /**
      * {@inheritdoc}
@@ -98,10 +90,11 @@ class AuthCodeService implements AuthCodeServiceInterface
         $salt = $this->getOption(self::OPT_SALT);
         
         $authCode = $this->getAuthCodeFactory()->createAuthCode($session, $client, $age, $salt, $scope);
+        // TEST
+        $authCode->setSession($session);
         
         return $authCode;
     }
-
 
     /**
      * {@inheritdoc}
@@ -114,7 +107,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         return true;
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::fetchAuthCode()
@@ -124,16 +116,20 @@ class AuthCodeService implements AuthCodeServiceInterface
         return $this->getAuthCodeMapper()->fetch($code);
     }
 
-
     /**
      * {@inheritdoc}
      * @see \InoOicServer\Oic\AuthCode\AuthCodeServiceInterface::fetchAuthCodeBySession()
      */
     public function fetchAuthCodeBySession(Session $session, Client $client, $scope = null)
     {
-        return $this->getAuthCodeMapper()->fetchBySession($session->getId(), $client->getId(), $scope);
+        $authCode = $this->getAuthCodeMapper()->fetchBySession($session->getId(), $client->getId(), $scope);
+        // TEST
+        if ($authCode instanceof AuthCode) {
+            $authCode->setSession($session);
+        }
+        
+        return $authCode;
     }
-
 
     /**
      * {@inheritdoc}
@@ -145,7 +141,6 @@ class AuthCodeService implements AuthCodeServiceInterface
         
         return true;
     }
-
 
     /**
      * {@inheritdoc}

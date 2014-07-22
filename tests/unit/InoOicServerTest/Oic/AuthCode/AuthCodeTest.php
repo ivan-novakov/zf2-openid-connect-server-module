@@ -1,14 +1,12 @@
 <?php
-
 namespace InoOicServerTest\Oic\AuthCode;
 
 use DateTime;
 use InoOicServer\Oic\AuthCode\AuthCode;
-
+use InoOicServer\Oic\Session\Session;
 
 class AuthCodeTest extends \PHPUnit_Framework_TestCase
 {
-
 
     public function testGettersAndSetters()
     {
@@ -18,6 +16,7 @@ class AuthCodeTest extends \PHPUnit_Framework_TestCase
         $createTime = '2014-01-02';
         $expirationTime = '2014-01-03';
         $scope = 'foo';
+        $session = new Session();
         
         $authCode = new AuthCode();
         
@@ -27,6 +26,7 @@ class AuthCodeTest extends \PHPUnit_Framework_TestCase
         $authCode->setCreateTime($createTime);
         $authCode->setExpirationTime($expirationTime);
         $authCode->setScope($scope);
+        $authCode->setSession($session);
         
         $this->assertSame($code, $authCode->getCode());
         $this->assertSame($clientId, $authCode->getClientId());
@@ -34,5 +34,6 @@ class AuthCodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(new DateTime($createTime), $authCode->getCreateTime());
         $this->assertEquals(new DateTime($expirationTime), $authCode->getExpirationTime());
         $this->assertSame($scope, $authCode->getScope());
+        $this->assertSame($session, $authCode->getSession());
     }
 }

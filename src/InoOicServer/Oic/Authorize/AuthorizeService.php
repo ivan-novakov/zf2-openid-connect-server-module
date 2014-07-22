@@ -204,7 +204,7 @@ class AuthorizeService
             $authCode = $this->initAuthCodeFromAuthSession($authSession, $client, $request);
             
             // create and return response with the code
-            return $this->createResponseResult($authCode, $request, $session);
+            return $this->createResponseResult($authCode, $request);
         }
         
         // otherwise redirect to authentication
@@ -308,8 +308,13 @@ class AuthorizeService
         return null;
     }
 
-    public function createResponseResult(AuthCode $authCode, AuthorizeRequest $request, Session $session)
+    public function createResponseResult(AuthCode $authCode, AuthorizeRequest $request, Session $session = null)
     {
+        // TEST
+        if (null === $session) {
+            $session = $this->resolveSessionByAuthCode($authCode);
+        }
+        
         $response = $this->getResponseFactory()->createAuthorizeResponse($authCode, $request, $session);
         $result = Result::constructResponseResult($response);
         
@@ -356,5 +361,20 @@ class AuthorizeService
         $result = Result::constructResponseResult($response);
         
         return $result;
+    }
+
+    protected function resolveSessionByAuthCode(AuthCode $authCode)
+    {
+        $session = $authCode->getSession();
+        if ($session instanceof Session) {
+            return $session;
+        }
+        
+        $session = $this->getSessionService()->fetchSessionByCode($authCode);
+        if ($session instanceof Session) {
+            return $session;
+        }
+        
+        throw new Exception\AuthCodeWithoutSessionException(sprintf("Authorization code '%s' has no session", $authCode->getCode()));
     }
 }

@@ -1,11 +1,10 @@
 <?php
-
 namespace InoOicServer\Oic\AuthCode;
 
 use DateTime;
 use InoOicServer\Oic\EntityInterface;
 use InoOicServer\Util\ConvertToDateTimeTrait;
-
+use InoOicServer\Oic\Session\Session;
 
 /**
  * The OIC authentication code entity.
@@ -45,6 +44,10 @@ class AuthCode implements EntityInterface
      */
     protected $scope;
 
+    /**
+     * @var Session
+     */
+    protected $session;
 
     /**
      * @return string
@@ -54,7 +57,6 @@ class AuthCode implements EntityInterface
         return $this->code;
     }
 
-
     /**
      * @param string $code
      */
@@ -62,7 +64,6 @@ class AuthCode implements EntityInterface
     {
         $this->code = $code;
     }
-
 
     /**
      * @return string
@@ -72,7 +73,6 @@ class AuthCode implements EntityInterface
         return $this->clientId;
     }
 
-
     /**
      * @param string $clientId
      */
@@ -80,7 +80,6 @@ class AuthCode implements EntityInterface
     {
         $this->clientId = $clientId;
     }
-
 
     /**
      * @return string
@@ -90,7 +89,6 @@ class AuthCode implements EntityInterface
         return $this->sessionId;
     }
 
-
     /**
      * @param string $sessionId
      */
@@ -98,7 +96,6 @@ class AuthCode implements EntityInterface
     {
         $this->sessionId = $sessionId;
     }
-
 
     /**
      * @return DateTime
@@ -108,7 +105,6 @@ class AuthCode implements EntityInterface
         return $this->createTime;
     }
 
-
     /**
      * @param string|DateTime $createTime
      */
@@ -116,7 +112,6 @@ class AuthCode implements EntityInterface
     {
         $this->createTime = $this->convertToDateTime($createTime);
     }
-
 
     /**
      * @return DateTime
@@ -126,7 +121,6 @@ class AuthCode implements EntityInterface
         return $this->expirationTime;
     }
 
-
     /**
      * @param string|DateTime $expirationTime
      */
@@ -134,7 +128,6 @@ class AuthCode implements EntityInterface
     {
         $this->expirationTime = $this->convertToDateTime($expirationTime);
     }
-
 
     /**
      * @return string
@@ -144,12 +137,27 @@ class AuthCode implements EntityInterface
         return $this->scope;
     }
 
-
     /**
      * @param string $scope
      */
     public function setScope($scope)
     {
         $this->scope = $scope;
+    }
+
+    /**
+     * @return Session
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
+     * @param Session $session
+     */
+    public function setSession(Session $session)
+    {
+        $this->session = $session;
     }
 }
