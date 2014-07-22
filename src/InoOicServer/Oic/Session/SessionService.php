@@ -17,7 +17,7 @@ use InoOicServer\Oic\User\UserInterface;
  */
 class SessionService implements SessionServiceInterface
 {
-
+    
     use OptionsTrait;
 
     const OPT_AGE = 'age';
@@ -62,7 +62,7 @@ class SessionService implements SessionServiceInterface
         if (! $this->sessionFactory instanceof SessionFactoryInterface) {
             $this->sessionFactory = new SessionFactory();
         }
-
+        
         return $this->sessionFactory;
     }
 
@@ -98,9 +98,9 @@ class SessionService implements SessionServiceInterface
     {
         $age = $this->getOption(self::OPT_AGE);
         $salt = $this->getOption(self::OPT_SALT);
-
+        
         $session = $this->getSessionFactory()->createSession($authSession, $age, $salt, $nonce);
-
+        
         return $session;
     }
 
@@ -169,7 +169,7 @@ class SessionService implements SessionServiceInterface
             $session = $this->createSession($authSession, $nonce);
             $this->saveSession($session);
         }
-
+        
         return $session;
     }
 }

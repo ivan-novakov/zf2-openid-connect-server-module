@@ -185,9 +185,6 @@ class AuthorizeService
         // save Authorize\Request to context
         $context->setAuthorizeRequest($request);
         
-        // save client to context
-        // ?? is it necessary?
-        
         // check if there is active/valid session
         $session = $this->fetchSessionFromRequest($request);
         if ($session) {

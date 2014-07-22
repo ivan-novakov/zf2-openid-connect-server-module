@@ -3,6 +3,7 @@ namespace InoOicServer\Oic\Authorize\Http;
 
 use Zend\Http;
 use Zend\Uri;
+use Zend\Session;
 use InoOicServer\Oic\Authorize\Response\AuthorizeResponse;
 use InoOicServer\Oic\Authorize\Response\AuthorizeErrorResponse;
 use InoOicServer\Oic\Authorize\Response\ClientErrorResponse;
@@ -40,6 +41,11 @@ class HttpService implements HttpServiceInterface
      * @var AuthorizeRequestFactoryInterface
      */
     protected $authorizeRequestFactory;
+
+    /**
+     * @var Session\Container
+     */
+    protected $sessionContainer;
 
     /**
      * @var array
@@ -85,10 +91,11 @@ class HttpService implements HttpServiceInterface
      * @param array $options
      * @param Manager $authenticationManager
      */
-    public function __construct(array $options = array(), Manager $authenticationManager)
+    public function __construct(array $options = array(), Manager $authenticationManager, Session\Container $sessionContainer)
     {
         $this->setOptions($options);
         $this->setAuthenticationManager($authenticationManager);
+        $this->setSessionContainer($sessionContainer);
     }
 
     /**
@@ -148,6 +155,22 @@ class HttpService implements HttpServiceInterface
     }
 
     /**
+     * @return \Zend\Session\Container
+     */
+    public function getSessionContainer()
+    {
+        return $this->sessionContainer;
+    }
+
+    /**
+     * @param \Zend\Session\Container $sessionContainer
+     */
+    public function setSessionContainer(Session\Container $sessionContainer)
+    {
+        $this->sessionContainer = $sessionContainer;
+    }
+
+    /**
      * {@inhertidoc}
      * @see \InoOicServer\Oic\Authorize\Http\HttpServiceInterface::createAuthorizeRequest()
      */
@@ -170,6 +193,7 @@ class HttpService implements HttpServiceInterface
         /*
          * Headers
          */
+        /*
         $cookieManager = $this->getCookieManager();
         
         $sessionId = $cookieManager->getCookieValue($httpRequest, $this->getOption(self::OPT_SESSION_COOKIE_NAME));
@@ -181,7 +205,18 @@ class HttpService implements HttpServiceInterface
         if (null !== $authenticationSessionId) {
             $data['authentication_session_id'] = $authenticationSessionId;
         }
+        */
         
+        //TEST
+        $sessionContainer = $this->getSessionContainer();
+        if ($sessionContainer->offsetExists('session_id')) {
+            $data['session_id'] = $sessionContainer->offsetGet('session_id');
+        }
+        
+        if ($sessionContainer->offsetExists('authentication_session_id')) {
+            $data['authentication_session_id'] = $sessionContainer->offsetGet('authentication_session_id');
+        }
+
         return $this->getAuthorizeRequestFactory()->createRequest($data);
     }
 
@@ -342,10 +377,16 @@ class HttpService implements HttpServiceInterface
             'Location' => $uri->toString()
         ));
         
+        /*
         $httpResponse->getHeaders()->addHeaders(array(
             $this->createSetCookieHeader($this->getOption(self::OPT_AUTH_COOKIE_NAME), $authorizeResponse->getAuthSessionId()),
             $this->createSetCookieHeader($this->getOption(self::OPT_SESSION_COOKIE_NAME), $authorizeResponse->getSessionId())
         ));
+        */
+        // TEST
+        $sessionContainer = $this->getSessionContainer();
+        $sessionContainer->offsetSet('session_id', $authorizeResponse->getSessionId());
+        $sessionContainer->offsetSet('authentication_session_id', $authorizeResponse->getAuthSessionId());
         
         return $httpResponse;
     }
